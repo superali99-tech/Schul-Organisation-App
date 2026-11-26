@@ -15,7 +15,7 @@ pen-line notebook sparkles zap gauge activity hash at-sign external-link databas
 bookmark inbox arrow-right-left replace calendar-clock calendar-check calendar-plus list list-checks traffic-cone siren
 package backpack ban arrow-up-down move square-pen file-down file-up coins dices megaphone circle-x circle-minus
 circle-plus users-round sliders-horizontal type alarm-clock-check badge-check pin-off grid-3x3 table timer-reset
-notebook-text scroll-text`.split(/\s+/).filter(Boolean);
+notebook-text scroll-text send log-out qr-code scan-line cloud bell-ring arrow-right user-round message-square-text`.split(/\s+/).filter(Boolean);
 const out = {};
 for (const n of names) {
   const svg = fs.readFileSync(path.join(dir, n + '.svg'), 'utf8');

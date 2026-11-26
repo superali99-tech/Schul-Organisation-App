@@ -14,6 +14,21 @@ function hexToRgb(hex) {
   const n = parseInt(h.length === 3 ? h.split('').map((c) => c + c).join('') : h, 16);
   return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
 }
+function shiftHue(hex, deg, dl = 0) {
+  let [r, g, b] = hexToRgb(hex).map((x) => x / 255);
+  const mx = Math.max(r, g, b), mn = Math.min(r, g, b);
+  let h = 0, s = 0, l = (mx + mn) / 2;
+  if (mx !== mn) {
+    const d = mx - mn;
+    s = l > 0.5 ? d / (2 - mx - mn) : d / (mx + mn);
+    h = mx === r ? (g - b) / d + (g < b ? 6 : 0) : mx === g ? (b - r) / d + 2 : (r - g) / d + 4;
+    h *= 60;
+  }
+  h = (h + deg + 360) % 360; l = clamp(l + dl, 0, 1);
+  const c = (1 - Math.abs(2 * l - 1)) * s, x = c * (1 - Math.abs(((h / 60) % 2) - 1)), m = l - c / 2;
+  const [r1, g1, b1] = h < 60 ? [c, x, 0] : h < 120 ? [x, c, 0] : h < 180 ? [0, c, x] : h < 240 ? [0, x, c] : h < 300 ? [x, 0, c] : [c, 0, x];
+  return '#' + [r1, g1, b1].map((v) => Math.round((v + m) * 255).toString(16).padStart(2, '0')).join('');
+}
 const rgba = (hex, a) => { const [r, g, b] = hexToRgb(hex || '#64748b'); return `rgba(${r},${g},${b},${a})`; };
 function attrs(o) { return Object.entries(o).filter(([, v]) => v != null && v !== false).map(([k, v]) => (v === true ? k : `${k}="${esc(v)}"`)).join(' '); }
 
@@ -96,6 +111,8 @@ const App = {
     // Navigation
     const tab = v.tab || (path.split('/')[1] || 'today');
     $$('#bottomnav [data-tab]').forEach((b) => b.classList.toggle('on', b.dataset.tab === tab));
+    if (scrollTop) { void main.offsetWidth; main.classList.add('enter'); }
+    $('#topbar').classList.toggle('scrolled', main.scrollTop > 4);
     if (scrollTop && !restore) main.scrollTop = 0;
     else if (restore && this._scroll && this._scroll[path] != null) main.scrollTop = this._scroll[path];
     else main.scrollTop = prevScroll;
@@ -383,6 +400,10 @@ const Files = {
     UI.toast('Datei heruntergeladen');
   },
   csv(filename, rows) { this.save(filename, 'text/csv', toCSV(rows)); },
+  shareFile(filename, mime, content, text = '') {
+    if (Native.has) { Native.call('shareFile', filename, mime, content, text); return; }
+    this.save(filename, mime, content);
+  },
   share(title, text) {
     if (Native.has) { Native.call('shareText', title, text); return; }
     if (navigator.share) { navigator.share({ title, text }).catch(() => {}); return; }
@@ -462,11 +483,12 @@ function applyTheme() {
   const acc = st.accent || '#4f46e5';
   root.style.setProperty('--accent', acc);
   root.style.setProperty('--accent-soft', rgba(acc, dark ? 0.24 : 0.12));
-  root.style.setProperty('--accent-line', rgba(acc, 0.35));
+  root.style.setProperty('--accent-line', rgba(acc, dark ? 0.3 : 0.32));
+  root.style.setProperty('--accent2', shiftHue(acc, 32, 0.04));
   root.style.fontSize = (16 * (st.fontScale || 1)) + 'px';
-  const bar = dark ? '#1a1c22' : '#ffffff';
+  const bar = dark ? '#0b0d13' : '#f3f4fa';
   Native.call('setBarColors', bar, bar, !dark);
-  Native.call('setPageBackground', dark ? '#111318' : '#f5f6fa');
+  Native.call('setPageBackground', bar);
   const meta = document.querySelector('meta[name=theme-color]');
   if (meta) meta.content = bar;
 }

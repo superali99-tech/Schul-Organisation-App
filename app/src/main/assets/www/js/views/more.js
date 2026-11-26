@@ -9,6 +9,11 @@ App.def('/more', () => {
   const fu = S.talks.filter((t) => t.followUp && !t.followUpDone && t.followUp <= td).length;
   const tile = (nav, ic, label, c, badge) => `<button class="tile" data-nav="${nav}" style="--tc:${c};--tc-soft:${rgba(c, .13)}">${badge ? `<span class="badge ${badge.cls || ''}">${badge.v}</span>` : ''}<span class="tile-ic">${icon(ic)}</span>${label}</button>`;
   const h = `<div class="search" data-nav="/search">${icon('search')}<input placeholder="Suchen: Schüler, Klassen, Notizen …" readonly></div>
+  <div class="team-tile" data-nav="/team">
+    <div class="team-logo">${icon('users')}</div>
+    <div class="sp"><b>Kollegium</b><span>${Team.on() ? esc(S.team.name) + ' · ' + plural(S.team.members.length, 'Mitglied', 'Mitglieder') : 'Kolleg:innen einladen & zusammenarbeiten'}</span></div>
+    ${Team.on() && S.team.posts.some((x) => x.by !== S.team.me && (x.updatedAt || 0) > (S.team.seenPosts || 0)) ? '<span class="badge red">Neu</span>' : ''}${icon('chevron-right')}
+  </div>
   <div class="section-title">Organisation</div>
   <div class="tiles">
     ${tile('/tasks', 'list-todo', 'Aufgaben', '#4f46e5', openTasks ? { v: openTasks, cls: overdue ? 'red' : 'acc' } : null)}

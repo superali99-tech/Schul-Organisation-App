@@ -6,7 +6,7 @@ function eventItem(e) {
   const multi = e.end && e.end !== e.date;
   return `<div class="li" data-act="event-edit" data-id="${e.id}">
     <div class="li-ic" style="background:${rgba(t.c, .14)};color:${t.c}">${icon(t.i)}</div>
-    <div class="li-main"><div class="li-t">${esc(e.title)}</div>
+    <div class="li-main"><div class="li-t">${esc(e.title)}${e.team ? ` <span class="badge acc">${icon('users')}Team</span>` : ''}</div>
     <div class="li-s">${esc(t.l)}${e.time ? ' · ' + esc(e.time) + (e.endTime ? '–' + esc(e.endTime) : '') + ' Uhr' : ''}${e.place ? ' · ' + esc(e.place) : ''}${e.classId ? ' · ' + esc(cName(e.classId)) : ''}${multi ? ` · bis ${fmtDS(e.end)}` : ''}</div></div>
     <div class="li-end">${relDay(e.date) && e.date >= today() ? `<span class="badge">${e.date === today() ? 'Heute' : fmtDW(e.date)}</span>` : ''}${e.remind !== '' && e.remind != null ? icon('bell') : ''}</div>
   </div>`;
@@ -126,15 +126,25 @@ function editEvent(e, preset = {}) {
       { k: 'classId', label: 'Klasse (optional)', type: 'select', opts: classOptions(true) },
       { k: 'remind', label: 'Erinnerung', type: 'select', opts: [{ v: '', l: 'Keine' }, { v: '0', l: 'Zum Beginn' }, { v: '15', l: '15 Minuten vorher' }, { v: '30', l: '30 Minuten vorher' }, { v: '60', l: '1 Stunde vorher' }, { v: '1440', l: '1 Tag vorher' }, { v: '2880', l: '2 Tage vorher' }, { v: '10080', l: '1 Woche vorher' }] },
       { k: 'notes', label: 'Notizen', type: 'textarea', rows: 3 },
+      Team.on() ? { k: 'shared', label: `Mit dem Kollegium teilen`, type: 'switch', hint: `Erscheint bei allen im Team „${S.team.name}"` } : null,
     ],
-    values: e ? { ...e, remind: e.remind == null ? '' : String(e.remind) } : { type: 'termin', date: today(), remind: '', ...preset },
+    values: e ? { ...e, remind: e.remind == null ? '' : String(e.remind), shared: !!e.team } : { type: 'termin', date: today(), remind: '', ...preset, shared: !!preset.shared || (Team.on() && ['ferien', 'feiertag', 'konferenz', 'sprechtag'].includes(preset.type) && !!preset.shared) },
     onSave: (v) => {
       if (v.end && v.end < v.date) { UI.toast('„bis" liegt vor dem Startdatum', { type: 'err' }); return false; }
       if (v.remind !== '' && !S.settings.remind.on) { S.settings.remind.on = true; requestNotifPermission(); }
-      upsert('events', { ...(e || {}), ...v });
-      save(); App.refresh(); UI.toast('Gespeichert');
+      const shared = !!v.shared;
+      delete v.shared;
+      const obj = upsert('events', { ...(e || {}), ...v });
+      if (Team.on()) {
+        if (shared) { obj.team = S.team.id; Team.touch(obj); Team.changed(); }
+        else if (e && e.team) {
+          // Nicht mehr teilen: bei allen entfernen, lokal als eigener Termin behalten
+          Team.markDeleted(obj.id); delete obj.team; obj.id = uid(); Team.changed();
+        }
+      }
+      save(); App.refresh(); UI.toast(shared ? 'Gespeichert & mit dem Kollegium geteilt' : 'Gespeichert');
     },
-    onDelete: isNew ? null : () => deleteWithUndo('events', e.id, e.title, { confirm: false }),
+    onDelete: isNew ? null : () => deleteWithUndo('events', e.id, e.title, { confirm: !!e.team, after: () => { if (e.team && Team.on()) { Team.markDeleted(e.id); Team.changed(); } } }),
   });
 }
 

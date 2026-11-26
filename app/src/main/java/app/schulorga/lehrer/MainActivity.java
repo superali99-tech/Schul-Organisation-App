@@ -3,7 +3,9 @@ package app.schulorga.lehrer;
 import android.Manifest;
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
+import android.content.ClipData;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
@@ -72,7 +74,8 @@ public class MainActivity extends Activity {
     private static final int REQ_FILE_CHOOSER = 11;
     private static final int REQ_SAVE_FILE = 12;
     private static final int REQ_PERM_NOTIF = 13;
-    private static final int REQ_PERM_AUDIO = 14;
+    private static final int REQ_PERM_MEDIA = 14;
+    private static final int REQ_SYNC_PICK = 15;
 
     private WebView web;
     private FrameLayout root;
@@ -81,6 +84,8 @@ public class MainActivity extends Activity {
     private byte[] pendingSaveBytes;
     private PermissionRequest pendingPermission;
     private String launchRoute;
+    private String pendingIncoming;
+    private String[] pendingResources;
     private boolean pageReady = false;
 
     @Override
@@ -147,9 +152,50 @@ public class MainActivity extends Activity {
     }
 
     private void handleIntent(Intent intent) {
-        if (intent != null && intent.hasExtra("route")) {
+        if (intent == null) return;
+        if (intent.hasExtra("route")) {
             launchRoute = intent.getStringExtra("route");
             intent.removeExtra("route");
+        }
+        String action = intent.getAction();
+        if (Intent.ACTION_VIEW.equals(action) && intent.getData() != null) {
+            Uri u = intent.getData();
+            if ("schulorga".equals(u.getScheme())) deliverIncoming(u.toString());
+            else readIncomingUri(u);
+        } else if (Intent.ACTION_SEND.equals(action)) {
+            Uri stream = intent.getParcelableExtra(Intent.EXTRA_STREAM);
+            String text = intent.getStringExtra(Intent.EXTRA_TEXT);
+            if (stream != null) readIncomingUri(stream);
+            else if (text != null) deliverIncoming(text);
+        }
+        intent.setAction(Intent.ACTION_MAIN);
+        intent.setData(null);
+    }
+
+    private void readIncomingUri(Uri u) {
+        new Thread(() -> {
+            try (InputStream in = getContentResolver().openInputStream(u)) {
+                if (in == null) return;
+                ByteArrayOutputStream out = new ByteArrayOutputStream();
+                byte[] buf = new byte[16384];
+                int n;
+                while ((n = in.read(buf)) > 0) {
+                    out.write(buf, 0, n);
+                    if (out.size() > 30 * 1024 * 1024) break;
+                }
+                String text = out.toString("UTF-8");
+                runOnUiThread(() -> deliverIncoming(text));
+            } catch (Exception e) {
+                runOnUiThread(() -> Toast.makeText(this, "Datei konnte nicht gelesen werden", Toast.LENGTH_SHORT).show());
+            }
+        }).start();
+    }
+
+    private void deliverIncoming(String text) {
+        if (pageReady) {
+            js("window.App && App.onIncoming && App.onIncoming(" + JSONObject.quote(text) + ")");
+        } else {
+            pendingIncoming = text;
         }
     }
 
@@ -234,6 +280,21 @@ public class MainActivity extends Activity {
                 fileCallback.onReceiveValue(result);
                 fileCallback = null;
             }
+        } else if (requestCode == REQ_SYNC_PICK) {
+            boolean ok = false;
+            String name = "";
+            if (resultCode == RESULT_OK && data != null && data.getData() != null) {
+                Uri u = data.getData();
+                try {
+                    getContentResolver().takePersistableUriPermission(u,
+                            Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+                } catch (Exception ignored) {
+                }
+                name = displayName(u);
+                prefs().edit().putString("syncUri", u.toString()).putString("syncName", name).apply();
+                ok = true;
+            }
+            js("window.App && App.onSyncPicked && App.onSyncPicked(" + ok + "," + JSONObject.quote(name) + ")");
         } else if (requestCode == REQ_SAVE_FILE) {
             boolean ok = false;
             if (resultCode == RESULT_OK && data != null && data.getData() != null && pendingSaveBytes != null) {
@@ -254,13 +315,10 @@ public class MainActivity extends Activity {
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         boolean granted = grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED;
-        if (requestCode == REQ_PERM_AUDIO && pendingPermission != null) {
-            if (granted) {
-                pendingPermission.grant(new String[]{PermissionRequest.RESOURCE_AUDIO_CAPTURE});
-            } else {
-                pendingPermission.deny();
-            }
+        if (requestCode == REQ_PERM_MEDIA && pendingPermission != null) {
+            grantAvailable(pendingPermission, pendingResources);
             pendingPermission = null;
+            pendingResources = null;
         } else if (requestCode == REQ_PERM_NOTIF) {
             js("window.App && App.onNotifPermission && App.onNotifPermission(" + granted + ")");
         }
@@ -311,6 +369,11 @@ public class MainActivity extends Activity {
         @Override
         public void onPageFinished(WebView view, String url) {
             pageReady = true;
+            if (pendingIncoming != null) {
+                String t = pendingIncoming;
+                pendingIncoming = null;
+                deliverIncoming(t);
+            }
         }
     }
 
@@ -326,6 +389,22 @@ public class MainActivity extends Activity {
         if (p.endsWith(".woff2")) return "font/woff2";
         if (p.endsWith(".mp3")) return "audio/mpeg";
         return "application/octet-stream";
+    }
+
+    private static String permissionFor(String resource) {
+        if (PermissionRequest.RESOURCE_AUDIO_CAPTURE.equals(resource)) return Manifest.permission.RECORD_AUDIO;
+        if (PermissionRequest.RESOURCE_VIDEO_CAPTURE.equals(resource)) return Manifest.permission.CAMERA;
+        return null;
+    }
+
+    private void grantAvailable(PermissionRequest request, String[] res) {
+        java.util.List<String> ok = new java.util.ArrayList<>();
+        for (String r : res) {
+            String perm = permissionFor(r);
+            if (perm != null && checkSelfPermission(perm) == PackageManager.PERMISSION_GRANTED) ok.add(r);
+        }
+        if (ok.isEmpty()) request.deny();
+        else request.grant(ok.toArray(new String[0]));
     }
 
     private class AppChrome extends WebChromeClient {
@@ -349,16 +428,18 @@ public class MainActivity extends Activity {
         @Override
         public void onPermissionRequest(PermissionRequest request) {
             runOnUiThread(() -> {
-                boolean audio = Arrays.asList(request.getResources()).contains(PermissionRequest.RESOURCE_AUDIO_CAPTURE);
-                if (!audio) {
-                    request.deny();
-                    return;
+                String[] res = request.getResources();
+                java.util.List<String> missing = new java.util.ArrayList<>();
+                for (String r : res) {
+                    String perm = permissionFor(r);
+                    if (perm != null && checkSelfPermission(perm) != PackageManager.PERMISSION_GRANTED) missing.add(perm);
                 }
-                if (checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
-                    request.grant(new String[]{PermissionRequest.RESOURCE_AUDIO_CAPTURE});
+                if (missing.isEmpty()) {
+                    grantAvailable(request, res);
                 } else {
                     pendingPermission = request;
-                    requestPermissions(new String[]{Manifest.permission.RECORD_AUDIO}, REQ_PERM_AUDIO);
+                    pendingResources = res;
+                    requestPermissions(missing.toArray(new String[0]), REQ_PERM_MEDIA);
                 }
             });
         }
@@ -412,6 +493,46 @@ public class MainActivity extends Activity {
                 for (int i = 0; i < all.length - 14; i++) all[i].delete();
             }
         } catch (Exception ignored) {
+        }
+    }
+
+    private SharedPreferences prefs() {
+        return getSharedPreferences("sync", MODE_PRIVATE);
+    }
+
+    private String displayName(Uri u) {
+        try (android.database.Cursor c = getContentResolver().query(u,
+                new String[]{android.provider.OpenableColumns.DISPLAY_NAME}, null, null, null)) {
+            if (c != null && c.moveToFirst()) return c.getString(0);
+        } catch (Exception ignored) {
+        }
+        String last = u.getLastPathSegment();
+        return last == null ? "Team-Datei" : last;
+    }
+
+    private String readUri(Uri u) throws IOException {
+        try (InputStream in = getContentResolver().openInputStream(u)) {
+            if (in == null) return "";
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            byte[] buf = new byte[16384];
+            int n;
+            while ((n = in.read(buf)) > 0) out.write(buf, 0, n);
+            return out.toString("UTF-8");
+        }
+    }
+
+    private void writeUri(Uri u, String content) throws IOException {
+        byte[] bytes = content.getBytes(StandardCharsets.UTF_8);
+        OutputStream out;
+        try {
+            out = getContentResolver().openOutputStream(u, "wt");
+        } catch (Exception e) {
+            out = getContentResolver().openOutputStream(u, "w");
+        }
+        if (out == null) throw new IOException("kein Zugriff");
+        try (OutputStream o = out) {
+            o.write(bytes);
+            o.flush();
         }
     }
 
@@ -487,6 +608,142 @@ public class MainActivity extends Activity {
                     js("window.App && App.onFileSaved && App.onFileSaved(false)");
                 }
             });
+        }
+
+        @JavascriptInterface
+        public void shareFile(String filename, String mime, String content, String text) {
+            runOnUiThread(() -> {
+                try {
+                    String safe = filename.replaceAll("[^A-Za-z0-9._ -]", "_");
+                    File f = new File(ShareProvider.shareDir(MainActivity.this), safe);
+                    try (FileOutputStream out = new FileOutputStream(f)) {
+                        out.write(content.getBytes(StandardCharsets.UTF_8));
+                    }
+                    Uri uri = ShareProvider.uriFor(safe);
+                    Intent i = new Intent(Intent.ACTION_SEND);
+                    i.setType(mime == null || mime.isEmpty() ? "application/octet-stream" : mime);
+                    i.putExtra(Intent.EXTRA_STREAM, uri);
+                    i.putExtra(Intent.EXTRA_SUBJECT, safe);
+                    if (text != null && !text.isEmpty()) i.putExtra(Intent.EXTRA_TEXT, text);
+                    i.setClipData(ClipData.newRawUri(safe, uri));
+                    i.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    startActivity(Intent.createChooser(i, "Teilen").addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION));
+                } catch (Exception e) {
+                    Toast.makeText(MainActivity.this, "Teilen nicht möglich", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+
+        @JavascriptInterface
+        public void shareApk() {
+            new Thread(() -> {
+                try {
+                    File src = new File(getApplicationInfo().sourceDir);
+                    File dst = new File(ShareProvider.shareDir(MainActivity.this), "SchulOrga.apk");
+                    try (FileInputStream in = new FileInputStream(src); FileOutputStream out = new FileOutputStream(dst)) {
+                        byte[] buf = new byte[65536];
+                        int n;
+                        while ((n = in.read(buf)) > 0) out.write(buf, 0, n);
+                    }
+                    runOnUiThread(() -> {
+                        Uri uri = ShareProvider.uriFor("SchulOrga.apk");
+                        Intent i = new Intent(Intent.ACTION_SEND);
+                        i.setType("application/vnd.android.package-archive");
+                        i.putExtra(Intent.EXTRA_STREAM, uri);
+                        i.putExtra(Intent.EXTRA_TEXT, "SchulOrga – Organisations-App für Lehrkräfte. APK öffnen und installieren.");
+                        i.setClipData(ClipData.newRawUri("SchulOrga.apk", uri));
+                        i.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                        startActivity(Intent.createChooser(i, "App teilen").addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION));
+                    });
+                } catch (Exception e) {
+                    runOnUiThread(() -> Toast.makeText(MainActivity.this, "App konnte nicht geteilt werden", Toast.LENGTH_SHORT).show());
+                }
+            }).start();
+        }
+
+        @JavascriptInterface
+        public String getIncoming() {
+            String r = pendingIncoming;
+            pendingIncoming = null;
+            return r == null ? "" : r;
+        }
+
+        @JavascriptInterface
+        public void syncPick(boolean create, String suggestedName) {
+            runOnUiThread(() -> {
+                try {
+                    Intent i = new Intent(create ? Intent.ACTION_CREATE_DOCUMENT : Intent.ACTION_OPEN_DOCUMENT);
+                    i.addCategory(Intent.CATEGORY_OPENABLE);
+                    i.setType(create ? "application/json" : "*/*");
+                    if (create) i.putExtra(Intent.EXTRA_TITLE, suggestedName);
+                    i.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                            | Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
+                    startActivityForResult(i, REQ_SYNC_PICK);
+                } catch (Exception e) {
+                    js("window.App && App.onSyncPicked && App.onSyncPicked(false, '')");
+                }
+            });
+        }
+
+        @JavascriptInterface
+        public String syncInfo() {
+            String u = prefs().getString("syncUri", "");
+            if (u.isEmpty()) return "";
+            try {
+                JSONObject o = new JSONObject();
+                o.put("uri", u);
+                o.put("name", prefs().getString("syncName", "Team-Datei"));
+                return o.toString();
+            } catch (Exception e) {
+                return "";
+            }
+        }
+
+        @JavascriptInterface
+        public void syncClear() {
+            String u = prefs().getString("syncUri", "");
+            if (!u.isEmpty()) {
+                try {
+                    getContentResolver().releasePersistableUriPermission(Uri.parse(u),
+                            Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+                } catch (Exception ignored) {
+                }
+            }
+            prefs().edit().clear().apply();
+        }
+
+        @JavascriptInterface
+        public void syncRead(String reqId) {
+            String u = prefs().getString("syncUri", "");
+            new Thread(() -> {
+                boolean ok = false;
+                String content = "";
+                try {
+                    if (!u.isEmpty()) {
+                        content = readUri(Uri.parse(u));
+                        ok = true;
+                    }
+                } catch (Exception e) {
+                    content = String.valueOf(e.getMessage());
+                }
+                js("window.App && App.onSyncData && App.onSyncData(" + JSONObject.quote(reqId) + "," + ok + "," + JSONObject.quote(content) + ")");
+            }).start();
+        }
+
+        @JavascriptInterface
+        public void syncWrite(String reqId, String content) {
+            String u = prefs().getString("syncUri", "");
+            new Thread(() -> {
+                boolean ok = false;
+                try {
+                    if (!u.isEmpty()) {
+                        writeUri(Uri.parse(u), content);
+                        ok = true;
+                    }
+                } catch (Exception ignored) {
+                }
+                js("window.App && App.onSyncWritten && App.onSyncWritten(" + JSONObject.quote(reqId) + "," + ok + ")");
+            }).start();
         }
 
         @JavascriptInterface

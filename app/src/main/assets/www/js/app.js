@@ -68,6 +68,7 @@ App.onPause = () => {
 };
 App.onResume = () => {
   Lock.maybeLock();
+  if (App.onTeamResume) App.onTeamResume();
   if (App.path === '/today' && !UI.stack.length) App.refresh();
 };
 App.onSystemTheme = () => applyTheme();
@@ -103,9 +104,13 @@ if (window.matchMedia) {
   if (launch) { App.stack = [start, launch]; }
   else if (!Native.has && hash && hash !== '/' && App.match(hash)) { App.stack = hash === start ? [start] : [start, hash]; }
   else App.stack = [start];
+  $('#view').addEventListener('scroll', () => $('#topbar').classList.toggle('scrolled', $('#view').scrollTop > 4), { passive: true });
   App.render();
   Lock.maybeLock(true);
-  if (!S.settings.onboarded) setTimeout(showOnboarding, 300);
+  const incoming = Native.has ? Native.call('getIncoming') : '';
+  if (incoming) setTimeout(() => App.onIncoming(incoming), 400);
+  else if (!S.settings.onboarded) setTimeout(showOnboarding, 300);
+  setTimeout(() => { if (App.onTeamResume) App.onTeamResume(); }, 2500);
   // Minütlich die Startseite aktualisieren (aktuelle Stunde)
   setInterval(() => { if ((App.path === '/today' || App.path.startsWith('/timetable')) && !UI.stack.length && !document.hidden && !document.activeElement.matches('input,textarea,select')) App.refresh(); }, 60000);
   syncReminders();

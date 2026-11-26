@@ -269,6 +269,7 @@ function defaultData() {
     changes: [],
     seating: {},
     pickHistory: {},
+    team: null,
   };
 }
 
@@ -320,8 +321,8 @@ function removeById(coll, id) { const i = S[coll].findIndex((x) => x.id === id);
 function upsert(coll, obj) {
   if (!obj.id) obj.id = uid();
   const i = S[coll].findIndex((x) => x.id === obj.id);
-  if (i >= 0) S[coll][i] = { ...S[coll][i], ...obj };
-  else S[coll].push(obj);
+  if (i >= 0) { S[coll][i] = { ...S[coll][i], ...obj }; return S[coll][i]; }
+  S[coll].push(obj);
   return obj;
 }
 const activeClasses = () => S.classes.filter((c) => !c.archived).sort((a, b) => cmpStr(a.name, b.name));
@@ -399,6 +400,21 @@ function lessonsOn(date) {
       const orig = S.timetable.find((t) => t.day === dow(ch.date) && t.period === ch.period && (!ch.classId || t.classId === ch.classId));
       list.push({ id: 'mv-' + ch.id, day: d, period: ch.toPeriod, classId: ch.classId || (orig && orig.classId), subjectId: ch.subjectId || (orig && orig.subjectId), room: ch.room || (orig && orig.room), date, src: 'change', change: ch, extra: true });
     }
+  }
+  // Vertretungen aus dem Schulteam
+  if (S.team && S.team.id) {
+    const me = S.team.me;
+    S.team.subs.filter((x) => x.date === date).forEach((x) => {
+      if (x.sub === me) {
+        const lc = S.classes.find((c) => c.name.toLowerCase() === String(x.className || '').toLowerCase());
+        list.push({ id: 'ts-' + x.id, day: d, period: Number(x.period), classId: lc ? lc.id : '', subjectId: '', room: x.room, date, src: 'team', extra: true, teamSub: x,
+          change: { type: 'vertretung', note: `Vertretung ${x.className || ''}${x.subject ? ' · ' + x.subject : ''}${x.absent ? ' für ' + teamMemberName(x.absent, true) : ''}` } });
+      }
+      if (x.absent === me) {
+        const l = list.find((y) => y.period === Number(x.period) && !y.extra);
+        if (l) { l.cancelled = { id: 'ts-' + x.id, note: x.sub ? `Vertretung durch ${teamMemberName(x.sub)}` : 'Du bist als abwesend eingetragen' }; l.teamSub = x; }
+      }
+    });
   }
   if (hol) list.forEach((l) => { l.holiday = hol; });
   return list.sort((a, b) => a.period - b.period);

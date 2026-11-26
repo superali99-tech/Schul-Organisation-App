@@ -72,8 +72,19 @@ App.def('/today', () => {
   const wt = weekType(d);
   const out = [];
 
-  out.push(`<div class="hello"><h2>${greeting()}${teacherName() ? ', ' + esc(teacherName()) : ''}!</h2>
-    <div class="muted">${fmtDL(d)} · KW ${isoWeek(d)}${wt ? ` · ${wt}-Woche` : ''}</div></div>`);
+  const lessonsToday = lessonsOn(d).filter((l) => !l.cancelled && !l.holiday).length;
+  const openTasks = S.tasks.filter((t) => !t.done && (!t.due || t.due <= addDays(d, 2))).length;
+  const examsWeek = S.assessments.filter((a) => a.date && a.date >= d && a.date <= addDays(d, 7) && (cat(a.catId) || {}).exam).length;
+  const dd = pd(d);
+  out.push(`<div class="today-hero">
+    <div class="th-date">${WD[dow(d)]}, ${dd.getDate()}. ${MONTHS[dd.getMonth()]}</div>
+    <h2>${greeting()}${teacherName() ? ', ' + esc(teacherName()) : ''}!</h2>
+    <div class="th-sub">KW ${isoWeek(d)}${wt ? ` · ${wt}-Woche` : ''}${st.school ? ' · ' + esc(st.school) : ''}</div>
+    <div class="th-stats">
+      <div data-nav="/timetable" data-root><b>${lessonsToday}</b><span>${lessonsToday === 1 ? 'Stunde' : 'Stunden'} heute</span></div>
+      <div data-nav="/tasks"><b>${openTasks}</b><span>Aufgaben fällig</span></div>
+      <div data-nav="/overview/exams"><b>${examsWeek}</b><span>Prüfungen</span></div>
+    </div></div>`);
 
   const empty = !S.classes.length && !S.timetable.length;
   if (empty) {
@@ -126,13 +137,15 @@ App.def('/today', () => {
   }
 
   // Schnellaktionen
-  out.push(`<div class="quick">
-    <button class="btn" data-nav="/tool/random">${icon('shuffle')}Zufallsauswahl</button>
-    <button class="btn" data-nav="/tool/timer">${icon('timer')}Timer</button>
-    <button class="btn" data-act="task-add">${icon('list-todo')}Aufgabe</button>
-    <button class="btn" data-act="note-new">${icon('sticky-note')}Notiz</button>
-    <button class="btn" data-act="hw-add">${icon('book-open')}Hausaufgabe</button>
-    <button class="btn" data-nav="/tool/groups">${icon('users-round')}Gruppen</button>
+  const q = (attr, ic, label, c) => `<button ${attr}><span class="q-ic" style="--qc:${c}">${icon(ic)}</span>${label}</button>`;
+  out.push(`<div class="quick2">
+    ${q('data-nav="/tool/random"', 'shuffle', 'Zufall', '#6366f1')}
+    ${q('data-nav="/tool/timer"', 'timer', 'Timer', '#f97316')}
+    ${q('data-act="task-add"', 'list-todo', 'Aufgabe', '#0ea5e9')}
+    ${q('data-act="note-new"', 'sticky-note', 'Notiz', '#eab308')}
+    ${q('data-act="hw-add"', 'book-open', 'Hausaufg.', '#14b8a6')}
+    ${q('data-nav="/tool/groups"', 'users-round', 'Gruppen', '#ec4899')}
+    ${q('data-nav="/team"', 'users', 'Kollegium', '#8b5cf6')}
   </div>`);
 
   out.push('<div class="two-col"><div>');
@@ -194,9 +207,30 @@ App.def('/today', () => {
   }
   out.push('</div></div>');
 
+  // Kollegium
+  if (Team.on()) {
+    const t = S.team;
+    const unread = sortBy(t.posts.filter((x) => x.by !== t.me && (x.updatedAt || 0) > (t.seenPosts || 0)), (x) => -(x.updatedAt || 0));
+    const mySubs = sortBy(t.subs.filter((x) => x.sub === t.me && x.date >= d && x.date <= addDays(d, 7)), 'date', (x) => Number(x.period));
+    const open = t.subs.filter((x) => !x.sub && x.date >= d).length;
+    if (unread.length || mySubs.length || open) {
+      out.push(`<div class="card team-card"><div class="card-h"><h3>${icon('users')}Kollegium · ${esc(t.name)}</h3><button class="link" data-nav="/team">Öffnen</button></div>
+        ${unread.slice(0, 3).map((x) => `<div class="mini-post" data-nav="/team/board"><b>${esc(teamMemberName(x.by, true))}:</b> ${esc(x.title || (x.text || '').slice(0, 80))}</div>`).join('')}
+        ${mySubs.map((x) => `<div class="mini-post" data-nav="/lesson/${x.date}/${x.period}">${icon('replace')} <b>Vertretung ${relDay(x.date)}, ${Number(x.period) + 1}. Std.:</b> ${esc(x.className)}${x.room ? ' · Raum ' + esc(x.room) : ''}</div>`).join('')}
+        ${open ? `<div class="mini-post" data-nav="/team/subs">${icon('triangle-alert')} ${plural(open, 'offene Vertretung', 'offene Vertretungen')} im Team</div>` : ''}
+      </div>`);
+    }
+  } else if (!st.teamPromoHidden && S.classes.length) {
+    out.push(`<div class="promo"><button class="promo-x" data-act="team-promo-hide" aria-label="Ausblenden">${icon('x')}</button>
+      <div class="promo-ic">${icon('users')}</div><div class="sp"><b>Arbeite mit deinem Kollegium</b><span>Lade Kolleg:innen ein und teilt Termine, Vertretungen & Klassenlisten.</span></div>
+      <button class="btn btn-sm btn-white" data-nav="/team">Los</button></div>`);
+  }
+
   return {
     title: 'SchulOrga', sub: st.school || 'Dein Schulplaner', tab: 'today', icon: 'graduation-cap',
     actions: [{ icon: 'search', nav: '/search', label: 'Suche' }],
     html: out.join(''),
   };
 });
+
+A['team-promo-hide'] = () => { S.settings.teamPromoHidden = true; save(); App.refresh(); };
