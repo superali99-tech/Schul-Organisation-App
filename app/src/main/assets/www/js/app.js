@@ -103,6 +103,21 @@ const syncReminders = debounce(() => {
 }, 1500);
 Store.onSave(syncReminders);
 
+// ------------------------------------------------------------------ Web-App: offline nutzbar und automatisch aktuell
+if (!Native.has && 'serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
+  navigator.serviceWorker.register('sw.js').then((reg) => {
+    reg.addEventListener('updatefound', () => {
+      const w = reg.installing;
+      if (!w) return;
+      w.addEventListener('statechange', () => {
+        if (w.state === 'installed' && navigator.serviceWorker.controller) {
+          UI.toast('Neue Version geladen – sie gilt ab dem nächsten Öffnen', { ms: 5000 });
+        }
+      });
+    });
+  }).catch(() => {});
+}
+
 // ------------------------------------------------------------------ Startbildschirm-Widgets
 function buildWidgetData() {
   const td = today();

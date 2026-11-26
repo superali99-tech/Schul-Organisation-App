@@ -22,7 +22,7 @@
 
 <div class="page-head"><div class="wrap"><span class="eyebrow">Anleitung</span><h1>So nutzt du Schulplan</h1><p class="lead">Von der Installation über die Einrichtung bis zu Kollegium, Benachrichtigungen und Datensicherung. Springe direkt zu dem Thema, das du brauchst.</p></div></div>
 <div class="wrap doc">
-<nav class="toc" aria-label="Inhalt"><strong>Inhalt</strong><ol><li><a href="#version">Welche Version brauche ich?</a></li><li><a href="#android">Installation auf Android</a></li><li><a href="#windows">Installation unter Windows</a></li><li><a href="#mac">Installation auf dem Mac</a></li><li><a href="#start">Erste Schritte</a></li><li><a href="#stundenplan">Stundenplan & Vertretungen</a></li><li><a href="#unterricht">Eine Stunde halten</a></li><li><a href="#noten">Noten & Leistungsnachweise</a></li><li><a href="#anwesenheit">Anwesenheit</a></li><li><a href="#organisation">Hausaufgaben, Aufgaben & Kalender</a></li><li><a href="#kollegium">Kollegium</a></li><li><a href="#benachrichtigungen">Benachrichtigungen</a></li><li><a href="#widgets">Widgets (Android)</a></li><li><a href="#werkzeuge">Werkzeuge</a></li><li><a href="#sicherung">Datensicherung & Gerätewechsel</a></li><li><a href="#updates">Updates</a></li><li><a href="#sicherheit">PIN & Datenschutz-Einstellungen</a></li><li><a href="#probleme">Hilfe bei Problemen</a></li><li><a href="#deinstallieren">Deinstallieren</a></li></ol></nav>
+<nav class="toc" aria-label="Inhalt"><strong>Inhalt</strong><ol><li><a href="#version">Welche Version brauche ich?</a></li><li><a href="#android">Installation auf Android</a></li><li><a href="#windows">Installation unter Windows</a></li><li><a href="#smart-app-control">Windows: Smart App Control</a></li><li><a href="#mac">Installation auf dem Mac</a></li><li><a href="#webapp">Web-App (Browser)</a></li><li><a href="#start">Erste Schritte</a></li><li><a href="#stundenplan">Stundenplan & Vertretungen</a></li><li><a href="#unterricht">Eine Stunde halten</a></li><li><a href="#noten">Noten & Leistungsnachweise</a></li><li><a href="#anwesenheit">Anwesenheit</a></li><li><a href="#organisation">Hausaufgaben, Aufgaben & Kalender</a></li><li><a href="#kollegium">Kollegium</a></li><li><a href="#benachrichtigungen">Benachrichtigungen</a></li><li><a href="#widgets">Widgets (Android)</a></li><li><a href="#werkzeuge">Werkzeuge</a></li><li><a href="#sicherung">Datensicherung & Gerätewechsel</a></li><li><a href="#updates">Updates</a></li><li><a href="#sicherheit">PIN & Datenschutz-Einstellungen</a></li><li><a href="#probleme">Hilfe bei Problemen</a></li><li><a href="#deinstallieren">Deinstallieren</a></li></ol></nav>
 <article class="prose">
 <div id="installation"></div>
 <section id="version">
@@ -34,6 +34,7 @@
       <tr><td>Windows-PC oder -Laptop</td><td><a href="https://raw.githubusercontent.com/superali99-tech/Schul-Organisation-App/HEAD/release/Schulplan-Setup.exe">Schulplan-Setup.exe</a></td><td>Windows 10 oder 11, 64 Bit</td></tr>
       <tr><td>Mac mit M1, M2, M3 oder M4</td><td><a href="https://raw.githubusercontent.com/superali99-tech/Schul-Organisation-App/HEAD/release/Schulplan-Mac-AppleSilicon.zip">Schulplan-Mac-AppleSilicon.zip</a></td><td>macOS 11 oder neuer</td></tr>
       <tr><td>Mac mit Intel-Prozessor</td><td><a href="https://raw.githubusercontent.com/superali99-tech/Schul-Organisation-App/HEAD/release/Schulplan-Mac-Intel.zip">Schulplan-Mac-Intel.zip</a></td><td>macOS 11 oder neuer</td></tr>
+      <tr><td>iPhone, iPad, Chromebook, Linux – oder wenn Windows blockiert</td><td><a href="app/">Web-App im Browser</a></td><td>Aktueller Browser</td></tr>
     </tbody></table></div>
   <p><strong>Welchen Chip hat mein Mac?</strong> Klicke oben links auf das Apple-Menü  → <em>Über diesen Mac</em>. Steht bei „Chip“ <em>Apple M1</em> (oder M2, M3, M4), nimm Apple Silicon. Steht bei „Prozessor“ <em>Intel</em>, nimm die Intel-Version.</p>
 </section>
@@ -66,6 +67,20 @@
   </ul>
 </section>
 
+<section id="smart-app-control">
+  <h2>Windows: „Smart App Control hat eine App blockiert“</h2>
+  <p>Auf manchen Windows-11-PCs ist <strong>Smart App Control</strong> eingeschaltet. Es lässt nur Programme starten, die mit einem gekauften Zertifikat signiert sind oder die Microsoft bereits kennt. Schulplan wird kostenlos verteilt und hat (noch) kein solches Zertifikat. Anders als bei der SmartScreen-Meldung gibt es hier <strong>keinen „Trotzdem ausführen“-Knopf</strong>. Die Installation selbst hat trotzdem geklappt – nur der Start wird verhindert.</p>
+  <h3>Lösung 1 (empfohlen): Web-App nutzen</h3>
+  <p>Öffne die <a href="#webapp">Web-App</a> in Edge oder Chrome und installiere sie dort als App. Sie bekommt ein eigenes Fenster und ein Symbol auf dem Desktop und wird von Smart App Control nicht blockiert. Danach kannst du Schulplan über <em>Einstellungen → Apps → Installierte Apps</em> wieder deinstallieren.</p>
+  <h3>Lösung 2: Smart App Control ausschalten</h3>
+  <ol class="steps">
+    <li><div><h4>Windows-Sicherheit öffnen</h4><p>Start → „Windows-Sicherheit“ eingeben und öffnen.</p></div></li>
+    <li><div><h4>App- &amp; Browsersteuerung</h4><p>Links <strong>App- &amp; Browsersteuerung</strong> → <strong>Smart App Control-Einstellungen</strong>.</p></div></li>
+    <li><div><h4>Ausschalten</h4><p><strong>Aus</strong> wählen und Schulplan über das Desktop-Symbol starten.</p></div></li>
+  </ol>
+  <div class="notice"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3" /><path d="M12 9v4" /><path d="M12 17h.01" /></svg><div>Smart App Control ist ein zusätzlicher Schutz. Je nach Windows-Version lässt es sich nach dem Ausschalten nur durch Zurücksetzen von Windows wieder einschalten. Der normale Virenschutz (Microsoft Defender) bleibt aktiv. Auf Dienstgeräten entscheidet die IT der Schule – nutze dort die Web-App.</div></div>
+</section>
+
 <section id="mac">
   <h2>Installation auf dem Mac</h2>
   <ol class="steps">
@@ -80,6 +95,28 @@
     <li>Mit <kbd>⌘</kbd> <kbd>1</kbd> bis <kbd>4</kbd> springst du zu Heute, Stundenplan, Klassen und Kalender.</li>
     <li>Deine Daten liegen unter <code>~/Library/Application Support/Schulplan</code>.</li>
     <li>Beim ersten QR-Scan bzw. bei der Lautstärke-Ampel fragt macOS nach Kamera bzw. Mikrofon.</li>
+  </ul>
+</section>
+
+<section id="webapp">
+  <h2>Web-App (im Browser)</h2>
+  <p>Die Web-App ist Schulplan ohne Installationsdatei. Sie läuft in jedem aktuellen Browser, lässt sich als App installieren, funktioniert offline und aktualisiert sich beim Öffnen von selbst. Adresse: <a href="app/">Web-App öffnen</a>.</p>
+  <h3>Windows und Mac mit Edge oder Chrome</h3>
+  <ol class="steps">
+    <li><div><h4>Web-App öffnen</h4><p>Öffne die Web-App in <strong>Microsoft Edge</strong> oder <strong>Google Chrome</strong>.</p></div></li>
+    <li><div><h4>Als App installieren</h4><p>Edge: Menü <strong>⋯</strong> → <strong>Apps</strong> → <strong>Diese Website als App installieren</strong>. Chrome: Symbol <strong>Installieren</strong> rechts in der Adressleiste (oder Menü <strong>⋮</strong> → <strong>Streamen, speichern und teilen</strong> → <strong>Seite als App installieren</strong>).</p></div></li>
+    <li><div><h4>Aufs Desktop legen</h4><p>Bestätige „Auf dem Desktop anheften“ bzw. „Desktopverknüpfung erstellen“. Schulplan öffnet sich jetzt in einem eigenen Fenster.</p></div></li>
+  </ol>
+  <h3>iPhone und iPad</h3>
+  <ol class="steps">
+    <li><div><h4>In Safari öffnen</h4><p>Öffne die Web-App in <strong>Safari</strong>.</p></div></li>
+    <li><div><h4>Zum Home-Bildschirm</h4><p>Tippe auf <strong>Teilen</strong> (Quadrat mit Pfeil) → <strong>Zum Home-Bildschirm</strong> → <strong>Hinzufügen</strong>.</p></div></li>
+  </ol>
+  <h3>Gut zu wissen</h3>
+  <ul>
+    <li>Die Daten der Web-App liegen im jeweiligen <strong>Browser</strong> auf deinem Gerät. Löscht du die Browserdaten für die Seite, sind sie weg – exportiere deshalb regelmäßig eine Sicherung.</li>
+    <li>Die Daten sind getrennt von der Android-, Windows- oder Mac-App. Zum Übertragen eine Sicherung exportieren und in der Web-App wiederherstellen.</li>
+    <li>Erinnerungen und Widgets gibt es nur in den installierten Apps. Die Web-App kann Benachrichtigungen nur zeigen, solange sie geöffnet ist.</li>
   </ul>
 </section>
 

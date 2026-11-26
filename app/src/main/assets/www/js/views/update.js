@@ -49,7 +49,7 @@ const Update = {
   current() { return Native.has ? Number(Native.call('versionCode')) || 0 : 0; },
   versionName() { return Native.has ? Native.call('appVersion') : 'Web'; },
   check(silent = true) {
-    if (!Native.has) { if (!silent) UI.toast('Updates gibt es nur in der installierten Android-App'); return Promise.resolve(null); }
+    if (!Native.has) { if (!silent) UI.toast('Die Web-App aktualisiert sich beim Öffnen automatisch – du hast immer die neueste Version.'); return Promise.resolve(null); }
     Native.call('setUpdateUrls', JSON.stringify(Update.urls()));
     Update.lastCheck = Date.now();
     if (!silent) { Update.state = 'checking'; Update.redraw(); }

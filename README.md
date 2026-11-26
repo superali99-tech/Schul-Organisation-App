@@ -4,6 +4,7 @@ Eine Android-App, die den Schulalltag für Lehrerinnen und Lehrer organisiert. S
 
 📦 **Android:** [`release/Schulplan.apk`](release/Schulplan.apk) (Android 7.0 oder neuer)  
 🖥️ **Windows:** [`release/Schulplan-Setup.exe`](release/Schulplan-Setup.exe) (Windows 10/11, 64 Bit)  
+🌐 **Web-App (ohne Installationsdatei, auch iPhone/iPad):** https://superali99-tech.github.io/Schul-Organisation-App/app/  
 🍎 **Mac:** [`Schulplan-Mac-AppleSilicon.zip`](release/Schulplan-Mac-AppleSilicon.zip) (M1/M2/M3/M4) · [`Schulplan-Mac-Intel.zip`](release/Schulplan-Mac-Intel.zip) (ältere Macs) – macOS 11 oder neuer
 
 🌐 **Website:** https://superali99-tech.github.io/Schul-Organisation-App/ – Downloads, ausführliche Anleitung, Datenschutzerklärung, Nutzungsrichtlinien und Lizenz (Quelle im Ordner `docs/`).
@@ -124,7 +125,9 @@ Die App lädt `https://raw.githubusercontent.com/superali99-tech/Schul-Organisat
 
 ## Website (GitHub Pages)
 
-Die Website liegt im Ordner `docs/` (reines HTML/CSS, keine Cookies, kein Tracking, Schriften lokal). Einmalig einschalten: GitHub → *Settings* → *Pages* → *Build and deployment*: „Deploy from a branch“, Branch `ccr-c2cca40c-1fdkle` (bzw. der Standard-Branch), Ordner `/docs` → *Save*. Nach einer Minute ist sie unter https://superali99-tech.github.io/Schul-Organisation-App/ erreichbar. Bei neuen Versionen Versionsnummern, Größen und Prüfsummen in `docs/index.html` und `docs/script.js` anpassen.
+Die Website liegt im Ordner `docs/` (reines HTML/CSS, keine Cookies, kein Tracking, Schriften lokal). Einmalig einschalten: GitHub → *Settings* → *Pages* → *Build and deployment*: „Deploy from a branch“, Branch `ccr-c2cca40c-1fdkle` (bzw. der Standard-Branch), Ordner `/docs` → *Save*. Nach einer Minute ist sie unter https://superali99-tech.github.io/Schul-Organisation-App/ erreichbar. Bei neuen Versionen Versionsnummern, Größen und Prüfsummen in `docs/index.html` und `docs/script.js` anpassen und die Web-App mit `node tools/build-webapp.js` neu nach `docs/app/` bauen.
+
+**Windows meldet „Smart App Control hat eine App blockiert“:** Diese Windows-11-Funktion lässt unsignierte Programme gar nicht starten (kein „Trotzdem ausführen“). Abhilfe: die Web-App nutzen (in Edge/Chrome als App installieren) oder Smart App Control unter *Windows-Sicherheit → App- & Browsersteuerung* ausschalten. Dauerhaft hilft nur ein Code-Signing-Zertifikat.
 
 ## Technik & selbst bauen
 

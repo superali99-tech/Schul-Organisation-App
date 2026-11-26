@@ -98,6 +98,7 @@
           <a class="btn btn-primary" href="https://raw.githubusercontent.com/superali99-tech/Schul-Organisation-App/HEAD/release/Schulplan-Setup.exe"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" x2="12" y1="15" y2="3" /></svg><span class="stack">Installer herunterladen<small>Ohne Administratorrechte</small></span></a>
           <a class="btn btn-ghost btn-sm" href="anleitung.html#windows"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 7v14" /><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z" /></svg>Installation unter Windows</a>
         </div>
+        <p class="checksum">Blockiert Windows 11 die App mit „Smart App Control“? Dann nutze die <a href="#webapp">Web-App</a> oder lies <a href="anleitung.html#smart-app-control">diese Hilfe</a>.</p>
         <details class="checksum"><summary>Prüfsumme (SHA-256)</summary><div class="hash"><code>95d87e3f4711e617d69d5487ebcbcc6aa29fab97b7bcad01b60dc2c8e585bff6</code><button class="copy" type="button">Kopieren</button></div></details>
       </article>
       <article class="platform" data-platform="mac">
@@ -111,8 +112,16 @@
         <details class="checksum"><summary>Prüfsummen (SHA-256)</summary><div class="hash"><code>85a85b91b029a549372f3b0b67790a33ad05aaef4db6f04104836bf0cbca199c</code><button class="copy" type="button">Kopieren</button></div><p class="muted" style="font-size:.78rem">Apple Silicon</p><div class="hash"><code>4dfdbb6e39347457a2e0738aaff3c935e6f3a8ddbedbf203ce7dcd6560ed3041</code><button class="copy" type="button">Kopieren</button></div><p class="muted" style="font-size:.78rem">Intel</p></details>
       </article>
     </div>
+    <article class="platform webapp" id="webapp" style="margin-top:20px">
+      <div class="platform-head"><span class="os"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h6v6" /><path d="M10 14 21 3" /><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" /></svg></span><div><h3>Web-App – ohne Installationsdatei</h3><p>Für iPhone, iPad, Chromebook, Linux und wenn Windows die App blockiert</p></div></div>
+      <p class="muted">Schulplan läuft auch direkt im Browser und lässt sich dort als App installieren – mit eigenem Symbol auf dem Desktop bzw. Home-Bildschirm. Sie funktioniert offline und ist immer auf dem neuesten Stand. Deine Daten bleiben im Browser auf deinem Gerät.</p>
+      <div class="hero-cta">
+        <a class="btn btn-primary" href="app/"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h6v6" /><path d="M10 14 21 3" /><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" /></svg><span class="stack">Web-App öffnen<small>Edge, Chrome, Safari oder Firefox</small></span></a>
+        <a class="btn btn-ghost btn-sm" href="anleitung.html#webapp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 7v14" /><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z" /></svg>So installierst du die Web-App</a>
+      </div>
+    </article>
     <div style="display:grid;gap:12px;margin-top:22px">
-      <div class="notice info" id="ios-note" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10" /><path d="M12 16v-4" /><path d="M12 8h.01" /></svg><div><strong>iPhone und iPad:</strong> Für Apple-Mobilgeräte gibt es Schulplan noch nicht. Nutze am Computer die Windows- oder Mac-Version.</div></div>
+      <div class="notice info" id="ios-note" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10" /><path d="M12 16v-4" /><path d="M12 8h.01" /></svg><div><strong>iPhone und iPad:</strong> Nutze die <a href="#webapp">Web-App</a>: in Safari öffnen, auf „Teilen“ tippen und „Zum Home-Bildschirm“ wählen.</div></div>
       <div class="notice"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3" /><path d="M12 9v4" /><path d="M12 17h.01" /></svg><div>Schulplan wird nicht über den Play Store oder Microsoft/Apple verteilt. Dein Gerät zeigt deshalb beim ersten Mal eine Sicherheitsabfrage – das ist normal. Lade die App nur von dieser Seite oder aus dem <a href="https://github.com/superali99-tech/Schul-Organisation-App">offiziellen GitHub-Projekt</a>.</div></div>
     </div>
   </div>
@@ -162,7 +171,8 @@
       <details><summary>Kann ich Handy und Computer gleichzeitig nutzen?</summary><div><p>Ja. Daten überträgst du über eine Sicherungsdatei: am einen Gerät exportieren, am anderen wiederherstellen. Für das Kollegium gibt es zusätzlich einen verschlüsselten Abgleich.</p></div></details>
       <details><summary>Wie bekomme ich Updates?</summary><div><p>Schulplan prüft selbst auf neue Versionen. Unter Android und Windows genügt ein Tipp auf „Aktualisieren“, am Mac lädt die App die neue Version in deinen Download-Ordner. Deine Daten bleiben dabei erhalten.</p></div></details>
       <details><summary>Was passiert, wenn ich mein Handy verliere?</summary><div><p>Deine Daten liegen nur auf dem Gerät. Exportiere deshalb regelmäßig eine Sicherung (Mehr → Datensicherung) und bewahre sie sicher auf. Mit einer PIN-Sperre kann niemand Fremdes die App öffnen.</p></div></details>
-      <details><summary>Gibt es Schulplan für iPhone und iPad?</summary><div><p>Noch nicht. Am Computer kannst du die Windows- oder Mac-Version nutzen.</p></div></details>
+      <details><summary>Gibt es Schulplan für iPhone und iPad?</summary><div><p>Ja, als <a href="#webapp">Web-App</a>: in Safari öffnen, „Teilen“ → „Zum Home-Bildschirm“. Danach startet Schulplan wie eine normale App.</p></div></details>
+      <details><summary>Windows meldet „Smart App Control hat eine App blockiert“</summary><div><p>Diese Windows-11-Funktion lässt nur Programme mit gekauftem Signatur-Zertifikat zu und bietet keinen „Trotzdem ausführen“-Knopf. Nutze die <a href="#webapp">Web-App</a> – sie läuft ohne Einschränkung. Weitere Möglichkeiten stehen in der <a href="anleitung.html#smart-app-control">Anleitung</a>.</p></div></details>
     </div>
   </div>
 </section>
