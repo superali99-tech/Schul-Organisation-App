@@ -180,6 +180,9 @@ App.onNotifPermission = (granted) => {
   syncReminders();
 };
 
+// Desktop: per Ziehen & Ablegen geöffnete Dateien
+window.addEventListener('message', (e) => { if (e.data && typeof e.data.schulplanIncoming === 'string') App.onIncoming(e.data.schulplanIncoming); });
+
 document.addEventListener('visibilitychange', () => {
   if (Native.has) return; // Android meldet sich über onPause/onResume
   if (document.hidden) App.onPause(); else App.onResume();

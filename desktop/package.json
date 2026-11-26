@@ -1,0 +1,74 @@
+{
+  "name": "schulplan",
+  "productName": "Schulplan",
+  "version": "1.3.1",
+  "description": "Schulplan – der Organisations-Planer für Lehrkräfte der Astrid Lindgren Schule",
+  "author": "Astrid Lindgren Schule",
+  "license": "UNLICENSED",
+  "private": true,
+  "main": "main.js",
+  "scripts": {
+    "copy-www": "node scripts/copy-www.js",
+    "start": "npm run copy-www && electron .",
+    "dist": "node scripts/patch-builder.js && npm run copy-www && electron-builder --win nsis --x64",
+    "postinstall": "node scripts/patch-builder.js"
+  },
+  "devDependencies": {
+    "electron": "33.4.11",
+    "electron-builder": "26.0.12",
+    "resedit": "1.7.2"
+  },
+  "build": {
+    "appId": "app.schulorga.lehrer.desktop",
+    "productName": "Schulplan",
+    "copyright": "Astrid Lindgren Schule",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "package.json",
+      "build/icon.png"
+    ],
+    "extraResources": [
+      {
+        "from": "www",
+        "to": "www"
+      }
+    ],
+    "afterPack": "./scripts/afterPack.js",
+    "compression": "maximum",
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "build/icon.ico",
+      "signAndEditExecutable": false
+    },
+    "nsis": {
+      "oneClick": true,
+      "perMachine": false,
+      "createDesktopShortcut": "always",
+      "createStartMenuShortcut": true,
+      "shortcutName": "Schulplan",
+      "runAfterFinish": true,
+      "installerIcon": "build/icon.ico",
+      "uninstallerIcon": "build/icon.ico",
+      "uninstallDisplayName": "Schulplan",
+      "deleteAppDataOnUninstall": false,
+      "artifactName": "Schulplan-Setup.${ext}"
+    },
+    "publish": null
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/superali99-tech/Schul-Organisation-App.git"
+  }
+}

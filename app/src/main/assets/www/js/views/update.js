@@ -5,6 +5,12 @@ const UPDATE_URLS = ['https://raw.githubusercontent.com/superali99-tech/Schul-Or
 
 /** Neuerungen je Version (neueste zuerst) */
 const CHANGELOG = [
+  { v: '1.3.1', items: [
+    'Schulplan gibt es jetzt auch für Windows (Desktop-Version mit Installer)',
+    'Zurück-Taste funktioniert wieder richtig (geht zur vorherigen Seite statt die App zu schließen)',
+    'Update-Prüfung, Cloud-Abgleich im Kollegium und Speichern-Meldungen repariert',
+    'Neue Ansicht für große Bildschirme und Tablets mit Seitenleiste',
+  ] },
   { v: '1.3.0', items: [
     'Automatische Updates: Neue Versionen werden in der App angezeigt und mit einem Tipp installiert',
     'Benachrichtigungen für alles: Stundenbeginn und -ende, Termine (Beginn & Ende), Aufgaben, Hausaufgaben, Prüfungen, Geburtstage, Ferien',
@@ -87,6 +93,9 @@ const Update = {
     const i = Update.info;
     if (Update.state === 'downloading') {
       return `<div class="upd-progress"><div class="progress" style="height:10px"><i style="width:${Update.pct}%"></i></div><p class="center muted small">Wird heruntergeladen … ${Update.pct} %</p></div>`;
+    }
+    if (Update.state === 'installing' && window.SCHULPLAN_DESKTOP) {
+      return `<div class="banner ok">${icon('refresh-cw')}<div><b>Wird installiert …</b><br>Schulplan schließt sich kurz und startet dann in der neuen Version. Deine Daten bleiben erhalten.</div></div>`;
     }
     if (Update.state === 'installing') {
       return `<div class="banner ok">${icon('download')}<div><b>Fast geschafft!</b><br>Bestätige im nächsten Fenster mit <b>„Aktualisieren"</b>. Deine Daten bleiben erhalten.</div></div>

@@ -570,4 +570,8 @@ document.addEventListener('keydown', (e) => {
 });
 
 A['app-back'] = () => App.back();
+
+// Für Aufrufe aus der nativen Hülle (Android/Windows): „window.App" muss existieren
+window.App = App;
+window.UI = UI;
 A['noop'] = () => {};

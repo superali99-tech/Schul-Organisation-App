@@ -2,7 +2,10 @@
 
 Eine Android-App, die den Schulalltag für Lehrerinnen und Lehrer organisiert. Sie arbeitet komplett **offline**, die Daten bleiben **auf dem Gerät**, und es gibt keine Werbung und kein Konto.
 
-📦 **APK zum Installieren:** [`release/Schulplan.apk`](release/Schulplan.apk) (Android 7.0 oder neuer)
+📦 **Android:** [`release/Schulplan.apk`](release/Schulplan.apk) (Android 7.0 oder neuer)  
+🖥️ **Windows:** [`release/Schulplan-Setup.exe`](release/Schulplan-Setup.exe) (Windows 10/11, 64 Bit)
+
+**Neu in 1.3.1:** Windows-Version · Seitenleiste für große Bildschirme · Zurück-Taste, Update-Prüfung und Cloud-Abgleich repariert.
 
 **Neu in 1.3:** Automatische Updates in der App · Benachrichtigungen für Stunden, Termine, Aufgaben, Hausaufgaben, Prüfungen, Geburtstage, Ferien und eine Morgen-Übersicht · Startbildschirm mit Logo statt schwarzem Bildschirm.
 
@@ -20,6 +23,16 @@ Eine Android-App, die den Schulalltag für Lehrerinnen und Lehrer organisiert. S
 4. Beim ersten Start legst du deinen Namen und dein Notensystem fest – oder lädst zum Ausprobieren die **Beispieldaten**.
 
 > **Updates kommen automatisch:** Ab Version 1.3 prüft die App selbst auf neue Versionen, zeigt „Neue Version verfügbar“ mit den Neuerungen und installiert sie mit einem Tipp. Die Daten bleiben dabei erhalten. Nur Version 1.3 selbst muss einmalig per Hand installiert werden.
+
+## Installation unter Windows
+
+1. [`release/Schulplan-Setup.exe`](release/Schulplan-Setup.exe) herunterladen und doppelklicken.
+2. Windows zeigt eventuell „Der Computer wurde durch Windows geschützt“ (die App ist nicht kostenpflichtig signiert): auf **Weitere Informationen → Trotzdem ausführen** klicken.
+3. Schulplan installiert sich ohne Administratorrechte und legt ein Symbol auf dem **Desktop** und im **Startmenü** an.
+
+Die Windows-Version hat dieselben Funktionen wie die Android-App, dazu eine Seitenleiste für große Bildschirme. Daten liegen unter `%APPDATA%\Schulplan` (mit täglichen automatischen Sicherungen). Beim Schließen läuft Schulplan im Infobereich (unten rechts) weiter, damit Erinnerungen ankommen; **Rechtsklick → Beenden** schließt die App ganz. Updates installiert die App selbst. Dateien (Team-Pakete, Einladungen, Sicherungen) kann man einfach ins Fenster ziehen.
+
+**Daten zwischen Handy und PC übertragen:** Am Handy *Mehr → Datensicherung → Sicherung exportieren*, die Datei auf den PC bringen und in Schulplan für Windows wiederherstellen (oder ins Fenster ziehen).
 
 ## Kollegium: mit anderen Lehrkräften der Schule zusammenarbeiten
 
@@ -87,7 +100,8 @@ Alle Team-Daten sind Ende-zu-Ende verschlüsselt (AES-256-GCM). Den Schlüssel h
 2. In `app/src/main/assets/www/js/views/update.js` einen Eintrag oben in `CHANGELOG` ergänzen (wird nach dem Update als „Neu in …“ angezeigt).
 3. `./gradlew assembleRelease` und die APK nach `release/Schulplan.apk` kopieren.
 4. In `release/version.json` `versionCode`, `versionName`, `date` und `notes` anpassen.
-5. Committen und pushen – alle installierten Apps sehen die neue Version beim nächsten Öffnen bzw. per Benachrichtigung (Prüfung etwa zweimal täglich).
+5. Windows: In `desktop/package.json` `version` anpassen, `cd desktop && npm install && npm run dist`, dann `desktop/dist/Schulplan-Setup.exe` nach `release/` kopieren und in `release/version.json` den Block `desktop` anpassen.
+6. Committen und pushen – alle installierten Apps sehen die neue Version beim nächsten Öffnen bzw. per Benachrichtigung (Prüfung etwa zweimal täglich).
 
 Die App lädt `https://raw.githubusercontent.com/superali99-tech/Schul-Organisation-App/HEAD/release/version.json`. Das Repository muss dafür öffentlich sein (oder in der App unter *App-Updates → Update-Quelle* eine andere Adresse eingetragen werden). Android installiert ein Update nur, wenn es mit demselben Schlüssel signiert ist.
 

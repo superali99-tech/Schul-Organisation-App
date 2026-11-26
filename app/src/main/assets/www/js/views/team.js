@@ -287,7 +287,7 @@ const Team = {
           <p class="muted small mt">Die Einladung ist mit der PIN verschlüsselt. Sie enthält den Team-Schlüssel, die Mitgliederliste, Termine, Pinnwand und geteilte Klassenlisten.</p>
         </div>
         <div data-p="app" hidden>
-          <div class="banner">${icon('info')}<div>Schulplan ist nicht im Play Store. Gib die App einfach weiter – per Nearby Share, Bluetooth, E-Mail oder Messenger.</div></div>
+          <div class="banner">${icon('info')}<div>${window.SCHULPLAN_DESKTOP ? 'Kopiere den Download-Link für die Windows-Version und schicke ihn an deine Kolleg:innen.' : 'Schulplan ist nicht im Play Store.'} Gib die App einfach weiter – per Nearby Share, Bluetooth, E-Mail oder Messenger.</div></div>
           <button class="btn btn-primary btn-block btn-lg" data-x="apk" ${Native.has ? '' : 'disabled'}>${icon('share-2')}App-Datei (APK) teilen</button>
           ${Native.has ? '' : '<p class="muted small">Nur in der Android-App verfügbar.</p>'}
         </div>

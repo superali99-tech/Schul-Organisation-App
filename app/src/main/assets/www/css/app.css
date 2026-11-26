@@ -810,3 +810,40 @@ h1, h2, h3, h4 { letter-spacing: -.02em; }
 .upd-notes li .i { width: 18px; height: 18px; color: var(--accent); margin-top: 1px; }
 .upd-progress { padding: 6px 0; }
 .upd-progress .progress > i { background: var(--grad); transition: width .2s; }
+
+/* =====================================================================
+   Große Bildschirme / Desktop: Navigation als Seitenleiste
+   ===================================================================== */
+@media (min-width: 900px) {
+  #app { max-width: none; padding-left: 104px; }
+  #bottomnav {
+    top: 14px; bottom: 14px; left: 14px; right: auto; width: 78px; height: auto; max-width: none; margin: 0;
+    flex-direction: column; justify-content: flex-start; gap: 4px; padding: 14px 0; border-radius: 26px;
+  }
+  #bottomnav button { flex: none; height: 66px; width: 100%; font-size: .68rem; }
+  #bottomnav button .nav-ic { width: 46px; height: 34px; }
+  #bottomnav button.on .nav-ic { width: 52px; }
+  #topbar { padding-left: 18px; padding-right: 18px; }
+  .view { padding: 10px 28px 48px; }
+  .view > * { max-width: 1180px; margin-left: auto; margin-right: auto; }
+  .view > .tabs { max-width: none; margin-left: -28px; margin-right: -28px; padding-left: 24px; padding-right: 24px; }
+  .fab { bottom: 28px; right: 32px; }
+  #toasts { bottom: 28px; }
+  .modal { align-items: center; padding: 24px; }
+  .sheet { border-radius: 26px; max-height: 88%; max-width: 620px; transform: translateY(24px) scale(.98); opacity: 0; transition: transform .22s cubic-bezier(.2, .9, .25, 1), opacity .18s; }
+  .modal.show .sheet { transform: none; opacity: 1; }
+  .modal-full .sheet { height: 88%; max-width: 860px; border-radius: 26px; }
+  .sheet-grip { display: none; }
+  .tiles { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); }
+  .tt-c { min-height: 72px; font-size: .84rem; }
+  .tt-c.has b { font-size: .95rem; }
+  .today-hero { padding: 26px 26px 22px; }
+  .today-hero h2 { font-size: 1.9rem; }
+  .quick2 { margin-left: 0; margin-right: 0; padding-left: 0; }
+  .li:hover, .tile:hover, .post:hover, .tt-c:hover, .cal-d:hover { filter: brightness(.985); }
+  [data-theme="dark"] .li:hover, [data-theme="dark"] .tile:hover { filter: brightness(1.12); }
+  button, .li[data-nav], .li[data-act], [data-nav], [data-act] { cursor: pointer; }
+}
+@media (min-width: 1300px) {
+  .two-col { gap: 16px; }
+}

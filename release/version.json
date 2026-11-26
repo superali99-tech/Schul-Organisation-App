@@ -1,12 +1,23 @@
 {
-  "versionCode": 5,
-  "versionName": "1.3.0",
+  "versionCode": 6,
+  "versionName": "1.3.1",
   "date": "2026-11-26",
   "apk": "https://raw.githubusercontent.com/superali99-tech/Schul-Organisation-App/HEAD/release/Schulplan.apk",
   "notes": [
-    "Automatische Updates: Neue Versionen werden in der App angezeigt und mit einem Tipp installiert",
-    "Benachrichtigungen für alles: Stundenbeginn und -ende, Termine (Beginn & Ende), Aufgaben, Hausaufgaben, Prüfungen, Geburtstage, Ferien",
-    "Morgen-Übersicht: Jeden Schultag eine kurze Zusammenfassung deines Tages",
-    "Kein schwarzer Bildschirm mehr beim Start – stattdessen erscheint das Schulplan-Logo"
-  ]
+    "Schulplan gibt es jetzt auch für Windows (Desktop-Version mit Installer)",
+    "Zurück-Taste funktioniert wieder richtig",
+    "Update-Prüfung, Cloud-Abgleich im Kollegium und Speichern-Meldungen repariert",
+    "Neue Ansicht für große Bildschirme und Tablets mit Seitenleiste"
+  ],
+  "desktop": {
+    "version": "1.3.1",
+    "date": "2026-11-26",
+    "url": "https://raw.githubusercontent.com/superali99-tech/Schul-Organisation-App/HEAD/release/Schulplan-Setup.exe",
+    "notes": [
+      "Erste Windows-Version von Schulplan",
+      "Seitenleiste für große Bildschirme",
+      "Erinnerungen als Windows-Benachrichtigungen, Schulplan läuft dafür im Infobereich weiter",
+      "Updates kommen automatisch"
+    ]
+  }
 }
