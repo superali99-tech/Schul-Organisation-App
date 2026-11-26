@@ -59,6 +59,7 @@ Unter **Mehr → Kollegium** gründet eine Lehrkraft das Schulteam und lädt and
 
 * **QR-Code** im Lehrerzimmer: Die Kollegin öffnet Schulplan → Kollegium → *Einladung annehmen* → *QR-Code scannen*.
 * **Nachricht** per WhatsApp, E-Mail oder SMS: Der Code ist mit einer 4-stelligen **PIN verschlüsselt**, die man persönlich weitergibt.
+  Zum Beitreten: Kollegium → *Einladung annehmen* → *Einladungs-Nachricht einfügen* → die ganze Nachricht einfügen **und** die PIN ins PIN-Feld eingeben. Die PIN allein reicht nicht.
 * **App weitergeben:** Die APK lässt sich direkt aus der App teilen (Nearby Share, Bluetooth, Messenger).
 
 Gemeinsam genutzt werden:

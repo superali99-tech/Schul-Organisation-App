@@ -162,24 +162,30 @@ const Team = {
     const key = await Codec.pinKey(pin, salt);
     return 'SO1J.' + Codec.b64u(concatBytes(salt, await Codec.encrypt(key, Codec.unb64u(plain.slice(5)))));
   },
-  async parseInvite(str) {
+  async parseInvite(str, givenPin) {
     const m = String(str).match(/SO1([IJ])\.([A-Za-z0-9_-]+)/);
     if (!m) return null;
     let bytes = Codec.unb64u(m[2]);
     if (m[1] === 'J') {
-      const pin = await UI.prompt('Einladungs-PIN', { type: 'password', label: 'Die PIN hat dir die einladende Person mitgeteilt.', ph: '••••' });
+      let pin = givenPin;
+      if (!pin) pin = await UI.prompt('Einladungs-PIN', { type: 'tel', label: 'Die 4-stellige PIN hat dir die einladende Person persönlich gesagt.', ph: 'z. B. 2489' });
       if (!pin) return null;
       try {
-        const key = await Codec.pinKey(pin.trim(), bytes.subarray(0, 16));
+        const key = await Codec.pinKey(String(pin).trim(), bytes.subarray(0, 16));
         bytes = await Codec.decrypt(key, bytes.subarray(16));
-      } catch (e) { UI.toast('Falsche PIN', { type: 'err' }); return null; }
+      } catch (e) {
+        if (givenPin) throw new Error('PIN');
+        UI.toast('Die PIN passt nicht zu dieser Einladung', { type: 'err' }); return null;
+      }
     }
     const inv = await Codec.unpack(bytes);
     return inv && inv.k === 'invite' && inv.team ? inv : null;
   },
-  async acceptInvite(str) {
-    let inv;
-    try { inv = await Team.parseInvite(str); } catch (e) { UI.toast('Einladung beschädigt oder unvollständig', { type: 'err' }); return; }
+  async acceptInvite(str, inv0) {
+    let inv = inv0;
+    if (!inv) {
+      try { inv = await Team.parseInvite(str); } catch (e) { UI.toast('Einladung beschädigt oder unvollständig', { type: 'err' }); return; }
+    }
     if (!inv) return;
     if (Team.on() && S.team.id === inv.team.id) {
       const sum = Team.merge(inv);
@@ -299,7 +305,7 @@ const Team = {
         }));
         let code = null;
         const getCode = async () => { if (!code) code = await Team.protect(await Team.buildInvite(false), pin); return code; };
-        const msg = (c) => `Hallo! 👋\nIch lade dich in unser Schulteam „${t.name}" in der App Schulplan ein.\n\nSo geht's:\n1. Schulplan öffnen → Mehr → Kollegium → „Einladung annehmen"\n2. „Code einfügen" wählen und diese ganze Nachricht einfügen\n3. Die PIN sage ich dir persönlich.\n\n${c}`;
+        const msg = (c) => `Hallo! 👋\nIch lade dich in unser Schulteam „${t.name}" in der App Schulplan ein.\n\nSo geht's:\n1. Diese GANZE Nachricht kopieren (lange drücken → Kopieren)\n2. Schulplan öffnen → Mehr → Kollegium → „Einladung annehmen" → „Einladungs-Nachricht einfügen"\n3. Einfügen und die 4-stellige PIN eingeben – die sage ich dir persönlich.\n\nEinladungscode:\n${c}`;
         el.querySelector('[data-x="share"]').addEventListener('click', async () => Files.share('Einladung Schulplan', msg(await getCode())));
         el.querySelector('[data-x="copy"]').addEventListener('click', async () => Files.copy(msg(await getCode())));
         el.querySelector('[data-x="file"]').addEventListener('click', async () => Files.shareFile('Schulplan-Einladung.json', 'application/json', JSON.stringify({ schulorga: 'team-invite', team: t.name, code: await getCode() }), `Einladung in das Schulteam „${t.name}" (Schulplan). Die PIN bekommst du persönlich.`));
@@ -311,15 +317,75 @@ const Team = {
   acceptMenu() {
     UI.menu('Einladung annehmen', [
       { l: 'QR-Code scannen', s: 'Im Lehrerzimmer am Handy der Kollegin/des Kollegen', i: 'scan-line', fn: () => Team.scan() },
-      { l: 'Code einfügen', s: 'Aus WhatsApp, E-Mail oder SMS kopiert', i: 'copy', fn: async () => {
-        const txt = await UI.prompt('Einladung einfügen', { multiline: true, ph: 'Ganze Nachricht oder Code (beginnt mit SO1…) hier einfügen', ok: 'Weiter' });
-        if (txt) App.onIncoming(txt);
-      } },
+      { l: 'Einladungs-Nachricht einfügen', s: 'Aus WhatsApp, E-Mail oder SMS – mit PIN', i: 'copy', fn: () => Team.acceptForm() },
       { l: 'Datei öffnen', s: 'Schulplan-Einladung.json', i: 'file-text', fn: async () => {
         const f = await Files.pick();
         if (f) App.onIncoming(await Files.readText(f));
       } },
     ]);
+  },
+
+  /** Formular: Einladungs-Nachricht und PIN auf einen Blick */
+  acceptForm(prefill = '', hint = '') {
+    UI.open({
+      title: 'Einladung annehmen',
+      body: `<div class="col">
+        ${hint ? `<div class="banner warn" style="margin:0">${icon('info')}<div>${hint}</div></div>` : ''}
+        <ol class="accept-steps">
+          <li>Öffne die Einladung in WhatsApp, E-Mail oder SMS und <b>kopiere die ganze Nachricht</b> (lange drücken → Kopieren).</li>
+          <li>Füge sie unten ein.</li>
+          <li>Gib die <b>4-stellige PIN</b> ein, die dir die einladende Person persönlich gesagt hat.</li>
+        </ol>
+        <label class="field"><span>1 · Einladungs-Nachricht</span>
+          <textarea class="inp" id="inv-text" rows="4" placeholder="Hier die ganze Nachricht einfügen – sie enthält einen langen Code, der mit SO1 beginnt">${esc(prefill)}</textarea></label>
+        <button class="btn btn-soft" type="button" id="inv-paste">${icon('copy')}Aus der Zwischenablage einfügen</button>
+        <label class="field" id="inv-pin-field"><span>2 · PIN</span>
+          <input class="inp" id="inv-pin" type="tel" inputmode="numeric" maxlength="6" autocomplete="off" placeholder="z. B. 2489" style="font-size:1.4rem;letter-spacing:.3em;text-align:center"></label>
+        <div class="inv-err danger small" id="inv-err" hidden></div>
+      </div>`,
+      foot: `<span class="sp"></span><button class="btn btn-ghost" data-x="cancel">Abbrechen</button><button class="btn btn-primary" data-x="ok">${icon('user-check')}Beitreten</button>`,
+      onMount: (el, m) => {
+        const txt = el.querySelector('#inv-text');
+        const pin = el.querySelector('#inv-pin');
+        const err = el.querySelector('#inv-err');
+        const show = (msg, focus) => { err.innerHTML = msg; err.hidden = !msg; if (focus) focus.focus(); };
+        const check = () => {
+          const t = txt.value.trim();
+          // Nur Ziffern im Nachrichtenfeld? Das ist die PIN – automatisch verschieben
+          if (/^\d{4,6}$/.test(t)) { pin.value = t; txt.value = ''; show('Das war die <b>PIN</b> – sie steht jetzt unten. Füge oben bitte noch die <b>ganze Einladungs-Nachricht</b> ein.', txt); return; }
+          const isOpen = /SO1I\./.test(t);
+          el.querySelector('#inv-pin-field').style.opacity = isOpen ? '.45' : '1';
+          if (t && !/SO1[IJ]\./.test(t)) show('In diesem Text ist keine Einladung. Kopiere die <b>komplette</b> Nachricht – mit dem langen Code, der mit „SO1“ beginnt.');
+          else show('');
+        };
+        txt.addEventListener('input', check);
+        el.querySelector('#inv-paste').addEventListener('click', async () => {
+          try {
+            const t = await navigator.clipboard.readText();
+            if (t) { txt.value = t; check(); if (/SO1J\./.test(t) && !pin.value) pin.focus(); } else show('Die Zwischenablage ist leer. Kopiere zuerst die Einladungs-Nachricht.');
+          } catch (e) { txt.focus(); show('Einfügen bitte von Hand: lange in das obere Feld drücken → <b>Einfügen</b>.'); }
+        });
+        el.querySelector('[data-x="cancel"]').addEventListener('click', () => m.close());
+        el.querySelector('[data-x="ok"]').addEventListener('click', async () => {
+          const t = txt.value.trim();
+          const p = pin.value.trim();
+          if (!t) { show(p ? 'Die PIN allein reicht nicht – füge oben bitte die <b>ganze Einladungs-Nachricht</b> ein.' : 'Bitte zuerst die Einladungs-Nachricht einfügen.', txt); return; }
+          if (/^\d{4,6}$/.test(t)) { check(); return; }
+          if (!/SO1[IJ]\./.test(t)) { show('In diesem Text ist keine Einladung. Kopiere die <b>komplette</b> Nachricht.', txt); return; }
+          if (/SO1J\./.test(t) && !/^\d{4,6}$/.test(p)) { show('Bitte die 4-stellige <b>PIN</b> eingeben.', pin); return; }
+          let inv;
+          try { inv = await Team.parseInvite(t, p); } catch (e) {
+            show(e.message === 'PIN' ? 'Die <b>PIN passt nicht</b>. Frag die einladende Person noch einmal nach der PIN – jede Einladung hat ihre eigene.' : 'Die Einladung ist unvollständig. Kopiere die Nachricht bitte noch einmal ganz.', e.message === 'PIN' ? pin : txt);
+            return;
+          }
+          if (!inv) { show('Die Einladung konnte nicht gelesen werden. Kopiere die Nachricht bitte noch einmal ganz.', txt); return; }
+          m.close();
+          setTimeout(() => Team.acceptInvite(t, inv), 250);
+        });
+        if (prefill) check();
+        setTimeout(() => (prefill ? pin : txt).focus(), 300);
+      },
+    });
   },
 
   async scan() {
@@ -479,10 +545,12 @@ App.onIncoming = async (text) => {
   if (!text) return;
   if (Lock.active) { setTimeout(() => App.onIncoming(text), 1500); return; }
   UI.closeAll();
-  if (/SO1[IJ]\./.test(text)) { Team.acceptInvite(text); return; }
+  if (/SO1J\./.test(text)) { Team.acceptForm(text); return; }
+  if (/SO1I\./.test(text)) { Team.acceptInvite(text); return; }
+  if (/^\d{4,6}$/.test(text)) { Team.acceptForm('', `„${esc(text)}" ist die <b>PIN</b>. Für den Beitritt brauchst du zusätzlich die Einladungs-Nachricht.`); return; }
   let obj = null;
   try { obj = JSON.parse(text); } catch (e) { obj = null; }
-  if (obj && obj.schulorga === 'team-invite' && obj.code) { Team.acceptInvite(obj.code); return; }
+  if (obj && obj.schulorga === 'team-invite' && obj.code) { Team.acceptForm(obj.code); return; }
   if (obj && obj.schulorga === 'team-update') { Team.importUpdate(obj); return; }
   if (obj && validBackup(obj)) {
     if (await UI.confirm(`Diese Datei ist eine Schulplan-Sicherung (${obj.classes.length} Klassen, ${obj.students.length} Schüler:innen). Wiederherstellen? <b>Alle aktuellen Daten werden ersetzt.</b>`, { danger: true, ok: 'Wiederherstellen' })) {

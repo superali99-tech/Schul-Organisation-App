@@ -5,6 +5,11 @@ const UPDATE_URLS = ['https://raw.githubusercontent.com/superali99-tech/Schul-Or
 
 /** Neuerungen je Version (neueste zuerst) */
 const CHANGELOG = [
+  { v: '1.4.1', items: [
+    'Einladung annehmen ist jetzt einfacher: Einladungs-Nachricht und PIN in einem Formular',
+    'Knopf „Aus der Zwischenablage einfügen" für die kopierte Einladung',
+    'Klare Hinweise, wenn nur die PIN eingegeben wurde oder die PIN nicht passt',
+  ] },
   { v: '1.4.0', items: [
     'Desktop-Widget für Windows und Mac: nächste Stunde, heutige Stunden, Aufgaben und nächste Prüfung immer im Blick',
     'Web-App: Zahl am App-Symbol für fällige Aufgaben und Hausaufgaben',

@@ -1,21 +1,21 @@
 {
-  "versionCode": 8,
-  "versionName": "1.4.0",
+  "versionCode": 9,
+  "versionName": "1.4.1",
   "date": "2026-11-26",
   "apk": "https://raw.githubusercontent.com/superali99-tech/Schul-Organisation-App/HEAD/release/Schulplan.apk",
   "notes": [
-    "Desktop-Widget für Windows und Mac: nächste Stunde, heutige Stunden, Aufgaben und nächste Prüfung immer im Blick",
-    "Web-App: Zahl am App-Symbol für fällige Aufgaben und Hausaufgaben",
-    "Bessere Darstellung auf iPhone und iPad (Notch und Home-Leiste)",
-    "Web-App als Alternative, wenn Windows die App blockiert (Smart App Control)"
+    "Einladung annehmen ist jetzt einfacher: Einladungs-Nachricht und PIN in einem Formular",
+    "Knopf „Aus der Zwischenablage einfügen\" für die kopierte Einladung",
+    "Klare Hinweise, wenn nur die PIN eingegeben wurde oder die PIN nicht passt"
   ],
   "desktop": {
-    "version": "1.4.0",
+    "version": "1.4.1",
     "date": "2026-11-26",
     "url": "https://raw.githubusercontent.com/superali99-tech/Schul-Organisation-App/HEAD/release/Schulplan-Setup.exe",
     "notes": [
-      "Desktop-Widget für Windows und Mac: nächste Stunde, heutige Stunden, Aufgaben und nächste Prüfung immer im Blick",
-      "Erinnerungen und Updates wie gewohnt"
+      "Einladung annehmen ist jetzt einfacher: Einladungs-Nachricht und PIN in einem Formular",
+      "Knopf „Aus der Zwischenablage einfügen\" für die kopierte Einladung",
+      "Klare Hinweise, wenn nur die PIN eingegeben wurde oder die PIN nicht passt"
     ]
   },
   "mac": {
