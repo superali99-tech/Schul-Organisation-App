@@ -1,4 +1,4 @@
-/* SchulOrga – Oberfläche: Router, Dialoge, Formulare, Hilfskomponenten */
+/* Schulplan – Oberfläche: Router, Dialoge, Formulare, Hilfskomponenten */
 'use strict';
 
 const $ = (sel, root = document) => root.querySelector(sel);
@@ -464,7 +464,7 @@ const Print = {
     const el = $('#print-area');
     el.className = landscape ? 'landscape' : '';
     el.innerHTML = `<div class="p-head"><div class="p-title">${esc(title)}</div><div class="p-meta">${esc([st.school, st.teacher, 'Stand: ' + fmtD(today())].filter(Boolean).join(' · '))}</div></div>${html}`;
-    if (Native.has) Native.call('print', 'SchulOrga – ' + title);
+    if (Native.has) Native.call('print', 'Schulplan – ' + title);
     else { setTimeout(() => window.print(), 50); }
   },
   done() { $('#print-area').innerHTML = ''; },
@@ -512,7 +512,7 @@ const Lock = {
     const draw = (err) => {
       el.innerHTML = `<div class="lock-box">
         <div class="lock-ic">${icon('lock')}</div>
-        <h2>${esc(st.teacher ? 'Hallo ' + st.teacher : 'SchulOrga')}</h2>
+        <h2>${esc(st.teacher ? 'Hallo ' + st.teacher : 'Schulplan')}</h2>
         <p class="muted">PIN eingeben</p>
         <div class="pin-dots ${err ? 'err' : ''}">${[0, 1, 2, 3, 4, 5].slice(0, Math.max(4, entered.length)).map((i) => `<i class="${i < entered.length ? 'on' : ''}"></i>`).join('')}</div>
         <div class="pin-pad">${['1', '2', '3', '4', '5', '6', '7', '8', '9', 'C', '0', '⌫'].map((k) => `<button data-k="${k}">${k}</button>`).join('')}</div>

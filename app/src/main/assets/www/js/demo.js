@@ -11,7 +11,7 @@ function buildDemoData() {
 function fillDemo(d) {
   const td = today();
   const ws = weekStart(td);
-  d.settings = { ...d.settings, teacher: 'Schneider', title: 'Frau', school: 'Goethe-Gymnasium', onboarded: true, lastBackup: new Date().toISOString() };
+  d.settings = { ...d.settings, teacher: 'Schneider', title: 'Frau', school: 'Astrid Lindgren Schule', onboarded: true, lastBackup: new Date().toISOString() };
   const sub = (name, short, color) => { const s = { id: uid(), name, short, color }; d.subjects.push(s); return s; };
   const M = sub('Mathematik', 'M', '#2563eb');
   const P = sub('Physik', 'Ph', '#0891b2');
@@ -159,7 +159,7 @@ function showOnboarding() {
   const st = S.settings;
   UI.open({
     title: '', noHead: true, cls: 'onboarding',
-    body: `<div class="ob"><div class="ob-logo">${icon('graduation-cap')}</div><h2>Willkommen bei SchulOrga</h2>
+    body: `<div class="ob"><div class="ob-logo">${icon('graduation-cap')}</div><h2>Willkommen bei Schulplan</h2>
       <p class="muted">Dein digitaler Lehrerplaner – alles an einem Ort, offline & privat.</p>
       <div class="ob-feat">
         <div>${icon('calendar-days')}Stundenplan</div><div>${icon('users')}Klassen & Schüler</div>
@@ -170,7 +170,7 @@ function showOnboarding() {
       <form class="form" onsubmit="return false">
         <div class="frow"><label class="field"><span>Anrede</span><select name="title"><option value="">–</option><option ${st.title === 'Frau' ? 'selected' : ''}>Frau</option><option ${st.title === 'Herr' ? 'selected' : ''}>Herr</option></select></label>
         <label class="field"><span>Dein Name</span><input name="teacher" placeholder="z. B. Müller" value="${esc(st.teacher)}"></label></div>
-        <label class="field"><span>Schule</span><input name="school" placeholder="z. B. Goethe-Gymnasium" value="${esc(st.school)}"></label>
+        <label class="field"><span>Schule</span><input name="school" placeholder="z. B. Astrid Lindgren Schule" value="${esc(st.school)}"></label>
         <div class="field"><span>Notensystem</span><div class="seg seg-form"><label class="seg-o"><input type="radio" name="gs" value="noten" checked><span>Noten 1–6</span></label><label class="seg-o"><input type="radio" name="gs" value="punkte"><span>Punkte 0–15</span></label></div></div>
       </form>`,
     foot: `<button class="btn btn-ghost" data-ob="demo">${icon('sparkles')}Beispieldaten</button><span class="sp"></span><button class="btn btn-primary" data-ob="start">Los geht's</button>`,

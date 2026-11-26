@@ -40,7 +40,7 @@ App.def('/settings', () => {
     ${setItem('trash-2', 'Alle Daten löschen', 'App zurücksetzen', 'data-act="set-reset" style="color:var(--danger)"')}
   </div></div>
   <div class="section-title">Info</div>
-  <div class="card pad0"><div class="list">${setItem('info', 'Über SchulOrga', 'Version, Datenschutz, Lizenzen', 'data-nav="/about"')}</div></div>`;
+  <div class="card pad0"><div class="list">${setItem('info', 'Über Schulplan', 'Version, Datenschutz, Lizenzen', 'data-nav="/about"')}</div></div>`;
   return { title: 'Einstellungen', tab: 'more', icon: 'settings', html: h };
 });
 
@@ -51,7 +51,7 @@ A['set-profile'] = () => {
     fields: [
       { k: 'title', label: 'Anrede', type: 'select', half: true, opts: [{ v: '', l: '–' }, { v: 'Frau', l: 'Frau' }, { v: 'Herr', l: 'Herr' }] },
       { k: 'teacher', label: 'Name', half: true, ph: 'z. B. Müller' },
-      { k: 'school', label: 'Schule', ph: 'z. B. Goethe-Gymnasium' },
+      { k: 'school', label: 'Schule', ph: 'z. B. Astrid Lindgren Schule' },
       { k: 'short', label: 'Kürzel', ph: 'z. B. MÜL', half: true },
       { k: 'email', label: 'Dienst-E-Mail', type: 'email', half: true },
     ],
@@ -256,7 +256,7 @@ App.def('/settings/reminders', () => {
   const r = S.settings.remind;
   const allowed = Native.has ? Native.call('notificationsAllowed') : true;
   const list = buildReminders();
-  const h = `${Native.has && r.on && !allowed ? `<div class="banner warn">${icon('triangle-alert')}<div>Benachrichtigungen sind für SchulOrga nicht erlaubt. <a data-act="rem-perm">Jetzt erlauben</a></div></div>` : ''}
+  const h = `${Native.has && r.on && !allowed ? `<div class="banner warn">${icon('triangle-alert')}<div>Benachrichtigungen sind für Schulplan nicht erlaubt. <a data-act="rem-perm">Jetzt erlauben</a></div></div>` : ''}
     <div class="card"><div class="col">
       <label class="field-switch field"><span class="sw-l">Erinnerungen aktivieren</span><input type="checkbox" class="switch" data-change="rem-set" data-k="on" ${r.on ? 'checked' : ''}></label>
     </div></div>
@@ -287,9 +287,9 @@ A['rem-set'] = (el) => {
 A['rem-perm'] = () => requestNotifPermission();
 A['rem-test'] = () => {
   const list = buildReminders();
-  list.push({ code: 1999999999, time: Date.now() + 5000, title: 'SchulOrga', text: 'Test: Erinnerungen funktionieren! 🎉', route: '/settings/reminders' });
+  list.push({ code: 1999999999, time: Date.now() + 5000, title: 'Schulplan', text: 'Test: Erinnerungen funktionieren! 🎉', route: '/settings/reminders' });
   if (Native.has) { Native.call('syncReminders', JSON.stringify(list)); lastReminderJSON = null; UI.toast('Benachrichtigung kommt in 5 Sekunden'); }
-  else if ('Notification' in window && Notification.permission === 'granted') setTimeout(() => new Notification('SchulOrga', { body: 'Test: Erinnerungen funktionieren!' }), 5000);
+  else if ('Notification' in window && Notification.permission === 'granted') setTimeout(() => new Notification('Schulplan', { body: 'Test: Erinnerungen funktionieren!' }), 5000);
   else UI.toast('Nur in der Android-App verfügbar');
 };
 
@@ -349,7 +349,7 @@ App.def('/settings/backup', () => {
 A['backup-export'] = () => {
   S.settings.lastBackup = new Date().toISOString();
   Store.save.flush();
-  Files.save(`SchulOrga-Sicherung-${today()}.json`, 'application/json', JSON.stringify(S, null, 1));
+  Files.save(`Schulplan-Sicherung-${today()}.json`, 'application/json', JSON.stringify(S, null, 1));
   setTimeout(() => App.refresh(), 400);
 };
 function validBackup(d) { return d && typeof d === 'object' && d.settings && Array.isArray(d.classes) && Array.isArray(d.students); }
@@ -358,7 +358,7 @@ A['backup-import'] = async () => {
   if (!f) return;
   let d;
   try { d = JSON.parse(await Files.readText(f)); } catch (e) { UI.toast('Keine gültige Sicherungsdatei', { type: 'err' }); return; }
-  if (!validBackup(d)) { UI.toast('Keine gültige SchulOrga-Sicherung', { type: 'err' }); return; }
+  if (!validBackup(d)) { UI.toast('Keine gültige Schulplan-Sicherung', { type: 'err' }); return; }
   if (!(await UI.confirm(`Sicherung mit ${d.classes.length} Klassen und ${d.students.length} Schüler:innen wiederherstellen? <b>Alle aktuellen Daten werden ersetzt.</b>`, { danger: true, ok: 'Wiederherstellen' }))) return;
   Store.replace(d);
   applyTheme();
@@ -380,7 +380,7 @@ A['export-all-students'] = () => {
     const at = attStats(s.id);
     rows.push([c.name, s.lastName, s.firstName, s.birthday ? fmtD(s.birthday) : '', s.gender, s.email, s.phone, s.parentName, s.parentPhone, s.parentEmail, s.address, s.tags, a != null ? fmtNum(a) : '', at.absent, at.f]);
   }));
-  Files.csv(`SchulOrga_Schueler_${today()}.csv`, rows);
+  Files.csv(`Schulplan_Schueler_${today()}.csv`, rows);
 };
 A['export-all-grades'] = () => {
   const rows = [['Klasse', 'Fach', 'Datum', 'Leistungsnachweis', 'Kategorie', 'Gewicht', 'Nachname', 'Vorname', 'Punkte', 'Note', 'Bemerkung']];
@@ -391,7 +391,7 @@ A['export-all-grades'] = () => {
       if (g && (g.v != null || g.p != null)) rows.push([cName(a.classId), subName(a.subjectId), a.date ? fmtD(a.date) : '', a.title, (cat(a.catId) || {}).name || '', a.weight, s.lastName, s.firstName, g.p ?? '', g.v != null ? gs.format(g.v) : '', g.note || '']);
     });
   });
-  Files.csv(`SchulOrga_Noten_${today()}.csv`, rows);
+  Files.csv(`Schulplan_Noten_${today()}.csv`, rows);
 };
 
 // ------------------------------------------------------------------ Schuljahreswechsel & Zurücksetzen
@@ -447,9 +447,9 @@ A['set-reset'] = async () => {
 App.def('/about', () => {
   const v = Native.has ? Native.call('appVersion') : 'Web';
   return {
-    title: 'Über SchulOrga', tab: 'more',
-    html: `<div class="ob"><div class="ob-logo">${icon('graduation-cap')}</div><h2>SchulOrga</h2><p class="muted">Der Organisations-Planer für Lehrkräfte · Version ${esc(v)}</p></div>
-      <div class="card"><div class="card-h"><h3>${icon('shield')}Datenschutz</h3></div><p class="text2" style="margin:0">SchulOrga speichert alle Daten ausschließlich lokal auf deinem Gerät. Die App besitzt keine Internet-Berechtigung, es gibt keine Werbung, kein Tracking und kein Konto. Für die Datensicherung exportierst du selbst eine Datei. Bitte beachte die Vorgaben deines Bundeslandes zur Verarbeitung von Schülerdaten auf privaten Endgeräten.</p></div>
+    title: 'Über Schulplan', tab: 'more',
+    html: `<div class="ob"><div class="ob-logo">${icon('graduation-cap')}</div><h2>Schulplan</h2><p class="muted">Der Organisations-Planer für Lehrkräfte · Version ${esc(v)}</p></div>
+      <div class="card"><div class="card-h"><h3>${icon('shield')}Datenschutz</h3></div><p class="text2" style="margin:0">Schulplan speichert alle Daten ausschließlich lokal auf deinem Gerät. Die App besitzt keine Internet-Berechtigung, es gibt keine Werbung, kein Tracking und kein Konto. Für die Datensicherung exportierst du selbst eine Datei. Bitte beachte die Vorgaben deines Bundeslandes zur Verarbeitung von Schülerdaten auf privaten Endgeräten.</p></div>
       <div class="card"><div class="card-h"><h3>${icon('sparkles')}Funktionen</h3></div><p class="text2 small" style="margin:0">Stundenplan mit A/B-Wochen & Vertretungen · Klassen & Schülerprofile · Noten mit Gewichtung, Notenschlüssel & Notenspiegel · Anwesenheit & Fehlzeiten · Mitarbeit & Beobachtungen · Hausaufgaben · Klassenbuch & Unterrichtsreihen · Sitzpläne · Kalender, Ferien & Termine · Aufgaben · Notizen · Elterngespräche · Kollegium mit Einladungen, Pinnwand, Vertretungsplan & geteilten Klassenlisten · Zufallsauswahl, Gruppen, Timer, Lautstärke-Ampel u. v. m. · Erinnerungen · PIN-Sperre · CSV/ICS-Export · Drucken/PDF</p></div>
       <div class="card"><div class="card-h"><h3>${icon('file-text')}Lizenzen</h3></div><p class="text2 small" style="margin:0">Symbole: Lucide Icons (ISC-Lizenz), © Lucide Contributors · Schrift: Inter (SIL Open Font License 1.1), © The Inter Project Authors · QR-Codes: qrcode-generator (MIT), © Kazuhiko Arase; jsQR (Apache License 2.0), © Cosmo Wolfe.</p></div>`,
   };

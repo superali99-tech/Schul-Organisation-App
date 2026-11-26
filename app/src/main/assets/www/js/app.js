@@ -1,4 +1,4 @@
-/* SchulOrga – Start, Lebenszyklus, Erinnerungen */
+/* Schulplan – Start, Lebenszyklus, Erinnerungen */
 'use strict';
 
 // ------------------------------------------------------------------ Erinnerungen

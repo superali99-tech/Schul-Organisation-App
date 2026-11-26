@@ -62,7 +62,7 @@ final class Reminders {
         i.setAction("app.schulorga.lehrer.REMINDER." + code);
         if (r != null) {
             i.putExtra("code", code);
-            i.putExtra("title", r.optString("title", "SchulOrga"));
+            i.putExtra("title", r.optString("title", "Schulplan"));
             i.putExtra("text", r.optString("text", ""));
             i.putExtra("route", r.optString("route", ""));
         }

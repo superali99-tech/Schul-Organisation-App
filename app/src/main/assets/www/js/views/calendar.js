@@ -161,7 +161,7 @@ function icsDate(d, t) {
   return t ? `${x}T${t.replace(':', '')}00` : x;
 }
 function exportICS() {
-  const lines = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//SchulOrga//DE', 'CALSCALE:GREGORIAN'];
+  const lines = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Schulplan//DE', 'CALSCALE:GREGORIAN'];
   const escI = (s) => String(s || '').replace(/[\\;,]/g, (c) => '\\' + c).replace(/\n/g, '\\n');
   const stamp = new Date().toISOString().replace(/[-:]/g, '').slice(0, 15) + 'Z';
   const push = (id, title, date, end, time, endTime, desc, place) => {
@@ -178,5 +178,5 @@ function exportICS() {
   S.events.forEach((e) => push(e.id, e.title, e.date, e.end, e.time, e.endTime, e.notes, e.place));
   S.assessments.filter((a) => a.date).forEach((a) => push(a.id, `${a.title} (${cName(a.classId)})`, a.date, null, null, null, a.notes, ''));
   lines.push('END:VCALENDAR');
-  Files.save(`SchulOrga_Termine_${today()}.ics`, 'text/calendar', lines.join('\r\n'));
+  Files.save(`Schulplan_Termine_${today()}.ics`, 'text/calendar', lines.join('\r\n'));
 }

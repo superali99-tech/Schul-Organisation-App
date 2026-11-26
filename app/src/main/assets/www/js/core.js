@@ -1,4 +1,4 @@
-/* SchulOrga – Kern: Hilfsfunktionen, Datum, Datenspeicher, Notenlogik */
+/* Schulplan – Kern: Hilfsfunktionen, Datum, Datenspeicher, Notenlogik */
 'use strict';
 
 // ------------------------------------------------------------------ Allgemein
@@ -217,7 +217,8 @@ const LESSON_STATUS = { geplant: 'Geplant', gehalten: 'Gehalten', ausgefallen: '
 
 // ------------------------------------------------------------------ Datenspeicher
 let S = null;
-const DATA_VERSION = 1;
+const DATA_VERSION = 2;
+const DEFAULT_SCHOOL = 'Astrid Lindgren Schule';
 
 function defaultPeriods() {
   return [
@@ -236,7 +237,7 @@ function defaultData() {
     version: DATA_VERSION,
     created: new Date().toISOString(),
     settings: {
-      teacher: '', title: '', school: '', ...sy,
+      teacher: '', title: '', school: DEFAULT_SCHOOL, ...sy,
       gradeSystem: 'noten', tendencies: true,
       keyNoten: [{ g: 1, min: 92 }, { g: 2, min: 81 }, { g: 3, min: 67 }, { g: 4, min: 50 }, { g: 5, min: 30 }, { g: 6, min: 0 }],
       keyPunkte: [95, 90, 85, 80, 75, 70, 65, 60, 55, 50, 45, 40, 33, 27, 20, 0],
@@ -288,7 +289,9 @@ const Store = {
   migrate(d) {
     const def = defaultData();
     for (const k of Object.keys(def)) if (d[k] === undefined) d[k] = def[k];
+    const oldVersion = d.version || 1;
     d.settings = { ...def.settings, ...d.settings, remind: { ...def.settings.remind, ...(d.settings || {}).remind } };
+    if (oldVersion < 2 && !d.settings.school) d.settings.school = DEFAULT_SCHOOL;
     d.version = DATA_VERSION;
     return d;
   },

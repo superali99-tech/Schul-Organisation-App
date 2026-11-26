@@ -1,8 +1,8 @@
-# SchulOrga – Der Organisations-Planer für Lehrkräfte
+# Schulplan – Der Organisations-Planer für Lehrkräfte der Astrid Lindgren Schule
 
 Eine Android-App, die den Schulalltag für Lehrerinnen und Lehrer organisiert. Sie arbeitet komplett **offline**, die Daten bleiben **auf dem Gerät**, und es gibt keine Werbung und kein Konto.
 
-📦 **APK zum Installieren:** [`release/SchulOrga-1.1.0.apk`](release/SchulOrga-1.1.0.apk) (Android 7.0 oder neuer)
+📦 **APK zum Installieren:** [`release/Schulplan-1.1.1.apk`](release/Schulplan-1.1.1.apk) (Android 7.0 oder neuer)
 
 **Neu in 1.1:** Kollegium – Kolleg:innen der eigenen Schule einladen und zusammenarbeiten · komplett überarbeitetes, modernes Design.
 
@@ -10,9 +10,9 @@ Eine Android-App, die den Schulalltag für Lehrerinnen und Lehrer organisiert. S
 
 ## Installation auf dem Handy oder Tablet
 
-1. `release/SchulOrga-1.1.0.apk` aufs Gerät laden (z. B. über GitHub im Browser → „Download“).
+1. `release/Schulplan-1.1.1.apk` aufs Gerät laden (z. B. über GitHub im Browser → „Download“).
 2. Die Datei antippen. Android fragt beim ersten Mal, ob der Browser bzw. Dateimanager **„Apps aus unbekannten Quellen installieren“** darf → erlauben.
-3. Auf **Installieren** tippen und die App „SchulOrga“ öffnen.
+3. Auf **Installieren** tippen und die App „Schulplan“ öffnen.
 4. Beim ersten Start legst du deinen Namen und dein Notensystem fest – oder lädst zum Ausprobieren die **Beispieldaten**.
 
 > Updates: Eine neuere APK lässt sich einfach über die alte installieren. Die Daten bleiben dabei erhalten.
@@ -21,7 +21,7 @@ Eine Android-App, die den Schulalltag für Lehrerinnen und Lehrer organisiert. S
 
 Unter **Mehr → Kollegium** gründet eine Lehrkraft das Schulteam und lädt andere ein:
 
-* **QR-Code** im Lehrerzimmer: Die Kollegin öffnet SchulOrga → Kollegium → *Einladung annehmen* → *QR-Code scannen*.
+* **QR-Code** im Lehrerzimmer: Die Kollegin öffnet Schulplan → Kollegium → *Einladung annehmen* → *QR-Code scannen*.
 * **Nachricht** per WhatsApp, E-Mail oder SMS: Der Code ist mit einer 4-stelligen **PIN verschlüsselt**, die man persönlich weitergibt.
 * **App weitergeben:** Die APK lässt sich direkt aus der App teilen (Nearby Share, Bluetooth, Messenger).
 

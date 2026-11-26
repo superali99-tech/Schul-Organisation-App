@@ -89,7 +89,7 @@ App.def('/today', () => {
   const empty = !S.classes.length && !S.timetable.length;
   if (empty) {
     out.push(`<div class="card">
-      <div class="card-h"><h3>${icon('sparkles')}Willkommen bei SchulOrga</h3></div>
+      <div class="card-h"><h3>${icon('sparkles')}Willkommen bei Schulplan</h3></div>
       <p class="text2">Richte die App in wenigen Schritten ein – oder schau dir zuerst die Beispieldaten an.</p>
       <div class="list">
         <div class="li" data-nav="/classes">${'<div class="li-ic">1</div>'}<div class="li-main"><div class="li-t">Klassen & Fächer anlegen</div><div class="li-s">Klassen, Kurse und deine Fächer</div></div>${icon('chevron-right', 'chev')}</div>
@@ -227,7 +227,7 @@ App.def('/today', () => {
   }
 
   return {
-    title: 'SchulOrga', sub: st.school || 'Dein Schulplaner', tab: 'today', icon: 'graduation-cap',
+    title: 'Schulplan', sub: st.school || 'Dein Schulplaner', tab: 'today', icon: 'graduation-cap',
     actions: [{ icon: 'search', nav: '/search', label: 'Suche' }],
     html: out.join(''),
   };

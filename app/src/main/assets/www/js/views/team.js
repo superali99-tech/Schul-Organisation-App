@@ -238,7 +238,7 @@ const Team = {
       title: 'Schulteam gründen',
       fields: [
         { type: 'html', html: '<p class="muted small" style="margin:0">Du gründest das Team deiner Schule und lädst danach Kolleg:innen ein. Alles bleibt verschlüsselt und läuft ohne fremden Server.</p>' },
-        { k: 'team', label: 'Name des Teams / der Schule', req: true, ph: 'z. B. Goethe-Gymnasium' },
+        { k: 'team', label: 'Name des Teams / der Schule', req: true, ph: 'z. B. Astrid Lindgren Schule' },
         { type: 'section', label: 'Dein Profil im Kollegium', i: 'user' },
         { k: 'title', label: 'Anrede', type: 'select', half: true, opts: [{ v: '', l: '–' }, { v: 'Frau', l: 'Frau' }, { v: 'Herr', l: 'Herr' }] },
         { k: 'name', label: 'Name', req: true, half: true },
@@ -279,7 +279,7 @@ const Team = {
       body: `<div class="invite">
         <div class="seg" id="inv-seg"><button class="on" data-m="qr">${icon('qr-code')}QR-Code</button><button data-m="msg">${icon('message-circle')}Nachricht</button><button data-m="app">${icon('download')}App</button></div>
         <div data-p="qr"><div class="qr-box">${qrHtml}</div>
-          <p class="center small text2">Im Lehrerzimmer: Deine Kollegin oder dein Kollege öffnet SchulOrga → <b>Kollegium</b> → <b>Einladung annehmen</b> → <b>QR-Code scannen</b>.</p></div>
+          <p class="center small text2">Im Lehrerzimmer: Deine Kollegin oder dein Kollege öffnet Schulplan → <b>Kollegium</b> → <b>Einladung annehmen</b> → <b>QR-Code scannen</b>.</p></div>
         <div data-p="msg" hidden>
           <div class="pin-show"><span class="muted small">Einladungs-PIN</span><b>${pin}</b><span class="muted small">Sag die PIN persönlich oder am Telefon – nicht in derselben Nachricht.</span></div>
           <button class="btn btn-primary btn-block btn-lg" data-x="share">${icon('share-2')}Einladung senden (WhatsApp, E-Mail …)</button>
@@ -287,7 +287,7 @@ const Team = {
           <p class="muted small mt">Die Einladung ist mit der PIN verschlüsselt. Sie enthält den Team-Schlüssel, die Mitgliederliste, Termine, Pinnwand und geteilte Klassenlisten.</p>
         </div>
         <div data-p="app" hidden>
-          <div class="banner">${icon('info')}<div>SchulOrga ist nicht im Play Store. Gib die App einfach weiter – per Nearby Share, Bluetooth, E-Mail oder Messenger.</div></div>
+          <div class="banner">${icon('info')}<div>Schulplan ist nicht im Play Store. Gib die App einfach weiter – per Nearby Share, Bluetooth, E-Mail oder Messenger.</div></div>
           <button class="btn btn-primary btn-block btn-lg" data-x="apk" ${Native.has ? '' : 'disabled'}>${icon('share-2')}App-Datei (APK) teilen</button>
           ${Native.has ? '' : '<p class="muted small">Nur in der Android-App verfügbar.</p>'}
         </div>
@@ -299,10 +299,10 @@ const Team = {
         }));
         let code = null;
         const getCode = async () => { if (!code) code = await Team.protect(await Team.buildInvite(false), pin); return code; };
-        const msg = (c) => `Hallo! 👋\nIch lade dich in unser Schulteam „${t.name}" in der App SchulOrga ein.\n\nSo geht's:\n1. SchulOrga öffnen → Mehr → Kollegium → „Einladung annehmen"\n2. „Code einfügen" wählen und diese ganze Nachricht einfügen\n3. Die PIN sage ich dir persönlich.\n\n${c}`;
-        el.querySelector('[data-x="share"]').addEventListener('click', async () => Files.share('Einladung SchulOrga', msg(await getCode())));
+        const msg = (c) => `Hallo! 👋\nIch lade dich in unser Schulteam „${t.name}" in der App Schulplan ein.\n\nSo geht's:\n1. Schulplan öffnen → Mehr → Kollegium → „Einladung annehmen"\n2. „Code einfügen" wählen und diese ganze Nachricht einfügen\n3. Die PIN sage ich dir persönlich.\n\n${c}`;
+        el.querySelector('[data-x="share"]').addEventListener('click', async () => Files.share('Einladung Schulplan', msg(await getCode())));
         el.querySelector('[data-x="copy"]').addEventListener('click', async () => Files.copy(msg(await getCode())));
-        el.querySelector('[data-x="file"]').addEventListener('click', async () => Files.shareFile('SchulOrga-Einladung.json', 'application/json', JSON.stringify({ schulorga: 'team-invite', team: t.name, code: await getCode() }), `Einladung in das Schulteam „${t.name}" (SchulOrga). Die PIN bekommst du persönlich.`));
+        el.querySelector('[data-x="file"]').addEventListener('click', async () => Files.shareFile('Schulplan-Einladung.json', 'application/json', JSON.stringify({ schulorga: 'team-invite', team: t.name, code: await getCode() }), `Einladung in das Schulteam „${t.name}" (Schulplan). Die PIN bekommst du persönlich.`));
         el.querySelector('[data-x="apk"]').addEventListener('click', () => Native.call('shareApk'));
       },
     });
@@ -315,7 +315,7 @@ const Team = {
         const txt = await UI.prompt('Einladung einfügen', { multiline: true, ph: 'Ganze Nachricht oder Code (beginnt mit SO1…) hier einfügen', ok: 'Weiter' });
         if (txt) App.onIncoming(txt);
       } },
-      { l: 'Datei öffnen', s: 'SchulOrga-Einladung.json', i: 'file-text', fn: async () => {
+      { l: 'Datei öffnen', s: 'Schulplan-Einladung.json', i: 'file-text', fn: async () => {
         const f = await Files.pick();
         if (f) App.onIncoming(await Files.readText(f));
       } },
@@ -385,7 +385,7 @@ const Team = {
     const json = await Team.buildUpdate();
     S.team.lastShared = new Date().toISOString();
     save();
-    Files.shareFile(`SchulOrga-Team-${today()}.json`, 'application/json', json, `Neuigkeiten aus dem Schulteam „${S.team.name}" – Datei in SchulOrga öffnen.`);
+    Files.shareFile(`Schulplan-Team-${today()}.json`, 'application/json', json, `Neuigkeiten aus dem Schulteam „${S.team.name}" – Datei in Schulplan öffnen.`);
   },
   async importUpdate(obj) {
     if (!Team.on()) { UI.toast('Du bist noch in keinem Schulteam. Bitte zuerst eine Einladung annehmen.', { type: 'err', ms: 5000 }); return; }
@@ -485,7 +485,7 @@ App.onIncoming = async (text) => {
   if (obj && obj.schulorga === 'team-invite' && obj.code) { Team.acceptInvite(obj.code); return; }
   if (obj && obj.schulorga === 'team-update') { Team.importUpdate(obj); return; }
   if (obj && validBackup(obj)) {
-    if (await UI.confirm(`Diese Datei ist eine SchulOrga-Sicherung (${obj.classes.length} Klassen, ${obj.students.length} Schüler:innen). Wiederherstellen? <b>Alle aktuellen Daten werden ersetzt.</b>`, { danger: true, ok: 'Wiederherstellen' })) {
+    if (await UI.confirm(`Diese Datei ist eine Schulplan-Sicherung (${obj.classes.length} Klassen, ${obj.students.length} Schüler:innen). Wiederherstellen? <b>Alle aktuellen Daten werden ersetzt.</b>`, { danger: true, ok: 'Wiederherstellen' })) {
       Store.replace(obj); applyTheme(); App.navigate('/today', { root: true }); UI.toast('Sicherung wiederhergestellt ✓');
     }
     return;
@@ -671,7 +671,7 @@ function teamSyncSheet() {
     title: 'Abgleich mit dem Kollegium',
     body: `<div class="col">
       <div class="f-section">${icon('share-2')}Per Datei (WhatsApp, E-Mail, Nearby Share)</div>
-      <p class="muted small" style="margin:0">Sende deine Neuigkeiten als verschlüsselte Datei. Wer sie in SchulOrga öffnet, bekommt alle Änderungen. ${t.lastShared ? `Zuletzt gesendet ${relTime(t.lastShared)}.` : ''}</p>
+      <p class="muted small" style="margin:0">Sende deine Neuigkeiten als verschlüsselte Datei. Wer sie in Schulplan öffnet, bekommt alle Änderungen. ${t.lastShared ? `Zuletzt gesendet ${relTime(t.lastShared)}.` : ''}</p>
       <div class="btn-row"><button class="btn btn-primary" data-x="share">${icon('share-2')}Neuigkeiten senden</button><button class="btn" data-x="recv">${icon('download')}Datei öffnen</button></div>
       <div class="f-section mt">${icon('refresh-cw')}Gemeinsame Cloud-Datei</div>
       <p class="muted small" style="margin:0">Lege eine Team-Datei in einem freigegebenen Ordner an (z. B. Schul-Nextcloud, Google Drive, OneDrive). Alle verbinden dieselbe Datei – die App gleicht dann automatisch beim Öffnen ab. Die Datei ist verschlüsselt.</p>
@@ -685,7 +685,7 @@ function teamSyncSheet() {
       const on = (x, fn) => { const b = el.querySelector(`[data-x="${x}"]`); if (b) b.addEventListener(b.type === 'checkbox' ? 'change' : 'click', () => fn(b)); };
       on('share', () => { m.close(); Team.shareUpdate(); });
       on('recv', () => { m.close(); A['team-receive'](); });
-      on('create', () => { m.close(); Native.call('syncPick', true, `SchulOrga-Team-${t.name.replace(/[^\wäöüÄÖÜß-]+/g, '_')}.json`); });
+      on('create', () => { m.close(); Native.call('syncPick', true, `Schulplan-Team-${t.name.replace(/[^\wäöüÄÖÜß-]+/g, '_')}.json`); });
       on('open', () => { m.close(); Native.call('syncPick', false, ''); });
       on('sync', () => { m.close(); Sync.run(false); });
       on('off', () => { Native.call('syncClear'); m.close(); App.refresh(); UI.toast('Verbindung getrennt'); });

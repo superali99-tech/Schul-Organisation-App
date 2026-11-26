@@ -38,7 +38,7 @@ public class ReminderReceiver extends BroadcastReceiver {
                 ? new Notification.Builder(c, CHANNEL)
                 : new Notification.Builder(c);
         b.setSmallIcon(R.drawable.ic_notification)
-                .setContentTitle(title == null ? "SchulOrga" : title)
+                .setContentTitle(title == null ? "Schulplan" : title)
                 .setContentText(text)
                 .setStyle(new Notification.BigTextStyle().bigText(text))
                 .setContentIntent(content)

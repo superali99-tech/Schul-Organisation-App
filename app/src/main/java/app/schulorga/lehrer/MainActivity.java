@@ -62,7 +62,7 @@ import java.util.Date;
 import java.util.Locale;
 
 /**
- * Native Hülle der SchulOrga-App. Die Oberfläche liegt in assets/www und wird
+ * Native Hülle der Schulplan-App. Die Oberfläche liegt in assets/www und wird
  * über eine virtuelle HTTPS-Adresse geladen (kein Netzwerkzugriff nötig).
  */
 public class MainActivity extends Activity {
@@ -639,19 +639,19 @@ public class MainActivity extends Activity {
             new Thread(() -> {
                 try {
                     File src = new File(getApplicationInfo().sourceDir);
-                    File dst = new File(ShareProvider.shareDir(MainActivity.this), "SchulOrga.apk");
+                    File dst = new File(ShareProvider.shareDir(MainActivity.this), "Schulplan.apk");
                     try (FileInputStream in = new FileInputStream(src); FileOutputStream out = new FileOutputStream(dst)) {
                         byte[] buf = new byte[65536];
                         int n;
                         while ((n = in.read(buf)) > 0) out.write(buf, 0, n);
                     }
                     runOnUiThread(() -> {
-                        Uri uri = ShareProvider.uriFor("SchulOrga.apk");
+                        Uri uri = ShareProvider.uriFor("Schulplan.apk");
                         Intent i = new Intent(Intent.ACTION_SEND);
                         i.setType("application/vnd.android.package-archive");
                         i.putExtra(Intent.EXTRA_STREAM, uri);
-                        i.putExtra(Intent.EXTRA_TEXT, "SchulOrga – Organisations-App für Lehrkräfte. APK öffnen und installieren.");
-                        i.setClipData(ClipData.newRawUri("SchulOrga.apk", uri));
+                        i.putExtra(Intent.EXTRA_TEXT, "Schulplan – Organisations-App für Lehrkräfte. APK öffnen und installieren.");
+                        i.setClipData(ClipData.newRawUri("Schulplan.apk", uri));
                         i.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                         startActivity(Intent.createChooser(i, "App teilen").addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION));
                     });
