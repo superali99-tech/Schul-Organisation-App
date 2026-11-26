@@ -18,6 +18,9 @@ import android.graphics.PixelFormat;
 import android.graphics.Rect;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.LayerDrawable;
+import android.view.Gravity;
+import android.view.ViewTreeObserver;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -88,6 +91,7 @@ public class MainActivity extends Activity {
     private String pendingIncoming;
     private String[] pendingResources;
     private boolean pageReady = false;
+    private volatile boolean uiReady = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,7 +101,7 @@ public class MainActivity extends Activity {
         SharedPreferences ui = getSharedPreferences("ui", MODE_PRIVATE);
         boolean dark = ui.contains("dark") ? ui.getBoolean("dark", false) : isSystemDark();
         int bg = ui.getInt("bg", dark ? 0xFF0B0D13 : 0xFFF3F4FA);
-        getWindow().setBackgroundDrawable(new ColorDrawable(bg));
+        getWindow().setBackgroundDrawable(splash(bg));
 
         root = new FrameLayout(this);
         barBackground = new SplitColorDrawable(bg, bg);
@@ -106,6 +110,19 @@ public class MainActivity extends Activity {
         web = new WebView(this);
         web.setBackgroundColor(bg);
         web.setAlpha(0f); // erst einblenden, wenn die Oberfläche fertig gezeichnet ist
+        if (Build.VERSION.SDK_INT >= 31) {
+            // Den System-Startbildschirm (App-Symbol) zeigen, bis die Oberfläche fertig ist
+            web.setAlpha(1f);
+            final View content = findViewById(android.R.id.content);
+            content.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+                @Override
+                public boolean onPreDraw() {
+                    if (!uiReady) return false;
+                    content.getViewTreeObserver().removeOnPreDrawListener(this);
+                    return true;
+                }
+            });
+        }
         root.addView(web, new FrameLayout.LayoutParams(
                 FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
         setContentView(root);
@@ -118,7 +135,7 @@ public class MainActivity extends Activity {
                 Insets bars = insets.getInsets(WindowInsets.Type.systemBars() | WindowInsets.Type.displayCutout());
                 Insets ime = insets.getInsets(WindowInsets.Type.ime());
                 v.setPadding(bars.left, bars.top, bars.right, Math.max(bars.bottom, ime.bottom));
-                barBackground.setSplit(bars.top);
+                barBackground.setInsets(bars.top, Math.max(bars.bottom, ime.bottom));
                 return WindowInsets.CONSUMED;
             });
         }
@@ -142,6 +159,8 @@ public class MainActivity extends Activity {
 
         handleIntent(getIntent());
         web.loadUrl(START_URL);
+        root.postDelayed(this::markReady, 2500); // Sicherheitsnetz
+        Updater.scheduleDaily(getApplicationContext());
     }
 
     // ---------------------------------------------------------------- Lebenszyklus
@@ -250,6 +269,27 @@ public class MainActivity extends Activity {
 
     private void showWeb() {
         if (web != null && web.getAlpha() < 1f) web.animate().alpha(1f).setDuration(140).start();
+    }
+
+    private void markReady() {
+        if (uiReady) return;
+        uiReady = true;
+        showWeb();
+        if (root != null) root.invalidate();
+    }
+
+    /** Hintergrund während des Ladens: Farbe + App-Symbol in der Mitte. */
+    private Drawable splash(int bg) {
+        try {
+            Drawable icon = getDrawable(R.mipmap.ic_launcher_round);
+            LayerDrawable ld = new LayerDrawable(new Drawable[]{new ColorDrawable(bg), icon});
+            int size = Math.round(96 * getResources().getDisplayMetrics().density);
+            ld.setLayerGravity(1, Gravity.CENTER);
+            ld.setLayerSize(1, size, size);
+            return ld;
+        } catch (Exception e) {
+            return new ColorDrawable(bg);
+        }
     }
 
     boolean isSystemDark() {
@@ -380,7 +420,7 @@ public class MainActivity extends Activity {
         @Override
         public void onPageFinished(WebView view, String url) {
             pageReady = true;
-            web.postDelayed(MainActivity.this::showWeb, 900); // Sicherheitsnetz
+            web.postDelayed(MainActivity.this::markReady, 900); // Sicherheitsnetz
             if (pendingIncoming != null) {
                 String t = pendingIncoming;
                 pendingIncoming = null;
@@ -675,7 +715,61 @@ public class MainActivity extends Activity {
 
         @JavascriptInterface
         public void appReady() {
-            runOnUiThread(MainActivity.this::showWeb);
+            runOnUiThread(() -> root.postDelayed(MainActivity.this::markReady, 60));
+        }
+
+        @JavascriptInterface
+        public long versionCode() {
+            return Updater.installedVersionCode(MainActivity.this);
+        }
+
+        @JavascriptInterface
+        public void setUpdateUrls(String json) {
+            Updater.setUrls(getApplicationContext(), json);
+        }
+
+        @JavascriptInterface
+        public void checkUpdate(String reqId, String urlsJson) {
+            new Thread(() -> {
+                boolean ok = false;
+                String out;
+                try {
+                    JSONArray a = new JSONArray(urlsJson);
+                    String[] u = new String[a.length()];
+                    for (int i = 0; i < a.length(); i++) u[i] = a.getString(i);
+                    out = Updater.fetchInfo(u).toString();
+                    ok = true;
+                } catch (Exception e) {
+                    out = String.valueOf(e.getMessage());
+                }
+                js("window.App && App.onUpdateInfo && App.onUpdateInfo(" + JSONObject.quote(reqId) + "," + ok + "," + JSONObject.quote(out) + ")");
+            }).start();
+        }
+
+        @JavascriptInterface
+        public void startUpdate(String apkUrl) {
+            new Thread(() -> {
+                try {
+                    Updater.download(getApplicationContext(), apkUrl,
+                            pct -> js("window.App && App.onUpdateProgress && App.onUpdateProgress(" + pct + ")"));
+                    runOnUiThread(() -> {
+                        boolean started = Updater.install(MainActivity.this);
+                        js("window.App && App.onUpdateState && App.onUpdateState('" + (started ? "installing" : "permission") + "', '')");
+                    });
+                } catch (Exception e) {
+                    js("window.App && App.onUpdateState && App.onUpdateState('error'," + JSONObject.quote(String.valueOf(e.getMessage())) + ")");
+                }
+            }).start();
+        }
+
+        @JavascriptInterface
+        public boolean installDownloaded() {
+            if (!Updater.apkFile(MainActivity.this).exists()) return false;
+            runOnUiThread(() -> {
+                boolean started = Updater.install(MainActivity.this);
+                js("window.App && App.onUpdateState && App.onUpdateState('" + (started ? "installing" : "permission") + "', '')");
+            });
+            return true;
         }
 
         @JavascriptInterface
@@ -873,7 +967,7 @@ public class MainActivity extends Activity {
                 try {
                     int c = Color.parseColor(color);
                     web.setBackgroundColor(c);
-                    getWindow().setBackgroundDrawable(new ColorDrawable(c));
+                    getWindow().setBackgroundDrawable(splash(c));
                     getSharedPreferences("ui", MODE_PRIVATE).edit().putInt("bg", c).apply();
                 } catch (Exception ignored) {
                 }
@@ -943,6 +1037,7 @@ public class MainActivity extends Activity {
         private final Paint top = new Paint();
         private final Paint bottom = new Paint();
         private int split = 0;
+        private int bottomInset = 0;
 
         SplitColorDrawable(int topColor, int bottomColor) {
             top.setColor(topColor);
@@ -960,12 +1055,19 @@ public class MainActivity extends Activity {
             invalidateSelf();
         }
 
+        void setInsets(int topPx, int bottomPx) {
+            split = topPx;
+            bottomInset = bottomPx;
+            invalidateSelf();
+        }
+
         @Override
         public void draw(Canvas canvas) {
+            // Nur Status- und Navigationsleiste einfärben; die Mitte bleibt frei,
+            // damit beim Laden der Startbildschirm (Fenster-Hintergrund) sichtbar ist.
             Rect r = getBounds();
-            int mid = Math.max(split, r.height() / 2);
-            canvas.drawRect(r.left, r.top, r.right, r.top + mid, top);
-            canvas.drawRect(r.left, r.top + mid, r.right, r.bottom, bottom);
+            if (split > 0) canvas.drawRect(r.left, r.top, r.right, r.top + split, top);
+            if (bottomInset > 0) canvas.drawRect(r.left, r.bottom - bottomInset, r.right, r.bottom, bottom);
         }
 
         @Override
@@ -978,7 +1080,7 @@ public class MainActivity extends Activity {
 
         @Override
         public int getOpacity() {
-            return PixelFormat.OPAQUE;
+            return PixelFormat.TRANSLUCENT;
         }
     }
 }

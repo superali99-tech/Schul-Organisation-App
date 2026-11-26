@@ -217,7 +217,7 @@ const LESSON_STATUS = { geplant: 'Geplant', gehalten: 'Gehalten', ausgefallen: '
 
 // ------------------------------------------------------------------ Datenspeicher
 let S = null;
-const DATA_VERSION = 2;
+const DATA_VERSION = 3;
 const DEFAULT_SCHOOL = 'Astrid Lindgren Schule';
 
 function defaultPeriods() {
@@ -244,7 +244,7 @@ function defaultData() {
       periods: defaultPeriods(), days: 5, abWeeks: false, abRef: weekStart(today()),
       theme: 'auto', accent: '#4f46e5', fontScale: 1,
       pin: null, secure: false,
-      remind: { on: false, examDays: 1, time: '18:00', lessons: false, lessonMin: 5, events: true, tasks: true, followUps: true },
+      remind: { on: true, examDays: 1, time: '18:00', examMorning: true, lessons: true, lessonMin: 5, lessonEnd: false, lessonEndMin: 5, events: true, eventStart: true, eventEnd: true, tasks: true, taskTime: '07:30', homework: true, birthdays: true, holidays: true, briefing: true, briefingTime: '06:45', followUps: true },
       onboarded: false, lastBackup: null, startTab: '/today',
     },
     subjects: [],
@@ -292,6 +292,7 @@ const Store = {
     const oldVersion = d.version || 1;
     d.settings = { ...def.settings, ...d.settings, remind: { ...def.settings.remind, ...(d.settings || {}).remind } };
     if (oldVersion < 2 && !d.settings.school) d.settings.school = DEFAULT_SCHOOL;
+    if (oldVersion < 3) { d.settings.remind.on = true; d.settings.remind.lessons = true; }
     d.version = DATA_VERSION;
     return d;
   },

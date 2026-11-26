@@ -29,7 +29,7 @@ App.def('/settings', () => {
   </div></div>
   <div class="section-title">Erinnerungen & Sicherheit</div>
   <div class="card pad0"><div class="list">
-    ${setItem('bell', 'Erinnerungen', st.remind.on ? 'Aktiv' : 'Aus', 'data-nav="/settings/reminders"')}
+    ${setItem('bell', 'Benachrichtigungen', st.remind.on ? 'Aktiv – Stunden, Termine, Aufgaben …' : 'Aus', 'data-nav="/settings/reminders"')}
     ${setItem('lock', 'App-Sperre (PIN)', st.pin ? 'Aktiv' : 'Aus', 'data-nav="/settings/security"')}
   </div></div>
   <div class="section-title">Daten</div>
@@ -40,7 +40,7 @@ App.def('/settings', () => {
     ${setItem('trash-2', 'Alle Daten löschen', 'App zurücksetzen', 'data-act="set-reset" style="color:var(--danger)"')}
   </div></div>
   <div class="section-title">Info</div>
-  <div class="card pad0"><div class="list">${setItem('info', 'Über Schulplan', 'Version, Datenschutz, Lizenzen', 'data-nav="/about"')}</div></div>`;
+  <div class="card pad0"><div class="list">${setItem('refresh-cw', 'App-Updates', Update.info ? 'Neue Version ' + Update.info.versionName + ' verfügbar!' : 'Version ' + Update.versionName(), 'data-nav="/update"', Update.info ? '<span class="badge red">Neu</span>' : '')}${setItem('info', 'Über Schulplan', 'Version, Datenschutz, Lizenzen', 'data-nav="/about"')}</div></div>`;
   return { title: 'Einstellungen', tab: 'more', icon: 'settings', html: h };
 });
 
@@ -256,30 +256,55 @@ App.def('/settings/reminders', () => {
   const r = S.settings.remind;
   const allowed = Native.has ? Native.call('notificationsAllowed') : true;
   const list = buildReminders();
+  const sw = (k, label, hint) => `<label class="field-switch field"><span class="sw-l">${label}${hint ? `<small>${hint}</small>` : ''}</span><input type="checkbox" class="switch" data-change="rem-set" data-k="${k}" ${r[k] ? 'checked' : ''}></label>`;
+  const sel = (k, label, opts) => `<label class="field"><span>${label}</span><select class="inline-input" data-change="rem-set" data-k="${k}">${opts.map(([v, l]) => `<option value="${v}" ${String(r[k]) === String(v) ? 'selected' : ''}>${l}</option>`).join('')}</select></label>`;
+  const time = (k, label) => `<label class="field"><span>${label}</span><input class="inline-input" type="time" value="${r[k] || ''}" data-change="rem-set" data-k="${k}"></label>`;
   const h = `${Native.has && r.on && !allowed ? `<div class="banner warn">${icon('triangle-alert')}<div>Benachrichtigungen sind für Schulplan nicht erlaubt. <a data-act="rem-perm">Jetzt erlauben</a></div></div>` : ''}
+    <div class="card">${sw('on', 'Benachrichtigungen', 'Schulplan erinnert dich an alles, was du planst')}</div>
+    <div class="${r.on ? '' : 'hidden'}">
     <div class="card"><div class="col">
-      <label class="field-switch field"><span class="sw-l">Erinnerungen aktivieren</span><input type="checkbox" class="switch" data-change="rem-set" data-k="on" ${r.on ? 'checked' : ''}></label>
+      <div class="f-section">${icon('sun')}Morgen-Übersicht</div>
+      ${sw('briefing', 'Tagesübersicht am Morgen', 'Stunden, Prüfungen, Termine und Aufgaben des Tages')}
+      ${r.briefing ? time('briefingTime', 'Uhrzeit') : ''}
     </div></div>
-    <div class="card ${r.on ? '' : 'hidden'}"><div class="col">
+    <div class="card"><div class="col">
+      <div class="f-section">${icon('clock')}Unterricht</div>
+      ${sw('lessons', 'Vor jeder Stunde', 'Mit Klasse, Raum und Thema – auch bei Vertretungen')}
+      ${r.lessons ? sel('lessonMin', 'Wann', [[0, 'Zum Stundenbeginn'], [2, '2 Minuten vorher'], [5, '5 Minuten vorher'], [10, '10 Minuten vorher'], [15, '15 Minuten vorher']]) : ''}
+      ${sw('lessonEnd', 'Vor Stundenende', 'Erinnerung an Hausaufgabe und Klassenbuch')}
+      ${r.lessonEnd ? sel('lessonEndMin', 'Wann', [[0, 'Zum Stundenende'], [3, '3 Minuten vorher'], [5, '5 Minuten vorher'], [10, '10 Minuten vorher']]) : ''}
+    </div></div>
+    <div class="card"><div class="col">
+      <div class="f-section">${icon('calendar')}Termine & Ferien</div>
+      ${sw('events', 'Termine', 'Konferenzen, Elternabende, Ausflüge …')}
+      ${r.events ? sw('eventStart', 'Bei Beginn', 'Ganztägige Termine morgens um 7 Uhr') + sw('eventEnd', 'Bei Ende', 'Wenn eine Endzeit eingetragen ist') : ''}
+      ${sw('holidays', 'Ferien & freie Tage', 'Am Abend vorher')}
+    </div></div>
+    <div class="card"><div class="col">
       <div class="f-section">${icon('file-text')}Prüfungen</div>
-      <div class="frow"><label class="field"><span>Tage vorher</span><select class="inline-input" data-change="rem-set" data-k="examDays">${[0, 1, 2, 3, 7].map((d) => `<option value="${d}" ${r.examDays === d ? 'selected' : ''}>${d === 0 ? 'Am selben Tag' : plural(d, 'Tag', 'Tage') + ' vorher'}</option>`).join('')}</select></label>
-      <label class="field"><span>Uhrzeit</span><input class="inline-input" type="time" value="${r.time}" data-change="rem-set" data-k="time"></label></div>
-      <label class="field-switch field"><span class="sw-l">Termine<small>Laut Einstellung am Termin</small></span><input type="checkbox" class="switch" data-change="rem-set" data-k="events" ${r.events ? 'checked' : ''}></label>
-      <label class="field-switch field"><span class="sw-l">Aufgaben mit Erinnerung</span><input type="checkbox" class="switch" data-change="rem-set" data-k="tasks" ${r.tasks ? 'checked' : ''}></label>
-      <label class="field-switch field"><span class="sw-l">Wiedervorlagen (Elterngespräche)</span><input type="checkbox" class="switch" data-change="rem-set" data-k="followUps" ${r.followUps ? 'checked' : ''}></label>
-      <label class="field-switch field"><span class="sw-l">Vor jeder Unterrichtsstunde<small>Mit Klasse, Raum und Thema</small></span><input type="checkbox" class="switch" data-change="rem-set" data-k="lessons" ${r.lessons ? 'checked' : ''}></label>
-      ${r.lessons ? `<label class="field"><span>Minuten vorher</span><select class="inline-input" data-change="rem-set" data-k="lessonMin">${[2, 5, 10, 15].map((m) => `<option value="${m}" ${r.lessonMin === m ? 'selected' : ''}>${m} Minuten</option>`).join('')}</select></label>` : ''}
-      <button class="btn btn-soft" data-act="rem-test">${icon('bell')}Test-Benachrichtigung (in 5 Sek.)</button>
+      ${sel('examDays', 'Vorab erinnern', [[0, 'Nicht vorab'], [1, '1 Tag vorher'], [2, '2 Tage vorher'], [3, '3 Tage vorher'], [7, '1 Woche vorher']])}
+      ${r.examDays > 0 ? time('time', 'Uhrzeit') : ''}
+      ${sw('examMorning', 'Am Prüfungstag morgens')}
     </div></div>
-    ${r.on ? `<div class="section-title">Geplant (${list.length})</div><div class="card pad0"><div class="list">${list.slice(0, 15).map((x) => `<div class="li"><div class="li-ic">${icon('bell')}</div><div class="li-main"><div class="li-t">${esc(x.title)}</div><div class="li-s">${fmtDW(iso(new Date(x.time)))} ${mint(new Date(x.time).getHours() * 60 + new Date(x.time).getMinutes())} · ${esc(x.text)}</div></div></div>`).join('') || '<div class="li muted">Keine anstehenden Erinnerungen</div>'}</div></div>` : ''}
-    ${!Native.has ? `<p class="muted small">Hinweis: Benachrichtigungen funktionieren in der installierten Android-App.</p>` : ''}`;
-  return { title: 'Erinnerungen', tab: 'more', html: h };
+    <div class="card"><div class="col">
+      <div class="f-section">${icon('list-todo')}Aufgaben & Hausaufgaben</div>
+      ${sw('tasks', 'Fällige Aufgaben', 'Zur eingetragenen Uhrzeit, sonst zur Standardzeit')}
+      ${r.tasks ? time('taskTime', 'Standardzeit') : ''}
+      ${sw('homework', 'Hausaufgaben-Kontrolle', 'Morgens am Fälligkeitstag')}
+      ${sw('followUps', 'Wiedervorlagen (Elterngespräche)')}
+      ${sw('birthdays', 'Geburtstage der Schüler:innen', 'Morgens um 7 Uhr')}
+    </div></div>
+    <button class="btn btn-soft btn-block" data-act="rem-test">${icon('bell')}Test-Benachrichtigung (in 5 Sek.)</button>
+    <div class="section-title">Als Nächstes geplant (${list.length})</div><div class="card pad0"><div class="list">${list.slice(0, 15).map((x) => `<div class="li"><div class="li-ic">${icon('bell')}</div><div class="li-main"><div class="li-t">${esc(x.title)}</div><div class="li-s">${fmtDW(iso(new Date(x.time)))} ${mint(new Date(x.time).getHours() * 60 + new Date(x.time).getMinutes())} · ${esc(x.text)}</div></div></div>`).join('') || '<div class="li muted">Keine anstehenden Erinnerungen</div>'}</div></div>
+    </div>
+    ${!Native.has ? '<p class="muted small">Hinweis: Benachrichtigungen funktionieren in der installierten Android-App.</p>' : ''}`;
+  return { title: 'Benachrichtigungen', tab: 'more', html: h };
 });
 A['rem-set'] = (el) => {
   const r = S.settings.remind;
   const k = el.dataset.k;
   if (el.type === 'checkbox') r[k] = el.checked;
-  else if (['examDays', 'lessonMin'].includes(k)) r[k] = Number(el.value);
+  else if (['examDays', 'lessonMin', 'lessonEndMin'].includes(k)) r[k] = Number(el.value);
   else r[k] = el.value;
   if (k === 'on' && el.checked) requestNotifPermission();
   save(); App.refresh();
@@ -296,7 +321,7 @@ A['rem-test'] = () => {
 // ------------------------------------------------------------------ Sicherheit
 App.def('/settings/security', () => {
   const st = S.settings;
-  const h = `<div class="banner">${icon('shield')}<div>Alle Daten bleiben ausschließlich auf diesem Gerät. Die App hat keine Internet-Berechtigung. Schütze sensible Schülerdaten zusätzlich mit einer PIN.</div></div>
+  const h = `<div class="banner">${icon('shield')}<div>Alle Daten bleiben ausschließlich auf diesem Gerät. Das Internet wird nur für die Update-Prüfung genutzt. Schütze sensible Schülerdaten zusätzlich mit einer PIN.</div></div>
     <div class="card pad0"><div class="list">
       ${setItem('key', st.pin ? 'PIN ändern' : 'PIN festlegen', st.pin ? 'App ist mit PIN geschützt' : '4–6 Ziffern', 'data-act="pin-set"')}
       ${st.pin ? setItem('lock-open', 'PIN entfernen', '', 'data-act="pin-remove"') : ''}
@@ -449,7 +474,7 @@ App.def('/about', () => {
   return {
     title: 'Über Schulplan', tab: 'more',
     html: `<div class="ob"><div class="ob-logo">${icon('graduation-cap')}</div><h2>Schulplan</h2><p class="muted">Der Organisations-Planer für Lehrkräfte · Version ${esc(v)}</p></div>
-      <div class="card"><div class="card-h"><h3>${icon('shield')}Datenschutz</h3></div><p class="text2" style="margin:0">Schulplan speichert alle Daten ausschließlich lokal auf deinem Gerät. Die App besitzt keine Internet-Berechtigung, es gibt keine Werbung, kein Tracking und kein Konto. Für die Datensicherung exportierst du selbst eine Datei. Bitte beachte die Vorgaben deines Bundeslandes zur Verarbeitung von Schülerdaten auf privaten Endgeräten.</p></div>
+      <div class="card"><div class="card-h"><h3>${icon('shield')}Datenschutz</h3></div><p class="text2" style="margin:0">Schulplan speichert alle Daten ausschließlich lokal auf deinem Gerät. Die App nutzt das Internet ausschließlich, um nach Updates zu suchen – dabei werden keine Daten übertragen. Es gibt keine Werbung, kein Tracking und kein Konto. Für die Datensicherung exportierst du selbst eine Datei. Bitte beachte die Vorgaben deines Bundeslandes zur Verarbeitung von Schülerdaten auf privaten Endgeräten.</p></div>
       <div class="card"><div class="card-h"><h3>${icon('sparkles')}Funktionen</h3></div><p class="text2 small" style="margin:0">Stundenplan mit A/B-Wochen & Vertretungen · Klassen & Schülerprofile · Noten mit Gewichtung, Notenschlüssel & Notenspiegel · Anwesenheit & Fehlzeiten · Mitarbeit & Beobachtungen · Hausaufgaben · Klassenbuch & Unterrichtsreihen · Sitzpläne · Kalender, Ferien & Termine · Aufgaben · Notizen · Elterngespräche · Kollegium mit Einladungen, Pinnwand, Vertretungsplan & geteilten Klassenlisten · Zufallsauswahl, Gruppen, Timer, Lautstärke-Ampel u. v. m. · Erinnerungen · PIN-Sperre · CSV/ICS-Export · Drucken/PDF</p></div>
       <div class="card"><div class="card-h"><h3>${icon('file-text')}Lizenzen</h3></div><p class="text2 small" style="margin:0">Symbole: Lucide Icons (ISC-Lizenz), © Lucide Contributors · Schrift: Inter (SIL Open Font License 1.1), © The Inter Project Authors · QR-Codes: qrcode-generator (MIT), © Kazuhiko Arase; jsQR (Apache License 2.0), © Cosmo Wolfe.</p></div>`,
   };

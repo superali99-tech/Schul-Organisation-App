@@ -86,6 +86,9 @@ App.def('/today', () => {
       <div data-nav="/overview/exams"><b>${examsWeek}</b><span>Prüfungen</span></div>
     </div></div>`);
 
+  if (Update.info) {
+    out.push(`<div class="promo" data-act="upd-open"><div class="promo-ic">${icon('download')}</div><div class="sp"><b>Neue Version ${esc(Update.info.versionName || '')} verfügbar</b><span>Tippe hier – mit einem Tipp aktualisiert, deine Daten bleiben erhalten.</span></div><button class="btn btn-sm btn-white" data-act="upd-open">Update</button></div>`);
+  }
   const empty = !S.classes.length && !S.timetable.length;
   if (empty) {
     out.push(`<div class="card">

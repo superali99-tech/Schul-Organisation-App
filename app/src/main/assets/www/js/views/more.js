@@ -30,6 +30,7 @@ App.def('/more', () => {
   <div class="tiles">${TOOLS.map((t) => tile('/tool/' + t.id, t.i, esc(t.l), t.c)).join('')}</div>
   <div class="section-title">App</div>
   <div class="tiles">
+    ${tile('/update', 'refresh-cw', 'App-Updates', '#8b5cf6', Update.info ? { v: 'Neu', cls: 'red' } : null)}
     ${tile('/settings', 'settings', 'Einstellungen', '#64748b')}
     ${tile('/settings/backup', 'database', 'Datensicherung', '#2563eb', !S.settings.lastBackup && S.students.length ? { v: '!', cls: 'red' } : null)}
     ${tile('/about', 'info', 'Über die App', '#64748b')}

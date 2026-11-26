@@ -8,48 +8,90 @@ function buildReminders() {
   const out = [];
   const nowMs = Date.now();
   const horizon = nowMs + 45 * 86400000;
+  const td = today();
   const add = (id, time, title, text, route) => { if (time > nowMs && time < horizon) out.push({ code: hashInt(id), time, title, text, route }); };
 
+  // Stunden & Morgen-Übersicht (14 Tage)
+  for (let i = 0; i < 14; i++) {
+    const d = addDays(td, i);
+    const hol = holidayOn(d);
+    const ls = lessonsOn(d).filter((l) => !l.holiday);
+    const active = ls.filter((l) => !l.cancelled);
+    if (r.briefing && !hol) {
+      const parts = [];
+      if (active.length) { const f = active[0]; const p = periodTime(f.period); parts.push(`${plural(active.length, 'Stunde', 'Stunden')}, erste um ${p ? p.s : '?'}: ${lessonLabel(f)}`); }
+      const canc = ls.filter((l) => l.cancelled).length;
+      if (canc) parts.push(`${canc} entfällt`);
+      const due = S.tasks.filter((t) => !t.done && t.due === d).length;
+      if (due) parts.push(plural(due, 'Aufgabe', 'Aufgaben') + ' fällig');
+      const exams = S.assessments.filter((a) => a.date === d && (cat(a.catId) || {}).exam);
+      if (exams.length) parts.push('Prüfung: ' + exams.map((a) => `${a.title} (${cName(a.classId)})`).join(', '));
+      const evs = S.events.filter((e) => e.type !== 'ferien' && e.type !== 'feiertag' && e.date <= d && (e.end || e.date) >= d);
+      if (evs.length) parts.push('Termin: ' + evs.map((e) => e.title + (e.time ? ' ' + e.time : '')).join(', '));
+      if (parts.length) add('br' + d, dateTimeMs(d, r.briefingTime || '06:45'), `Guten Morgen! Dein ${WD[dow(d)]}`, parts.join(' · '), '/today');
+    }
+    ls.forEach((l) => {
+      const p = periodTime(l.period);
+      if (!p || l.cancelled) return;
+      const room = lessonRoom(l);
+      const entry = l.classId ? lessonEntry(l.classId, d, l.period) : null;
+      const route = `/lesson/${d}/${l.period}`;
+      if (r.lessons) {
+        const m = Number(r.lessonMin) || 0;
+        add(`ls${d}-${l.period}`, dateTimeMs(d, p.s) - m * 60000, `${m ? 'In ' + m + ' Min.' : 'Jetzt'}: ${l.period + 1}. Stunde · ${lessonLabel(l)}`,
+          [room ? 'Raum ' + room : '', `${p.s}–${p.e} Uhr`, entry && entry.topic ? 'Thema: ' + entry.topic : ''].filter(Boolean).join(' · '), route);
+      }
+      if (r.lessonEnd) {
+        const m = Number(r.lessonEndMin) || 0;
+        add(`le${d}-${l.period}`, dateTimeMs(d, p.e) - m * 60000, `${m ? 'Noch ' + m + ' Min.' : 'Stundenende'}: ${lessonLabel(l)}`, 'Hausaufgabe aufgeben oder Klassenbuch eintragen?', route);
+      }
+    });
+  }
   // Prüfungen
   S.assessments.forEach((a) => {
     const k = cat(a.catId);
     if (!a.date || !k || !k.exam) return;
-    const t = dateTimeMs(addDays(a.date, -(r.examDays || 0)), r.time || '18:00');
-    const when = r.examDays === 0 ? 'heute' : r.examDays === 1 ? 'morgen' : `am ${fmtDW(a.date)}`;
-    add('ex' + a.id, t, `${k.name.split(' ')[0]}: ${a.title}`, `${cName(a.classId)} – ${when}`, '/assessment/' + a.id);
+    if (r.examDays > 0) add('ex' + a.id, dateTimeMs(addDays(a.date, -r.examDays), r.time || '18:00'), `${k.name.split(' ')[0]}: ${a.title}`, `${cName(a.classId)} – ${r.examDays === 1 ? 'morgen' : 'am ' + fmtDW(a.date)}`, '/assessment/' + a.id);
+    if (r.examMorning) add('exm' + a.id, dateTimeMs(a.date, '07:00'), `Heute: ${a.title}`, `${cName(a.classId)}${a.subjectId ? ' · ' + subName(a.subjectId) : ''} – viel Erfolg!`, '/assessment/' + a.id);
   });
-  // Termine
-  if (r.events) S.events.forEach((e) => {
-    if (e.remind === '' || e.remind == null || e.type === 'ferien') return;
-    const start = dateTimeMs(e.date, e.time || '07:30');
-    const m = Number(e.remind);
-    add('ev' + e.id, start - m * 60000, e.title, `${(EVENT_TYPES[e.type] || EVENT_TYPES.termin).l}${e.time ? ' um ' + e.time + ' Uhr' : ''}${e.place ? ' · ' + e.place : ''}`, '/calendar');
+  // Termine (Erinnerung vorher, Beginn, Ende) und Ferien
+  S.events.forEach((e) => {
+    const t = EVENT_TYPES[e.type] || EVENT_TYPES.termin;
+    if (e.type === 'ferien' || e.type === 'feiertag') {
+      if (r.holidays) add('hol' + e.id, dateTimeMs(addDays(e.date, -1), '18:00'), e.type === 'ferien' ? `Morgen beginnen die ${e.title} 🎉` : `Morgen frei: ${e.title}`, e.end && e.end !== e.date ? `Bis ${fmtDW(e.end)} – erhol dich gut!` : 'Genieß den freien Tag!', '/calendar');
+      return;
+    }
+    if (!r.events) return;
+    const place = e.place ? ' · ' + e.place : '';
+    if (e.remind !== '' && e.remind != null) add('ev' + e.id, dateTimeMs(e.date, e.time || '07:30') - Number(e.remind) * 60000, `Erinnerung: ${e.title}`, `${t.l}${e.time ? ' um ' + e.time + ' Uhr' : ''}${place}`, '/calendar');
+    if (r.eventStart) {
+      if (e.time) add('evs' + e.id, dateTimeMs(e.date, e.time), `Jetzt: ${e.title}`, `${t.l}${e.endTime ? ' bis ' + e.endTime + ' Uhr' : ''}${place}`, '/calendar');
+      else add('evs' + e.id, dateTimeMs(e.date, '07:00'), `Heute: ${e.title}`, `${t.l}${e.end && e.end !== e.date ? ' bis ' + fmtDW(e.end) : ''}${place}`, '/calendar');
+    }
+    if (r.eventEnd && e.endTime) add('eve' + e.id, dateTimeMs(e.end || e.date, e.endTime), `Endet jetzt: ${e.title}`, t.l + place, '/calendar');
   });
   // Aufgaben
   if (r.tasks) S.tasks.forEach((t) => {
-    if (t.done || !t.remind || !t.due) return;
-    add('tk' + t.id, dateTimeMs(t.due, t.time || r.time || '18:00'), 'Aufgabe fällig', t.title, '/tasks');
+    if (t.done || !t.due) return;
+    add('tk' + t.id, dateTimeMs(t.due, t.time || r.taskTime || '07:30'), t.prio === 2 ? 'Dringende Aufgabe fällig' : 'Aufgabe fällig', t.title + (t.cat ? ' · ' + t.cat : ''), '/tasks');
+  });
+  // Hausaufgaben (Kontrolle)
+  if (r.homework) S.homework.forEach((h) => {
+    if (h.done || !h.due) return;
+    add('hw' + h.id, dateTimeMs(h.due, '07:15'), `Heute fällig in ${cName(h.classId)}`, `Hausaufgabe: ${h.title} – Kontrolle nicht vergessen`, '/homework');
+  });
+  // Geburtstage
+  if (r.birthdays) S.students.forEach((s) => {
+    if (!s.birthday || !cls(s.classId) || cls(s.classId).archived) return;
+    const n = nextBirthday(s.birthday, td);
+    add('bd' + s.id + n, dateTimeMs(n, '07:05'), `🎂 ${sName(s)} hat heute Geburtstag`, `${cName(s.classId)} · wird ${age(s.birthday, n)}`, '/student/' + s.id);
   });
   // Wiedervorlagen
   if (r.followUps) S.talks.forEach((t) => {
     if (!t.followUp || t.followUpDone) return;
     add('fu' + t.id, dateTimeMs(t.followUp, '07:30'), 'Wiedervorlage Elterngespräch', `${sName(stu(t.studentId))}: ${t.topic || ''}`, '/talks');
   });
-  // Unterrichtsstunden (nächste 7 Tage)
-  if (r.lessons) {
-    for (let i = 0; i < 7; i++) {
-      const d = addDays(today(), i);
-      lessonsOn(d).forEach((l) => {
-        if (l.cancelled || l.holiday) return;
-        const p = periodTime(l.period);
-        if (!p) return;
-        const entry = l.classId ? lessonEntry(l.classId, d, l.period) : null;
-        const room = l.roomChange || l.room || (cls(l.classId) || {}).room || '';
-        add(`ls${d}-${l.period}`, dateTimeMs(d, p.s) - (r.lessonMin || 5) * 60000, `${l.period + 1}. Stunde: ${lessonLabel(l)}`, [room ? 'Raum ' + room : '', `${p.s}–${p.e}`, entry && entry.topic ? entry.topic : ''].filter(Boolean).join(' · '), `/lesson/${d}/${l.period}`);
-      });
-    }
-  }
-  return out.sort((a, b) => a.time - b.time).slice(0, 120);
+  return out.sort((a, b) => a.time - b.time).slice(0, 400);
 }
 let lastReminderJSON = null;
 const syncReminders = debounce(() => {
@@ -106,6 +148,16 @@ const syncWidgets = debounce(() => {
 }, 1200);
 Store.onSave(syncWidgets);
 
+function askNotificationsOnce() {
+  if (!Native.has || !S.settings.remind.on || !S.settings.onboarded) return;
+  if (Native.call('notificationsAllowed')) return;
+  let asked = null;
+  try { asked = localStorage.getItem('sp-notif-asked'); } catch (e) { /* egal */ }
+  if (asked) return;
+  try { localStorage.setItem('sp-notif-asked', '1'); } catch (e) { /* egal */ }
+  Native.call('requestNotificationPermission');
+}
+
 // ------------------------------------------------------------------ Native Rückrufe
 App.onPause = () => {
   Store.save.flush();
@@ -113,6 +165,8 @@ App.onPause = () => {
 };
 App.onResume = () => {
   Lock.maybeLock();
+  if (Date.now() - Update.lastCheck > 3 * 3600000) Update.check(true);
+  if (Update.state === 'permission') Native.call('installDownloaded');
   syncWidgets();
   if (App.onTeamResume) App.onTeamResume();
   if (App.path === '/today' && !UI.stack.length) App.refresh();
@@ -152,7 +206,7 @@ if (window.matchMedia) {
   else App.stack = [start];
   $('#view').addEventListener('scroll', () => $('#topbar').classList.toggle('scrolled', $('#view').scrollTop > 4), { passive: true });
   App.render();
-  requestAnimationFrame(() => requestAnimationFrame(() => Native.call('appReady')));
+  setTimeout(() => Native.call('appReady'), 0);
   Lock.maybeLock(true);
   const incoming = Native.has ? Native.call('getIncoming') : '';
   if (incoming) setTimeout(() => App.onIncoming(incoming), 400);
@@ -162,4 +216,10 @@ if (window.matchMedia) {
   setInterval(() => { if ((App.path === '/today' || App.path.startsWith('/timetable')) && !UI.stack.length && !document.hidden && !document.activeElement.matches('input,textarea,select')) App.refresh(); }, 60000);
   syncReminders();
   syncWidgets();
+  // Neuerungen nach einem Update, Update-Prüfung, Benachrichtigungs-Erlaubnis
+  setTimeout(() => {
+    if (!UI.stack.length && !Lock.active) showWhatsNew();
+    Update.check(true);
+    askNotificationsOnce();
+  }, 1200);
 }());

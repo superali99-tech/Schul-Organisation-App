@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- Bewusst KEINE Internet-Berechtigung: alle Daten bleiben auf dem Gerät (Datenschutz/DSGVO). -->
+    <!-- Internet NUR für die Update-Prüfung. Es werden keine Schul- oder Schülerdaten übertragen. -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" android:maxSdkVersion="32" />
@@ -118,6 +120,10 @@
 
         <receiver
             android:name=".ReminderReceiver"
+            android:exported="false" />
+
+        <receiver
+            android:name=".UpdateReceiver"
             android:exported="false" />
 
         <receiver

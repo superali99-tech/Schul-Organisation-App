@@ -2,7 +2,9 @@
 
 Eine Android-App, die den Schulalltag für Lehrerinnen und Lehrer organisiert. Sie arbeitet komplett **offline**, die Daten bleiben **auf dem Gerät**, und es gibt keine Werbung und kein Konto.
 
-📦 **APK zum Installieren:** [`release/Schulplan-1.2.0.apk`](release/Schulplan-1.2.0.apk) (Android 7.0 oder neuer)
+📦 **APK zum Installieren:** [`release/Schulplan.apk`](release/Schulplan.apk) (Android 7.0 oder neuer)
+
+**Neu in 1.3:** Automatische Updates in der App · Benachrichtigungen für Stunden, Termine, Aufgaben, Hausaufgaben, Prüfungen, Geburtstage, Ferien und eine Morgen-Übersicht · Startbildschirm mit Logo statt schwarzem Bildschirm.
 
 **Neu in 1.2:** 4 Startbildschirm-Widgets (Stundenplan heute, Nächste Stunde, Aufgaben, Termine & Prüfungen) · kein weißes Aufblitzen mehr beim Start.
 
@@ -12,12 +14,12 @@ Eine Android-App, die den Schulalltag für Lehrerinnen und Lehrer organisiert. S
 
 ## Installation auf dem Handy oder Tablet
 
-1. `release/Schulplan-1.2.0.apk` aufs Gerät laden (z. B. über GitHub im Browser → „Download“).
+1. `release/Schulplan.apk` aufs Gerät laden (z. B. über GitHub im Browser → „Download“).
 2. Die Datei antippen. Android fragt beim ersten Mal, ob der Browser bzw. Dateimanager **„Apps aus unbekannten Quellen installieren“** darf → erlauben.
 3. Auf **Installieren** tippen und die App „Schulplan“ öffnen.
 4. Beim ersten Start legst du deinen Namen und dein Notensystem fest – oder lädst zum Ausprobieren die **Beispieldaten**.
 
-> Updates: Eine neuere APK lässt sich einfach über die alte installieren. Die Daten bleiben dabei erhalten.
+> **Updates kommen automatisch:** Ab Version 1.3 prüft die App selbst auf neue Versionen, zeigt „Neue Version verfügbar“ mit den Neuerungen und installiert sie mit einem Tipp. Die Daten bleiben dabei erhalten. Nur Version 1.3 selbst muss einmalig per Hand installiert werden.
 
 ## Kollegium: mit anderen Lehrkräften der Schule zusammenarbeiten
 
@@ -75,9 +77,19 @@ Alle Team-Daten sind Ende-zu-Ende verschlüsselt (AES-256-GCM). Den Schlüssel h
 
 ## Datenschutz
 
-* Alle Daten liegen nur im privaten App-Speicher auf dem Gerät. Die App hat **keine Internet-Berechtigung**.
+* Alle Daten liegen nur im privaten App-Speicher auf dem Gerät. Das Internet wird **ausschließlich für die Update-Prüfung** genutzt (Abruf von `release/version.json`); dabei werden keine Schul- oder Schülerdaten übertragen.
 * Für Android-Cloud-Backups ist die App gesperrt. Gesichert wird nur, was du selbst exportierst.
 * Bitte beachte die Vorgaben deines Bundeslandes zur Verarbeitung von Schülerdaten auf privaten Geräten. Die PIN-Sperre ist empfohlen.
+
+## Neue Version veröffentlichen (für alle Lehrkräfte)
+
+1. In `app/build.gradle` `versionCode` um 1 erhöhen und `versionName` anpassen.
+2. In `app/src/main/assets/www/js/views/update.js` einen Eintrag oben in `CHANGELOG` ergänzen (wird nach dem Update als „Neu in …“ angezeigt).
+3. `./gradlew assembleRelease` und die APK nach `release/Schulplan.apk` kopieren.
+4. In `release/version.json` `versionCode`, `versionName`, `date` und `notes` anpassen.
+5. Committen und pushen – alle installierten Apps sehen die neue Version beim nächsten Öffnen bzw. per Benachrichtigung (Prüfung etwa zweimal täglich).
+
+Die App lädt `https://raw.githubusercontent.com/superali99-tech/Schul-Organisation-App/HEAD/release/version.json`. Das Repository muss dafür öffentlich sein (oder in der App unter *App-Updates → Update-Quelle* eine andere Adresse eingetragen werden). Android installiert ein Update nur, wenn es mit demselben Schlüssel signiert ist.
 
 ## Technik & selbst bauen
 
