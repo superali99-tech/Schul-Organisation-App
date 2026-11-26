@@ -1,4 +1,4 @@
-/* Schulplan – Desktop (Windows) – Hauptprozess */
+/* Schulplan – Desktop (Windows, Mac, Linux) – Hauptprozess */
 'use strict';
 
 const { app, BrowserWindow, protocol, net, ipcMain, dialog, shell, Notification, nativeTheme, Menu, Tray, clipboard, powerSaveBlocker, session } = require('electron');
@@ -18,6 +18,8 @@ const BACKUPS = () => path.join(DATA(), 'auto-backups');
 const CONF = () => path.join(DATA(), 'desktop-config.json');
 const INSTALLER_URL = 'https://raw.githubusercontent.com/superali99-tech/Schul-Organisation-App/HEAD/release/Schulplan-Setup.exe';
 const IS_MAC = process.platform === 'darwin';
+const IS_LINUX = process.platform === 'linux';
+const APPIMAGE = IS_LINUX ? process.env.APPIMAGE || '' : '';
 
 let win = null;
 let tray = null;
@@ -140,7 +142,9 @@ function createWindow() {
       win.hide();
       if (!conf().trayHintShown) {
         setConf({ trayHintShown: true });
-        new Notification({ title: 'Schulplan läuft weiter', body: 'Schulplan ist unten rechts im Infobereich, damit Erinnerungen ankommen. Rechtsklick → „Beenden" schließt die App ganz.' }).show();
+        new Notification({ title: 'Schulplan läuft weiter', body: IS_LINUX
+          ? 'Schulplan läuft im Hintergrund weiter, damit Erinnerungen ankommen. Zurück über das Symbol in der oberen Leiste oder durch erneutes Öffnen. Strg+Q beendet die App ganz.'
+          : 'Schulplan ist unten rechts im Infobereich, damit Erinnerungen ankommen. Rechtsklick → „Beenden" schließt die App ganz.' }).show();
       }
     }
   });
@@ -149,6 +153,32 @@ function createWindow() {
   // Externe Links (Telefon, E-Mail, Webseiten) im System öffnen
   win.webContents.setWindowOpenHandler(({ url }) => { shell.openExternal(url); return { action: 'deny' }; });
   win.webContents.on('will-navigate', (e, url) => { if (!url.startsWith('app://')) { e.preventDefault(); shell.openExternal(url); } });
+}
+
+// Linux: Menüleiste (mit Alt einblendbar) – vor allem für die Tastenkürzel
+function linuxMenu() {
+  const go = (r) => () => { showWindow(); call('navigate', r); };
+  return Menu.buildFromTemplate([
+    { label: '&Datei', submenu: [
+      { label: 'Desktop-Widget anzeigen', type: 'checkbox', checked: !!conf().widget, accelerator: 'Ctrl+Shift+W', click: (item) => setWidget(item.checked) },
+      { type: 'separator' },
+      { label: 'Fenster schließen', accelerator: 'Ctrl+W', click: () => { if (win) win.close(); } },
+      { label: 'Beenden', accelerator: 'Ctrl+Q', click: () => { quitting = true; app.quit(); } },
+    ] },
+    { label: '&Bearbeiten', submenu: [
+      { role: 'undo', label: 'Rückgängig' }, { role: 'redo', label: 'Wiederholen' }, { type: 'separator' },
+      { role: 'cut', label: 'Ausschneiden' }, { role: 'copy', label: 'Kopieren' }, { role: 'paste', label: 'Einfügen' }, { role: 'selectAll', label: 'Alles auswählen' },
+    ] },
+    { label: '&Ansicht', submenu: [
+      { label: 'Heute', accelerator: 'Ctrl+1', click: go('/today') },
+      { label: 'Stundenplan', accelerator: 'Ctrl+2', click: go('/timetable') },
+      { label: 'Klassen', accelerator: 'Ctrl+3', click: go('/classes') },
+      { label: 'Kalender', accelerator: 'Ctrl+4', click: go('/calendar') },
+      { type: 'separator' },
+      { role: 'zoomIn', label: 'Größer' }, { role: 'zoomOut', label: 'Kleiner' }, { role: 'resetZoom', label: 'Normale Größe' },
+      { type: 'separator' }, { role: 'togglefullscreen', label: 'Vollbild' },
+    ] },
+  ]);
 }
 
 function macMenu() {
@@ -209,6 +239,7 @@ function refreshWidget() {
 function updateMenus() {
   if (tray) tray.setContextMenu(trayMenu());
   if (IS_MAC) Menu.setApplicationMenu(macMenu());
+  if (IS_LINUX) Menu.setApplicationMenu(linuxMenu());
 }
 
 function trayMenu() {
@@ -231,6 +262,62 @@ function createTray() {
     tray.on('click', showWindow);
     tray.on('double-click', showWindow);
   } catch (e) { tray = null; }
+}
+
+// ------------------------------------------------------------------ Linux-Update
+// AppImage: neue Datei laden und die alte direkt ersetzen (ohne Passwort), dann neu starten.
+// .deb: Paket laden und mit pkexec installieren (das System fragt nach dem Passwort), dann neu starten.
+async function linuxUpdate(url) {
+  let buf;
+  try { buf = await httpGet(url, (pct) => call('onUpdateProgress', pct)); } catch (e) { call('onUpdateState', 'error', e.message); return; }
+  const toDownloads = (name) => {
+    const f = path.join(app.getPath('downloads'), name);
+    fs.writeFileSync(f, buf, { mode: 0o755 });
+    return f;
+  };
+  if (APPIMAGE) {
+    try {
+      const tmp = APPIMAGE + '.update';
+      fs.writeFileSync(tmp, buf, { mode: 0o755 });
+      fs.chmodSync(tmp, 0o755);
+      fs.renameSync(tmp, APPIMAGE);
+    } catch (e) {
+      try {
+        const f = toDownloads('Schulplan-Linux.AppImage');
+        shell.showItemInFolder(f);
+        call('onUpdateState', 'error', 'Die AppImage-Datei konnte nicht ersetzt werden. Die neue Version liegt im Download-Ordner – einfach von dort starten.');
+      } catch (e2) { call('onUpdateState', 'error', e.message); }
+      return;
+    }
+    call('onUpdateState', 'installing', '');
+    setTimeout(() => { quitting = true; app.relaunch({ execPath: APPIMAGE, args: [] }); app.exit(0); }, 1200);
+    return;
+  }
+  const file = path.join(os.tmpdir(), `schulplan-update-${Date.now()}.deb`);
+  try { fs.writeFileSync(file, buf); } catch (e) { call('onUpdateState', 'error', e.message); return; }
+  call('onUpdateState', 'installing', '');
+  toast('Bitte gib im nächsten Fenster dein Passwort ein, um das Update zu installieren.');
+  let p;
+  try {
+    p = spawn('pkexec', ['sh', '-c', 'apt-get install -y "$1" || dpkg -i "$1"', 'sh', file], { stdio: 'ignore' });
+  } catch (e) { p = null; }
+  const fallback = () => {
+    try {
+      const f = toDownloads('Schulplan-Linux.deb');
+      shell.openPath(f);
+      call('onUpdateState', 'error', 'Installation nicht abgeschlossen. Die neue Version liegt im Download-Ordner (Schulplan-Linux.deb) – Doppelklick zum Installieren.');
+    } catch (e) { call('onUpdateState', 'error', e.message); }
+  };
+  if (!p) { fallback(); return; }
+  let done = false;
+  const finish = (ok) => {
+    if (done) return;
+    done = true;
+    fs.unlink(file, () => {});
+    if (ok) { quitting = true; app.relaunch(); app.exit(0); } else fallback();
+  };
+  p.on('error', () => finish(false));
+  p.on('exit', (code) => finish(code === 0));
 }
 
 // ------------------------------------------------------------------ Brücke (gleiche Funktionen wie in der Android-App)
@@ -268,7 +355,7 @@ const async_ = {
   },
   async shareFile(filename, mime, content) { return async_.saveFile(filename, mime, content, false); },
   shareText(title, text) { clipboard.writeText(text); toast('In die Zwischenablage kopiert – jetzt z. B. in E-Mail oder Messenger einfügen (Strg+V)'); },
-  shareApk() { clipboard.writeText('https://github.com/superali99-tech/Schul-Organisation-App#readme'); toast('Download-Link für Schulplan (Windows, Mac, Android) kopiert'); },
+  shareApk() { clipboard.writeText('https://github.com/superali99-tech/Schul-Organisation-App#readme'); toast('Download-Link für Schulplan (Windows, Mac, Linux, Android) kopiert'); },
   print(job) { win.webContents.print({ printBackground: true }, () => call('onPrintDone')); },
   syncReminders(json) { try { scheduleReminders(JSON.parse(json)); } catch (e) { /* ignorieren */ } },
   requestNotificationPermission() { call('onNotifPermission', true); },
@@ -297,7 +384,9 @@ const async_ = {
       try {
         const buf = await httpGet(u + (u.includes('?') ? '&' : '?') + 't=' + Date.now());
         const j = JSON.parse(buf.toString('utf8'));
-        const d = IS_MAC ? (j.mac && { ...j.mac, url: j.mac[process.arch === 'arm64' ? 'arm64' : 'x64'] }) : j.desktop;
+        const d = IS_MAC ? (j.mac && { ...j.mac, url: j.mac[process.arch === 'arm64' ? 'arm64' : 'x64'] })
+          : IS_LINUX ? (j.linux && { ...j.linux, url: APPIMAGE ? j.linux.appimage : j.linux.deb })
+          : j.desktop;
         if (!d || !d.version || !d.url) { call('onUpdateInfo', reqId, true, JSON.stringify({ versionCode: 0 })); return; }
         call('onUpdateInfo', reqId, true, JSON.stringify({ versionCode: versionCode(d.version), versionName: d.version, apk: d.url, notes: d.notes || j.notes || [], date: d.date || j.date }));
         return;
@@ -306,6 +395,7 @@ const async_ = {
     call('onUpdateInfo', reqId, false, lastErr);
   },
   async startUpdate(url) {
+    if (IS_LINUX) { linuxUpdate(url); return; }
     if (IS_MAC) {
       // Mac: neue Version in den Download-Ordner laden und im Finder zeigen
       try {
@@ -375,7 +465,7 @@ if (!app.requestSingleInstanceLock()) {
   });
 
   app.whenReady().then(() => {
-    Menu.setApplicationMenu(IS_MAC ? macMenu() : null);
+    Menu.setApplicationMenu(IS_MAC ? macMenu() : IS_LINUX ? linuxMenu() : null);
     pendingIncoming = incomingFromArgv(process.argv);
     protocol.handle('app', (req) => {
       const u = new URL(req.url);

@@ -5,11 +5,12 @@ Eine Android-App, die den Schulalltag für Lehrerinnen und Lehrer organisiert. S
 📦 **Android:** [`release/Schulplan.apk`](release/Schulplan.apk) (Android 7.0 oder neuer)  
 🖥️ **Windows:** [`release/Schulplan-Setup.exe`](release/Schulplan-Setup.exe) (Windows 10/11, 64 Bit)  
 🌐 **Web-App (ohne Installationsdatei, auch iPhone/iPad):** https://superali99-tech.github.io/Schul-Organisation-App/app/  
-🍎 **Mac:** [`Schulplan-Mac-AppleSilicon.zip`](release/Schulplan-Mac-AppleSilicon.zip) (M1/M2/M3/M4) · [`Schulplan-Mac-Intel.zip`](release/Schulplan-Mac-Intel.zip) (ältere Macs) – macOS 11 oder neuer
+🍎 **Mac:** [`Schulplan-Mac-AppleSilicon.zip`](release/Schulplan-Mac-AppleSilicon.zip) (M1/M2/M3/M4) · [`Schulplan-Mac-Intel.zip`](release/Schulplan-Mac-Intel.zip) (ältere Macs) – macOS 11 oder neuer  
+🐧 **Linux:** [`Schulplan-Linux.deb`](release/Schulplan-Linux.deb) (Ubuntu, Linux Mint, Debian) · [`Schulplan-Linux.AppImage`](release/Schulplan-Linux.AppImage) (alle anderen, 64 Bit)
 
 🌐 **Website:** https://superali99-tech.github.io/Schul-Organisation-App/ – Downloads, ausführliche Anleitung, Datenschutzerklärung, Nutzungsrichtlinien und Lizenz (Quelle im Ordner `docs/`).
 
-**Neu in 1.4:** Desktop-Widget für Windows und Mac · Zahl am App-Symbol der Web-App · bessere Darstellung auf iPhone/iPad.
+**Neu:** Linux-Version (.deb und AppImage) · Desktop-Widget für Windows, Mac und Linux · Zahl am App-Symbol der Web-App · bessere Darstellung auf iPhone/iPad.
 
 **Neu in 1.3.2:** Mac-Version · Update-Suche mit Zeitlimit (kein endloses Suchen mehr).
 
@@ -52,6 +53,13 @@ Die Windows-Version hat dieselben Funktionen wie die Android-App, dazu eine Seit
    * Meldet macOS *„ist beschädigt“*, einmalig im Programm **Terminal** eingeben: `xattr -cr /Applications/Schulplan.app` – danach startet die App normal.
 
 Daten liegen unter `~/Library/Application Support/Schulplan` (mit täglichen Sicherungen). Beim Schließen des Fensters bleibt Schulplan im Dock aktiv, damit Erinnerungen ankommen; **⌘Q** beendet die App. Neue Versionen meldet die App selbst und lädt sie in den Download-Ordner (dann entpacken und in *Programme* ersetzen).
+
+## Installation unter Linux
+
+* **Ubuntu, Linux Mint, Debian:** `Schulplan-Linux.deb` doppelklicken und installieren – oder im Terminal: `sudo apt install ./Schulplan-Linux.deb`. Schulplan erscheint danach im Anwendungsmenü.
+* **Andere Systeme (Fedora, openSUSE, Arch …):** `Schulplan-Linux.AppImage` laden, ausführbar machen (Rechtsklick → Eigenschaften → „Als Programm ausführen“ bzw. `chmod +x Schulplan-Linux.AppImage`) und doppelklicken. Startet es unter Ubuntu nicht, fehlt FUSE: `sudo apt install libfuse2` (24.04: `libfuse2t64`).
+
+Daten liegen unter `~/.config/Schulplan` (mit täglichen Sicherungen). Beim Schließen läuft Schulplan im Hintergrund weiter, damit Erinnerungen ankommen; **Strg+Q** beendet die App, **Strg+Umschalt+W** schaltet das Desktop-Widget ein. Updates: Das AppImage ersetzt sich selbst; beim .deb fragt das System einmal nach dem Passwort.
 
 ## Kollegium: mit anderen Lehrkräften der Schule zusammenarbeiten
 
@@ -122,6 +130,7 @@ Alle Team-Daten sind Ende-zu-Ende verschlüsselt (AES-256-GCM). Den Schlüssel h
 4. In `release/version.json` `versionCode`, `versionName`, `date` und `notes` anpassen.
 5. Windows: In `desktop/package.json` `version` anpassen, `cd desktop && npm install && npm run dist`, dann `desktop/dist/Schulplan-Setup.exe` nach `release/` kopieren und in `release/version.json` den Block `desktop` anpassen.
    Mac: `npm run dist-mac`, die beiden ZIPs aus `desktop/dist/` als `Schulplan-Mac-AppleSilicon.zip` / `Schulplan-Mac-Intel.zip` nach `release/` kopieren und den Block `mac` anpassen.
+   Linux: `npm run dist-linux`, `Schulplan-Linux.deb` und `Schulplan-Linux.AppImage` aus `desktop/dist/` nach `release/` kopieren und den Block `linux` anpassen.
 6. Committen und pushen – alle installierten Apps sehen die neue Version beim nächsten Öffnen bzw. per Benachrichtigung (Prüfung etwa zweimal täglich).
 
 Die App lädt `https://raw.githubusercontent.com/superali99-tech/Schul-Organisation-App/HEAD/release/version.json`. Das Repository muss dafür öffentlich sein (oder in der App unter *App-Updates → Update-Quelle* eine andere Adresse eingetragen werden). Android installiert ein Update nur, wenn es mit demselben Schlüssel signiert ist.

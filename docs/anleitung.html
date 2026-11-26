@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Schulplan Anleitung</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<meta name="description" content="Ausführliche Anleitung zu Schulplan: Installation auf Android, Windows und Mac, Einrichtung, Noten, Kollegium, Benachrichtigungen und Datensicherung.">
+<meta name="description" content="Ausführliche Anleitung zu Schulplan: Installation auf Android, Windows, Mac und Linux, Einrichtung, Noten, Kollegium, Benachrichtigungen und Datensicherung.">
 <meta name="theme-color" content="#4f46e5">
 <link rel="icon" href="img/favicon.png" type="image/png">
 <link rel="stylesheet" href="style.css">
@@ -22,7 +22,7 @@
 
 <div class="page-head"><div class="wrap"><span class="eyebrow">Anleitung</span><h1>So nutzt du Schulplan</h1><p class="lead">Von der Installation über die Einrichtung bis zu Kollegium, Benachrichtigungen und Datensicherung. Springe direkt zu dem Thema, das du brauchst.</p></div></div>
 <div class="wrap doc">
-<nav class="toc" aria-label="Inhalt"><strong>Inhalt</strong><ol><li><a href="#version">Welche Version brauche ich?</a></li><li><a href="#android">Installation auf Android</a></li><li><a href="#windows">Installation unter Windows</a></li><li><a href="#smart-app-control">Windows: Smart App Control</a></li><li><a href="#mac">Installation auf dem Mac</a></li><li><a href="#iphone">iPhone & iPad</a></li><li><a href="#webapp">Web-App (Browser)</a></li><li><a href="#start">Erste Schritte</a></li><li><a href="#stundenplan">Stundenplan & Vertretungen</a></li><li><a href="#unterricht">Eine Stunde halten</a></li><li><a href="#noten">Noten & Leistungsnachweise</a></li><li><a href="#anwesenheit">Anwesenheit</a></li><li><a href="#organisation">Hausaufgaben, Aufgaben & Kalender</a></li><li><a href="#kollegium">Kollegium</a></li><li><a href="#benachrichtigungen">Benachrichtigungen</a></li><li><a href="#widgets">Widgets (Android, Windows, Mac)</a></li><li><a href="#werkzeuge">Werkzeuge</a></li><li><a href="#sicherung">Datensicherung & Gerätewechsel</a></li><li><a href="#updates">Updates</a></li><li><a href="#sicherheit">PIN & Datenschutz-Einstellungen</a></li><li><a href="#probleme">Hilfe bei Problemen</a></li><li><a href="#deinstallieren">Deinstallieren</a></li></ol></nav>
+<nav class="toc" aria-label="Inhalt"><strong>Inhalt</strong><ol><li><a href="#version">Welche Version brauche ich?</a></li><li><a href="#android">Installation auf Android</a></li><li><a href="#windows">Installation unter Windows</a></li><li><a href="#smart-app-control">Windows: Smart App Control</a></li><li><a href="#mac">Installation auf dem Mac</a></li><li><a href="#linux">Installation unter Linux</a></li><li><a href="#iphone">iPhone & iPad</a></li><li><a href="#webapp">Web-App (Browser)</a></li><li><a href="#start">Erste Schritte</a></li><li><a href="#stundenplan">Stundenplan & Vertretungen</a></li><li><a href="#unterricht">Eine Stunde halten</a></li><li><a href="#noten">Noten & Leistungsnachweise</a></li><li><a href="#anwesenheit">Anwesenheit</a></li><li><a href="#organisation">Hausaufgaben, Aufgaben & Kalender</a></li><li><a href="#kollegium">Kollegium</a></li><li><a href="#benachrichtigungen">Benachrichtigungen</a></li><li><a href="#widgets">Widgets (Android, Windows, Mac, Linux)</a></li><li><a href="#werkzeuge">Werkzeuge</a></li><li><a href="#sicherung">Datensicherung & Gerätewechsel</a></li><li><a href="#updates">Updates</a></li><li><a href="#sicherheit">PIN & Datenschutz-Einstellungen</a></li><li><a href="#probleme">Hilfe bei Problemen</a></li><li><a href="#deinstallieren">Deinstallieren</a></li></ol></nav>
 <article class="prose">
 <div id="installation"></div>
 <section id="version">
@@ -34,7 +34,9 @@
       <tr><td>Windows-PC oder -Laptop</td><td><a href="https://raw.githubusercontent.com/superali99-tech/Schul-Organisation-App/HEAD/release/Schulplan-Setup.exe">Schulplan-Setup.exe</a></td><td>Windows 10 oder 11, 64 Bit</td></tr>
       <tr><td>Mac mit M1, M2, M3 oder M4</td><td><a href="https://raw.githubusercontent.com/superali99-tech/Schul-Organisation-App/HEAD/release/Schulplan-Mac-AppleSilicon.zip">Schulplan-Mac-AppleSilicon.zip</a></td><td>macOS 11 oder neuer</td></tr>
       <tr><td>Mac mit Intel-Prozessor</td><td><a href="https://raw.githubusercontent.com/superali99-tech/Schul-Organisation-App/HEAD/release/Schulplan-Mac-Intel.zip">Schulplan-Mac-Intel.zip</a></td><td>macOS 11 oder neuer</td></tr>
-      <tr><td>iPhone, iPad, Chromebook, Linux – oder wenn Windows blockiert</td><td><a href="app/">Web-App im Browser</a></td><td>Aktueller Browser</td></tr>
+      <tr><td>Linux: Ubuntu, Linux Mint, Debian</td><td><a href="https://raw.githubusercontent.com/superali99-tech/Schul-Organisation-App/HEAD/release/Schulplan-Linux.deb">Schulplan-Linux.deb</a></td><td>64 Bit, z.&nbsp;B. Ubuntu 22.04 oder neuer</td></tr>
+      <tr><td>Linux: Fedora, openSUSE, Arch und andere</td><td><a href="https://raw.githubusercontent.com/superali99-tech/Schul-Organisation-App/HEAD/release/Schulplan-Linux.AppImage">Schulplan-Linux.AppImage</a></td><td>64 Bit (x86)</td></tr>
+      <tr><td>iPhone, iPad, Chromebook – oder wenn Windows blockiert</td><td><a href="app/">Web-App im Browser</a></td><td>Aktueller Browser</td></tr>
     </tbody></table></div>
   <p><strong>Welchen Chip hat mein Mac?</strong> Klicke oben links auf das Apple-Menü  → <em>Über diesen Mac</em>. Steht bei „Chip“ <em>Apple M1</em> (oder M2, M3, M4), nimm Apple Silicon. Steht bei „Prozessor“ <em>Intel</em>, nimm die Intel-Version.</p>
 </section>
@@ -95,6 +97,32 @@
     <li>Mit <kbd>⌘</kbd> <kbd>1</kbd> bis <kbd>4</kbd> springst du zu Heute, Stundenplan, Klassen und Kalender.</li>
     <li>Deine Daten liegen unter <code>~/Library/Application Support/Schulplan</code>.</li>
     <li>Beim ersten QR-Scan bzw. bei der Lautstärke-Ampel fragt macOS nach Kamera bzw. Mikrofon.</li>
+  </ul>
+</section>
+
+<section id="linux">
+  <h2>Installation unter Linux</h2>
+  <p>Für Linux gibt es zwei Dateien. Nimm das <strong>.deb-Paket</strong> für Ubuntu, Linux Mint, Debian, Zorin OS, elementary OS und Pop!_OS. Für alle anderen Systeme (Fedora, openSUSE, Arch, Manjaro …) nimm das <strong>AppImage</strong>.</p>
+  <h3>.deb-Paket (Ubuntu, Mint, Debian)</h3>
+  <ol class="steps">
+    <li><div><h4>Herunterladen</h4><p>Lade <strong>Schulplan-Linux.deb</strong> (69 MB) in deinen Download-Ordner.</p></div></li>
+    <li><div><h4>Installieren</h4><p>Doppelklicke die Datei. Je nach System öffnet sich das App-Zentrum, die Anwendungsverwaltung oder der Paket-Installer. Klicke auf <strong>Installieren</strong> und gib dein Passwort ein.</p></div></li>
+    <li><div><h4>Oder im Terminal</h4><p>Öffne das Terminal im Download-Ordner und gib ein: <code>sudo apt install ./Schulplan-Linux.deb</code></p></div></li>
+    <li><div><h4>Starten</h4><p>Schulplan findest du jetzt im <strong>Anwendungsmenü</strong> (Suche: „Schulplan“). Tipp: Rechtsklick auf das Symbol im Dock → <em>Zu Favoriten hinzufügen</em>.</p></div></li>
+  </ol>
+  <h3>AppImage (alle Linux-Systeme)</h3>
+  <ol class="steps">
+    <li><div><h4>Herunterladen</h4><p>Lade <strong>Schulplan-Linux.AppImage</strong> (77 MB). Am besten legst du die Datei in einen festen Ordner, zum Beispiel <code>~/Anwendungen</code>.</p></div></li>
+    <li><div><h4>Ausführbar machen</h4><p>Rechtsklick auf die Datei → <strong>Eigenschaften</strong> → <strong>Als Programm ausführen</strong> bzw. <strong>Ausführbar</strong> einschalten. Im Terminal: <code>chmod +x Schulplan-Linux.AppImage</code></p></div></li>
+    <li><div><h4>Starten</h4><p>Doppelklicke die Datei. Updates ersetzen genau diese Datei – lass sie deshalb am selben Ort.</p></div></li>
+  </ol>
+  <div class="notice"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3" /><path d="M12 9v4" /><path d="M12 17h.01" /></svg><div><strong>Das AppImage startet nicht?</strong> Unter Ubuntu 22.04 und neuer fehlt oft das Paket für FUSE. Installiere es einmalig im Terminal: <code>sudo apt install libfuse2</code> (Ubuntu 24.04: <code>sudo apt install libfuse2t64</code>) – oder nimm einfach das .deb-Paket.</div></div>
+  <h3>Gut zu wissen</h3>
+  <ul>
+    <li>Schließt du das Fenster, läuft Schulplan im Hintergrund weiter, damit Erinnerungen ankommen. Zurück kommst du über das Schulplan-Symbol in der oberen Leiste (falls dein System es anzeigt) oder indem du Schulplan einfach noch einmal öffnest. <kbd>Strg</kbd> <kbd>Q</kbd> beendet die App ganz.</li>
+    <li>Mit <kbd>Alt</kbd> blendest du die Menüleiste ein. <kbd>Strg</kbd> <kbd>1</kbd> bis <kbd>4</kbd> springen zu Heute, Stundenplan, Klassen und Kalender.</li>
+    <li>Deine Daten liegen unter <code>~/.config/Schulplan</code>, inklusive täglicher Sicherungen der letzten 14 Tage.</li>
+    <li>Team-Dateien, Einladungen und Sicherungen kannst du einfach mit der Maus ins Fenster ziehen.</li>
   </ul>
 </section>
 
@@ -246,15 +274,16 @@
     <li><strong>Android:</strong> Erlaube Benachrichtigungen, wenn die App fragt. Bei Energiesparfunktionen mancher Hersteller hilft es, Schulplan vom Akku-Sparen auszunehmen.</li>
     <li><strong>Windows:</strong> Erinnerungen kommen, solange Schulplan läuft – auch im Infobereich.</li>
     <li><strong>Mac:</strong> Erinnerungen kommen, solange Schulplan im Dock aktiv ist.</li>
+    <li><strong>Linux:</strong> Erinnerungen kommen als Systembenachrichtigung, solange Schulplan läuft – auch im Hintergrund.</li>
   </ul>
 </section>
 
 <section id="widgets">
   <h2>Widgets</h2>
-  <h3>Windows und Mac: Desktop-Widget</h3>
+  <h3>Windows, Mac und Linux: Desktop-Widget</h3>
   <p>Ein kleines Fenster auf dem Desktop zeigt die laufende oder nächste Stunde mit Restzeit, die heutigen Stunden, offene Aufgaben und die nächste Prüfung. Es aktualisiert sich von selbst.</p>
   <ul>
-    <li>Einschalten: <em>Einstellungen → Desktop-Widget</em>, unter Windows auch per Rechtsklick auf das Schulplan-Symbol im Infobereich, am Mac über <em>Fenster → Desktop-Widget anzeigen</em> (<kbd>⌘</kbd> <kbd>⇧</kbd> <kbd>W</kbd>).</li>
+    <li>Einschalten: <em>Einstellungen → Desktop-Widget</em>, unter Windows auch per Rechtsklick auf das Schulplan-Symbol im Infobereich, am Mac über <em>Fenster → Desktop-Widget anzeigen</em> (<kbd>⌘</kbd> <kbd>⇧</kbd> <kbd>W</kbd>), unter Linux mit <kbd>Strg</kbd> <kbd>⇧</kbd> <kbd>W</kbd> oder über <em>Datei → Desktop-Widget anzeigen</em>.</li>
     <li>Verschieben: oben am Titel ziehen. Größe: am Rand ziehen. Position und Größe merkt sich Schulplan.</li>
     <li>Die Stecknadel hält das Widget <strong>immer im Vordergrund</strong>; das Kreuz blendet es aus. Ein Klick auf einen Eintrag öffnet ihn in Schulplan.</li>
   </ul>
@@ -291,6 +320,8 @@
     <li><strong>Android:</strong> „Jetzt aktualisieren“ → einmalig „Apps aus dieser Quelle zulassen“ → „Aktualisieren“.</li>
     <li><strong>Windows:</strong> „Jetzt aktualisieren“ – Schulplan installiert sich still neu und startet wieder.</li>
     <li><strong>Mac:</strong> Die neue Version landet im Download-Ordner; entpacken und in „Programme“ ersetzen.</li>
+    <li><strong>Linux (AppImage):</strong> „Jetzt aktualisieren“ – die Datei wird ersetzt und Schulplan startet neu, ganz ohne Passwort.</li>
+    <li><strong>Linux (.deb):</strong> „Jetzt aktualisieren“ – dein System fragt einmal nach deinem Passwort, dann startet Schulplan in der neuen Version.</li>
     <li>Nach einem Update zeigt die App, was neu ist. Deine Daten bleiben immer erhalten. Die Suche bricht nach spätestens 15 Sekunden ab.</li>
   </ul>
 </section>
@@ -311,6 +342,7 @@
     <details><summary>Ich bekomme keine Erinnerungen</summary><div><p>Prüfe unter <em>Einstellungen → Benachrichtigungen</em>, ob sie eingeschaltet sind, und in den Android-Einstellungen, ob Schulplan Mitteilungen senden darf. Nimm Schulplan bei Bedarf vom Akku-Sparen aus. Am Computer muss Schulplan laufen (Infobereich bzw. Dock).</p></div></details>
     <details><summary>Die Update-Suche meldet „keine Antwort vom Server“</summary><div><p>Das Gerät ist offline oder ein Schulnetz blockiert die Verbindung. Versuche es später oder in einem anderen Netz. Nach einer Veröffentlichung kann es bis zu fünf Minuten dauern, bis die neue Version angezeigt wird.</p></div></details>
     <details><summary>Windows: Der Installer startet nicht</summary><div><p>Bestätige die SmartScreen-Meldung über „Weitere Informationen → Trotzdem ausführen“. Manche Virenscanner halten unbekannte Programme kurz an; prüfe dort die Quarantäne.</p></div></details>
+    <details><summary>Linux: Das AppImage startet nicht</summary><div><p>Prüfe, ob die Datei ausführbar ist (Rechtsklick → Eigenschaften → „Als Programm ausführen“). Unter Ubuntu 22.04 und neuer fehlt oft FUSE: <code>sudo apt install libfuse2</code> bzw. unter Ubuntu 24.04 <code>sudo apt install libfuse2t64</code>. Alternativ das .deb-Paket nehmen – siehe <a href="#linux">Installation unter Linux</a>.</p></div></details>
     <details><summary>Mac: „beschädigt“ oder „Entwickler nicht verifiziert“</summary><div><p>Siehe <a href="#mac">Installation auf dem Mac</a>: Rechtsklick → Öffnen, „Dennoch öffnen“ in den Systemeinstellungen oder einmalig <code>xattr -cr /Applications/Schulplan.app</code> im Terminal.</p></div></details>
     <details><summary>Die Kollegium-Einladung funktioniert nicht</summary><div><p>Füge die ganze Nachricht ins obere Feld ein und die vierstellige PIN ins Feld <strong>PIN</strong> – die PIN allein reicht nicht. Meldet die App „Die PIN passt nicht“, frag noch einmal nach der PIN oder lass dir eine neue Einladung schicken. Ein QR-Code funktioniert nur in der Schulplan-App selbst (Kollegium → Einladung annehmen → QR-Code scannen).</p></div></details>
     <details><summary>Meine Frage ist nicht dabei</summary><div><p>Stelle sie auf der <a href="https://github.com/superali99-tech/Schul-Organisation-App/issues">Fragen-und-Fehler-Seite des Projekts</a>. Schreibe dort bitte keine Schülerdaten oder persönlichen Angaben hinein.</p></div></details>
@@ -323,6 +355,7 @@
     <li><strong>Android:</strong> Symbol lange drücken → App-Info → Deinstallieren. Dabei werden alle Daten auf dem Gerät gelöscht – vorher eine Sicherung exportieren.</li>
     <li><strong>Windows:</strong> Einstellungen → Apps → Installierte Apps → Schulplan → Deinstallieren. Deine Daten in <code>%APPDATA%\Schulplan</code> bleiben erhalten; lösche den Ordner, wenn du alles entfernen willst.</li>
     <li><strong>Mac:</strong> Schulplan aus „Programme“ in den Papierkorb ziehen. Daten liegen in <code>~/Library/Application Support/Schulplan</code>.</li>
+    <li><strong>Linux:</strong> .deb im Terminal mit <code>sudo apt remove schulplan</code> entfernen, ein AppImage einfach löschen. Daten liegen in <code>~/.config/Schulplan</code>.</li>
   </ul>
 </section>
 </article>
@@ -333,7 +366,7 @@
   <div class="wrap">
     <div class="about">
       <a class="brand" href="index.html"><img src="img/icon.png" alt="" width="36" height="36">Schulplan</a>
-      <p class="muted" style="margin-top:10px;max-width:42ch">Der Organisations-Planer für Lehrkräfte – für Android, Windows und Mac. Kostenlos, ohne Konto, ohne Werbung.</p>
+      <p class="muted" style="margin-top:10px;max-width:42ch">Der Organisations-Planer für Lehrkräfte – für Android, Windows, Mac und Linux. Kostenlos, ohne Konto, ohne Werbung.</p>
     </div>
     <div><h4>App</h4><ul><li><a href="index.html#download">Downloads</a></li><li><a href="index.html#funktionen">Funktionen</a></li><li><a href="anleitung.html">Anleitung</a></li><li><a href="anleitung.html#probleme">Hilfe bei Problemen</a></li></ul></div>
     <div><h4>Rechtliches</h4><ul><li><a href="datenschutz.html">Datenschutz</a></li><li><a href="richtlinien.html">Nutzungsrichtlinien</a></li><li><a href="lizenz.html">Lizenz</a></li></ul></div>

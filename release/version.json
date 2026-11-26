@@ -25,5 +25,14 @@
       "Windows, Mac und große Bildschirme: Alles steht jetzt sauber in der Mitte – Schnellzugriffe, Knöpfe, Hinweise und die Kopfzeile",
       "Einladung annehmen: Einladungs-Nachricht und PIN in einem Formular"
     ]
+  },
+  "linux": {
+    "version": "1.4.2",
+    "date": "2026-11-26",
+    "appimage": "https://raw.githubusercontent.com/superali99-tech/Schul-Organisation-App/HEAD/release/Schulplan-Linux.AppImage",
+    "deb": "https://raw.githubusercontent.com/superali99-tech/Schul-Organisation-App/HEAD/release/Schulplan-Linux.deb",
+    "notes": [
+      "Schulplan gibt es jetzt auch für Linux (AppImage und .deb) – mit Desktop-Widget, Erinnerungen und automatischen Updates"
+    ]
   }
 }

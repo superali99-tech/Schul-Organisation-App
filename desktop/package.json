@@ -12,7 +12,8 @@
     "start": "npm run copy-www && electron .",
     "dist": "node scripts/patch-builder.js && npm run copy-www && electron-builder --win nsis --x64",
     "postinstall": "node scripts/patch-builder.js",
-    "dist-mac": "node scripts/patch-builder.js && npm run copy-www && electron-builder --mac zip --arm64 --x64"
+    "dist-mac": "node scripts/patch-builder.js && npm run copy-www && electron-builder --mac zip --arm64 --x64",
+    "dist-linux": "node scripts/patch-builder.js && npm run copy-www && electron-builder --linux deb --x64 && SCHULPLAN_APPIMAGE=1 electron-builder --linux AppImage --x64"
   },
   "devDependencies": {
     "electron": "33.4.11",
@@ -87,6 +88,40 @@
         "NSMicrophoneUsageDescription": "Schulplan nutzt das Mikrofon nur für die Lautstärke-Ampel. Es wird nichts aufgenommen.",
         "LSApplicationCategoryType": "public.app-category.education"
       }
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ],
+      "icon": "build/icon.png",
+      "category": "Education",
+      "executableName": "schulplan",
+      "synopsis": "Organisations-Planer für Lehrkräfte",
+      "description": "Schulplan – Stundenplan, Klassen, Noten, Anwesenheit, Klassenbuch, Termine und Kollegium für Lehrkräfte der Astrid Lindgren Schule.",
+      "maintainer": "Schulplan-Projekt <noreply@schulplan.invalid>",
+      "vendor": "Astrid Lindgren Schule",
+      "artifactName": "Schulplan-Linux.${ext}",
+      "electronLanguages": [
+        "de",
+        "en-US"
+      ],
+      "desktop": {
+        "entry": {
+          "Name": "Schulplan",
+          "GenericName": "Schulplaner",
+          "Comment": "Organisations-Planer für Lehrkräfte",
+          "Keywords": "Schule;Lehrer;Stundenplan;Noten;Klassenbuch;"
+        }
+      }
+    },
+    "deb": {
+      "packageName": "schulplan",
+      "compression": "xz",
+      "artifactName": "Schulplan-Linux.${ext}"
+    },
+    "appImage": {
+      "artifactName": "Schulplan-Linux.${ext}"
     }
   },
   "repository": {
