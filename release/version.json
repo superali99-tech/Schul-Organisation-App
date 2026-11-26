@@ -1,31 +1,29 @@
 {
-  "versionCode": 9,
-  "versionName": "1.4.1",
+  "versionCode": 10,
+  "versionName": "1.4.2",
   "date": "2026-11-26",
   "apk": "https://raw.githubusercontent.com/superali99-tech/Schul-Organisation-App/HEAD/release/Schulplan.apk",
   "notes": [
-    "Einladung annehmen ist jetzt einfacher: Einladungs-Nachricht und PIN in einem Formular",
-    "Knopf „Aus der Zwischenablage einfügen\" für die kopierte Einladung",
-    "Klare Hinweise, wenn nur die PIN eingegeben wurde oder die PIN nicht passt"
+    "Windows, Mac und große Bildschirme: Alles steht jetzt sauber in der Mitte – Schnellzugriffe, Knöpfe, Hinweise und die Kopfzeile",
+    "Einladung annehmen: Einladungs-Nachricht und PIN in einem Formular"
   ],
   "desktop": {
-    "version": "1.4.1",
+    "version": "1.4.2",
     "date": "2026-11-26",
     "url": "https://raw.githubusercontent.com/superali99-tech/Schul-Organisation-App/HEAD/release/Schulplan-Setup.exe",
     "notes": [
-      "Einladung annehmen ist jetzt einfacher: Einladungs-Nachricht und PIN in einem Formular",
-      "Knopf „Aus der Zwischenablage einfügen\" für die kopierte Einladung",
-      "Klare Hinweise, wenn nur die PIN eingegeben wurde oder die PIN nicht passt"
+      "Windows, Mac und große Bildschirme: Alles steht jetzt sauber in der Mitte – Schnellzugriffe, Knöpfe, Hinweise und die Kopfzeile",
+      "Einladung annehmen: Einladungs-Nachricht und PIN in einem Formular"
     ]
   },
   "mac": {
-    "version": "1.4.0",
+    "version": "1.4.2",
     "date": "2026-11-26",
     "arm64": "https://raw.githubusercontent.com/superali99-tech/Schul-Organisation-App/HEAD/release/Schulplan-Mac-AppleSilicon.zip",
     "x64": "https://raw.githubusercontent.com/superali99-tech/Schul-Organisation-App/HEAD/release/Schulplan-Mac-Intel.zip",
     "notes": [
-      "Desktop-Widget für Windows und Mac: nächste Stunde, heutige Stunden, Aufgaben und nächste Prüfung immer im Blick",
-      "Widget über Menü „Fenster\" oder ⌘⇧W"
+      "Windows, Mac und große Bildschirme: Alles steht jetzt sauber in der Mitte – Schnellzugriffe, Knöpfe, Hinweise und die Kopfzeile",
+      "Einladung annehmen: Einladungs-Nachricht und PIN in einem Formular"
     ]
   }
 }

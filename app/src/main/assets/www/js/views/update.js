@@ -5,6 +5,9 @@ const UPDATE_URLS = ['https://raw.githubusercontent.com/superali99-tech/Schul-Or
 
 /** Neuerungen je Version (neueste zuerst) */
 const CHANGELOG = [
+  { v: '1.4.2', items: [
+    'Windows, Mac und große Bildschirme: Alles steht jetzt sauber in der Mitte – Schnellzugriffe, Knöpfe, Hinweise und die Kopfzeile',
+  ] },
   { v: '1.4.1', items: [
     'Einladung annehmen ist jetzt einfacher: Einladungs-Nachricht und PIN in einem Formular',
     'Knopf „Aus der Zwischenablage einfügen" für die kopierte Einladung',
