@@ -6,6 +6,8 @@ Eine Android-App, die den Schulalltag für Lehrerinnen und Lehrer organisiert. S
 🖥️ **Windows:** [`release/Schulplan-Setup.exe`](release/Schulplan-Setup.exe) (Windows 10/11, 64 Bit)  
 🍎 **Mac:** [`Schulplan-Mac-AppleSilicon.zip`](release/Schulplan-Mac-AppleSilicon.zip) (M1/M2/M3/M4) · [`Schulplan-Mac-Intel.zip`](release/Schulplan-Mac-Intel.zip) (ältere Macs) – macOS 11 oder neuer
 
+🌐 **Website:** https://superali99-tech.github.io/Schul-Organisation-App/ – Downloads, ausführliche Anleitung, Datenschutzerklärung, Nutzungsrichtlinien und Lizenz (Quelle im Ordner `docs/`).
+
 **Neu in 1.3.2:** Mac-Version · Update-Suche mit Zeitlimit (kein endloses Suchen mehr).
 
 **Neu in 1.3.1:** Windows-Version · Seitenleiste für große Bildschirme · Zurück-Taste, Update-Prüfung und Cloud-Abgleich repariert.
@@ -119,6 +121,10 @@ Alle Team-Daten sind Ende-zu-Ende verschlüsselt (AES-256-GCM). Den Schlüssel h
 6. Committen und pushen – alle installierten Apps sehen die neue Version beim nächsten Öffnen bzw. per Benachrichtigung (Prüfung etwa zweimal täglich).
 
 Die App lädt `https://raw.githubusercontent.com/superali99-tech/Schul-Organisation-App/HEAD/release/version.json`. Das Repository muss dafür öffentlich sein (oder in der App unter *App-Updates → Update-Quelle* eine andere Adresse eingetragen werden). Android installiert ein Update nur, wenn es mit demselben Schlüssel signiert ist.
+
+## Website (GitHub Pages)
+
+Die Website liegt im Ordner `docs/` (reines HTML/CSS, keine Cookies, kein Tracking, Schriften lokal). Einmalig einschalten: GitHub → *Settings* → *Pages* → *Build and deployment*: „Deploy from a branch“, Branch `ccr-c2cca40c-1fdkle` (bzw. der Standard-Branch), Ordner `/docs` → *Save*. Nach einer Minute ist sie unter https://superali99-tech.github.io/Schul-Organisation-App/ erreichbar. Bei neuen Versionen Versionsnummern, Größen und Prüfsummen in `docs/index.html` und `docs/script.js` anpassen.
 
 ## Technik & selbst bauen
 
