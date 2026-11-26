@@ -480,6 +480,8 @@ function applyTheme() {
   const dark = st.theme === 'dark' || (st.theme === 'auto' && systemDark());
   const root = document.documentElement;
   root.dataset.theme = dark ? 'dark' : 'light';
+  root.style.background = dark ? '#0b0d13' : '#f3f4fa';
+  try { localStorage.setItem('sp-theme', dark ? 'dark' : 'light'); } catch (e) { /* egal */ }
   const acc = st.accent || '#4f46e5';
   root.style.setProperty('--accent', acc);
   root.style.setProperty('--accent-soft', rgba(acc, dark ? 0.24 : 0.12));

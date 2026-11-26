@@ -5,6 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#ffffff">
   <title>Schulplan</title>
+  <script>
+    // Farbschema sofort setzen (verhindert helles Aufblitzen beim Start)
+    (function () {
+      var t = null;
+      try { t = localStorage.getItem('sp-theme'); } catch (e) {}
+      if (!t) { try { t = window.Android && Android.isSystemDark() ? 'dark' : (window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'); } catch (e) { t = 'light'; } }
+      document.documentElement.setAttribute('data-theme', t);
+      document.documentElement.style.background = t === 'dark' ? '#0b0d13' : '#f3f4fa';
+    })();
+  </script>
   <link rel="stylesheet" href="css/app.css">
 </head>
 <body>

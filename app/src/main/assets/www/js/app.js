@@ -61,6 +61,51 @@ const syncReminders = debounce(() => {
 }, 1500);
 Store.onSave(syncReminders);
 
+// ------------------------------------------------------------------ Startbildschirm-Widgets
+function buildWidgetData() {
+  const td = today();
+  const days = {};
+  for (let i = 0; i < 8; i++) {
+    const d = addDays(td, i);
+    days[d] = lessonsOn(d).filter((l) => !l.holiday).map((l) => {
+      const p = periodTime(l.period) || {};
+      return { p: l.period, s: p.s || '', e: p.e || '', t: lessonLabel(l), r: lessonRoom(l), x: l.cancelled ? 1 : 0, c: subjectColor(l.subjectId, l.classId) };
+    }).filter((l) => l.s);
+  }
+  const open = S.tasks.filter((t) => !t.done);
+  const tasks = sortBy(open, (t) => t.due || '9999', (t) => -(t.prio || 0)).slice(0, 10).map((t) => ({ t: t.title, d: t.due || '', p: t.prio || 0, k: t.cat || '' }));
+  const agenda = [];
+  const end = addDays(td, 21);
+  S.assessments.forEach((a) => {
+    const k = cat(a.catId);
+    if (a.date && a.date >= td && a.date <= end && k && k.exam) agenda.push({ d: a.date, t: a.title, s: `${cName(a.classId)} · ${k.name.split(' ')[0]}`, c: k.color || '#dc2626' });
+  });
+  S.events.forEach((e) => {
+    if (e.type === 'ferien' || (e.end || e.date) < td || e.date > end) return;
+    const t = EVENT_TYPES[e.type] || EVENT_TYPES.termin;
+    agenda.push({ d: e.date < td ? td : e.date, t: e.title, s: [e.time ? e.time + ' Uhr' : t.l, e.place].filter(Boolean).join(' · '), c: t.c });
+  });
+  S.homework.forEach((h) => {
+    if (!h.done && h.due && h.due >= td && h.due <= addDays(td, 7)) agenda.push({ d: h.due, t: 'HA: ' + h.title, s: cName(h.classId), c: '#0891b2' });
+  });
+  S.students.forEach((s) => {
+    if (!s.birthday || !cls(s.classId) || cls(s.classId).archived) return;
+    const n = nextBirthday(s.birthday, td);
+    if (daysBetween(td, n) <= 7) agenda.push({ d: n, t: '🎂 ' + sName(s), s: `${cName(s.classId)} · wird ${age(s.birthday, n)}`, c: '#f59e0b' });
+  });
+  agenda.sort((a, b) => (a.d < b.d ? -1 : a.d > b.d ? 1 : 0));
+  return { v: 1, day: td, school: S.settings.school, days, tasks, taskCount: open.length, agenda: agenda.slice(0, 12) };
+}
+let lastWidgetJSON = null;
+const syncWidgets = debounce(() => {
+  if (!Native.has) return;
+  const json = JSON.stringify(buildWidgetData());
+  if (json === lastWidgetJSON) return;
+  lastWidgetJSON = json;
+  Native.call('updateWidgets', json);
+}, 1200);
+Store.onSave(syncWidgets);
+
 // ------------------------------------------------------------------ Native Rückrufe
 App.onPause = () => {
   Store.save.flush();
@@ -68,6 +113,7 @@ App.onPause = () => {
 };
 App.onResume = () => {
   Lock.maybeLock();
+  syncWidgets();
   if (App.onTeamResume) App.onTeamResume();
   if (App.path === '/today' && !UI.stack.length) App.refresh();
 };
@@ -106,6 +152,7 @@ if (window.matchMedia) {
   else App.stack = [start];
   $('#view').addEventListener('scroll', () => $('#topbar').classList.toggle('scrolled', $('#view').scrollTop > 4), { passive: true });
   App.render();
+  requestAnimationFrame(() => requestAnimationFrame(() => Native.call('appReady')));
   Lock.maybeLock(true);
   const incoming = Native.has ? Native.call('getIncoming') : '';
   if (incoming) setTimeout(() => App.onIncoming(incoming), 400);
@@ -114,4 +161,5 @@ if (window.matchMedia) {
   // Minütlich die Startseite aktualisieren (aktuelle Stunde)
   setInterval(() => { if ((App.path === '/today' || App.path.startsWith('/timetable')) && !UI.stack.length && !document.hidden && !document.activeElement.matches('input,textarea,select')) App.refresh(); }, 60000);
   syncReminders();
+  syncWidgets();
 }());

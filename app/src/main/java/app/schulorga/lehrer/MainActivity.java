@@ -16,6 +16,7 @@ import android.graphics.Insets;
 import android.graphics.Paint;
 import android.graphics.PixelFormat;
 import android.graphics.Rect;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
@@ -92,13 +93,19 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // Farben vom letzten Start übernehmen, damit nichts weiß aufblitzt
+        SharedPreferences ui = getSharedPreferences("ui", MODE_PRIVATE);
+        boolean dark = ui.contains("dark") ? ui.getBoolean("dark", false) : isSystemDark();
+        int bg = ui.getInt("bg", dark ? 0xFF0B0D13 : 0xFFF3F4FA);
+        getWindow().setBackgroundDrawable(new ColorDrawable(bg));
+
         root = new FrameLayout(this);
-        boolean dark = isSystemDark();
-        barBackground = new SplitColorDrawable(dark ? 0xFF1A1C22 : 0xFFFFFFFF, dark ? 0xFF1A1C22 : 0xFFFFFFFF);
+        barBackground = new SplitColorDrawable(bg, bg);
         root.setBackground(barBackground);
 
         web = new WebView(this);
-        web.setBackgroundColor(dark ? 0xFF111318 : 0xFFF5F6FA);
+        web.setBackgroundColor(bg);
+        web.setAlpha(0f); // erst einblenden, wenn die Oberfläche fertig gezeichnet ist
         root.addView(web, new FrameLayout.LayoutParams(
                 FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
         setContentView(root);
@@ -241,6 +248,10 @@ public class MainActivity extends Activity {
         }
     }
 
+    private void showWeb() {
+        if (web != null && web.getAlpha() < 1f) web.animate().alpha(1f).setDuration(140).start();
+    }
+
     boolean isSystemDark() {
         int mode = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
         return mode == Configuration.UI_MODE_NIGHT_YES;
@@ -369,6 +380,7 @@ public class MainActivity extends Activity {
         @Override
         public void onPageFinished(WebView view, String url) {
             pageReady = true;
+            web.postDelayed(MainActivity.this::showWeb, 900); // Sicherheitsnetz
             if (pendingIncoming != null) {
                 String t = pendingIncoming;
                 pendingIncoming = null;
@@ -662,6 +674,16 @@ public class MainActivity extends Activity {
         }
 
         @JavascriptInterface
+        public void appReady() {
+            runOnUiThread(MainActivity.this::showWeb);
+        }
+
+        @JavascriptInterface
+        public void updateWidgets(String json) {
+            Widgets.save(getApplicationContext(), json);
+        }
+
+        @JavascriptInterface
         public String getIncoming() {
             String r = pendingIncoming;
             pendingIncoming = null;
@@ -834,6 +856,7 @@ public class MainActivity extends Activity {
                     int t = Color.parseColor(top);
                     int b = Color.parseColor(bottom);
                     barBackground.setColors(t, b);
+                    getSharedPreferences("ui", MODE_PRIVATE).edit().putBoolean("dark", !lightBars).apply();
                     if (Build.VERSION.SDK_INT < 30) {
                         getWindow().setStatusBarColor(t);
                         getWindow().setNavigationBarColor(b);
@@ -848,7 +871,10 @@ public class MainActivity extends Activity {
         public void setPageBackground(String color) {
             runOnUiThread(() -> {
                 try {
-                    web.setBackgroundColor(Color.parseColor(color));
+                    int c = Color.parseColor(color);
+                    web.setBackgroundColor(c);
+                    getWindow().setBackgroundDrawable(new ColorDrawable(c));
+                    getSharedPreferences("ui", MODE_PRIVATE).edit().putInt("bg", c).apply();
                 } catch (Exception ignored) {
                 }
             });

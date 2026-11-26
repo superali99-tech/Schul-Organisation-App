@@ -62,6 +62,54 @@
             </intent-filter>
         </activity>
 
+        <receiver
+            android:name=".WidgetToday"
+            android:exported="true"
+            android:label="@string/w_today">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_today" />
+        </receiver>
+
+        <receiver
+            android:name=".WidgetNext"
+            android:exported="true"
+            android:label="@string/w_next">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_next" />
+        </receiver>
+
+        <receiver
+            android:name=".WidgetTasks"
+            android:exported="true"
+            android:label="@string/w_tasks">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_tasks" />
+        </receiver>
+
+        <receiver
+            android:name=".WidgetAgenda"
+            android:exported="true"
+            android:label="@string/w_agenda">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_agenda" />
+        </receiver>
+
         <provider
             android:name=".ShareProvider"
             android:authorities="app.schulorga.lehrer.share"

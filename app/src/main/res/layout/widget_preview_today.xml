@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:layout_height="match_parent" android:background="@drawable/w_bg" android:orientation="vertical" android:padding="14dp">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center_vertical" android:orientation="horizontal">
+        <ImageView android:layout_width="30dp" android:layout_height="30dp" android:background="@drawable/w_icon_bg" android:padding="6dp" android:src="@drawable/w_ic_today" />
+        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginStart="10dp" android:layout_weight="1" android:singleLine="true" android:text="Heute" android:textColor="@color/w_text" android:textSize="16sp" android:textStyle="bold" />
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:background="@drawable/w_badge" android:paddingStart="9dp" android:paddingTop="3dp" android:paddingEnd="9dp" android:paddingBottom="3dp" android:text="Do 26.11." android:textColor="@color/w_accent" android:textSize="12sp" android:textStyle="bold" />
+    </LinearLayout>
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:orientation="vertical">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center_vertical" android:orientation="horizontal" android:paddingTop="4dp" android:paddingBottom="4dp">
+            <TextView android:layout_width="40dp" android:layout_height="wrap_content" android:gravity="end" android:maxLines="2" android:text="1." android:textColor="@color/w_sub" android:textSize="11sp" android:textStyle="bold" />
+            <ImageView android:layout_width="4dp" android:layout_height="30dp" android:layout_marginStart="9dp" android:layout_marginEnd="10dp" android:scaleType="fitXY" android:src="@drawable/w_bar" android:tint="#2563EB" />
+            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:singleLine="true" android:text="7a · Mathematik" android:textColor="@color/w_text" android:textSize="14sp" android:textStyle="bold" />
+                <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:singleLine="true" android:text="Raum 204 · 08:00–08:45" android:textColor="@color/w_sub" android:textSize="12sp" />
+            </LinearLayout>
+        </LinearLayout>
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center_vertical" android:orientation="horizontal" android:paddingTop="4dp" android:paddingBottom="4dp">
+            <TextView android:layout_width="40dp" android:layout_height="wrap_content" android:gravity="end" android:maxLines="2" android:text="2." android:textColor="@color/w_sub" android:textSize="11sp" android:textStyle="bold" />
+            <ImageView android:layout_width="4dp" android:layout_height="30dp" android:layout_marginStart="9dp" android:layout_marginEnd="10dp" android:scaleType="fitXY" android:src="@drawable/w_bar" android:tint="#0891B2" />
+            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:singleLine="true" android:text="9b · Mathematik" android:textColor="@color/w_text" android:textSize="14sp" android:textStyle="bold" />
+                <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:singleLine="true" android:text="● Jetzt · Raum 112 · 08:50–09:35" android:textColor="@color/w_sub" android:textSize="12sp" />
+            </LinearLayout>
+        </LinearLayout>
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center_vertical" android:orientation="horizontal" android:paddingTop="4dp" android:paddingBottom="4dp">
+            <TextView android:layout_width="40dp" android:layout_height="wrap_content" android:gravity="end" android:maxLines="2" android:text="3." android:textColor="@color/w_sub" android:textSize="11sp" android:textStyle="bold" />
+            <ImageView android:layout_width="4dp" android:layout_height="30dp" android:layout_marginStart="9dp" android:layout_marginEnd="10dp" android:scaleType="fitXY" android:src="@drawable/w_bar" android:tint="#9333EA" />
+            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:singleLine="true" android:text="6c · Informatik" android:textColor="@color/w_text" android:textSize="14sp" android:textStyle="bold" />
+                <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:singleLine="true" android:text="PC-Raum · 09:55–10:40" android:textColor="@color/w_sub" android:textSize="12sp" />
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

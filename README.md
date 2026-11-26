@@ -2,7 +2,9 @@
 
 Eine Android-App, die den Schulalltag für Lehrerinnen und Lehrer organisiert. Sie arbeitet komplett **offline**, die Daten bleiben **auf dem Gerät**, und es gibt keine Werbung und kein Konto.
 
-📦 **APK zum Installieren:** [`release/Schulplan-1.1.1.apk`](release/Schulplan-1.1.1.apk) (Android 7.0 oder neuer)
+📦 **APK zum Installieren:** [`release/Schulplan-1.2.0.apk`](release/Schulplan-1.2.0.apk) (Android 7.0 oder neuer)
+
+**Neu in 1.2:** 4 Startbildschirm-Widgets (Stundenplan heute, Nächste Stunde, Aufgaben, Termine & Prüfungen) · kein weißes Aufblitzen mehr beim Start.
 
 **Neu in 1.1:** Kollegium – Kolleg:innen der eigenen Schule einladen und zusammenarbeiten · komplett überarbeitetes, modernes Design.
 
@@ -10,7 +12,7 @@ Eine Android-App, die den Schulalltag für Lehrerinnen und Lehrer organisiert. S
 
 ## Installation auf dem Handy oder Tablet
 
-1. `release/Schulplan-1.1.1.apk` aufs Gerät laden (z. B. über GitHub im Browser → „Download“).
+1. `release/Schulplan-1.2.0.apk` aufs Gerät laden (z. B. über GitHub im Browser → „Download“).
 2. Die Datei antippen. Android fragt beim ersten Mal, ob der Browser bzw. Dateimanager **„Apps aus unbekannten Quellen installieren“** darf → erlauben.
 3. Auf **Installieren** tippen und die App „Schulplan“ öffnen.
 4. Beim ersten Start legst du deinen Namen und dein Notensystem fest – oder lädst zum Ausprobieren die **Beispieldaten**.

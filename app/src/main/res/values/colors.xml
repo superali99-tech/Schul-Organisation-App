@@ -2,4 +2,9 @@
 <resources>
     <color name="ic_bg">#4F46E5</color>
     <color name="window_bg">#F5F6FA</color>
+    <color name="w_bg">#FFFFFFFF</color>
+    <color name="w_text">#FF0F1222</color>
+    <color name="w_sub">#FF6B7186</color>
+    <color name="w_accent">#FF4F46E5</color>
+    <color name="w_soft">#FFEEF0FF</color>
 </resources>

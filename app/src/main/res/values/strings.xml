@@ -3,4 +3,12 @@
     <string name="app_name">Schulplan</string>
     <string name="channel_name">Erinnerungen</string>
     <string name="channel_desc">Erinnerungen an Prüfungen, Termine, Aufgaben und Unterrichtsstunden</string>
+    <string name="w_today">Stundenplan heute</string>
+    <string name="w_today_desc">Deine Stunden von heute mit Raum und Uhrzeit</string>
+    <string name="w_next">Nächste Stunde</string>
+    <string name="w_next_desc">Welche Stunde gerade läuft oder als Nächstes kommt</string>
+    <string name="w_tasks">Aufgaben</string>
+    <string name="w_tasks_desc">Deine offenen Aufgaben nach Fälligkeit</string>
+    <string name="w_agenda">Termine &amp; Prüfungen</string>
+    <string name="w_agenda_desc">Anstehende Prüfungen, Termine, Hausaufgaben und Geburtstage</string>
 </resources>
