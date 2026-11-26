@@ -17,6 +17,7 @@ const FILE = () => path.join(DATA(), 'schulplan-data.json');
 const BACKUPS = () => path.join(DATA(), 'auto-backups');
 const CONF = () => path.join(DATA(), 'desktop-config.json');
 const INSTALLER_URL = 'https://raw.githubusercontent.com/superali99-tech/Schul-Organisation-App/HEAD/release/Schulplan-Setup.exe';
+const IS_MAC = process.platform === 'darwin';
 
 let win = null;
 let tray = null;
@@ -132,6 +133,7 @@ function createWindow() {
   win.on('move', saveBounds);
   win.on('close', (e) => {
     // Schließen = in den Infobereich, damit Erinnerungen weiterlaufen
+    if (!quitting && IS_MAC) { e.preventDefault(); win.hide(); return; }
     if (!quitting && tray) {
       e.preventDefault();
       win.hide();
@@ -146,6 +148,28 @@ function createWindow() {
   // Externe Links (Telefon, E-Mail, Webseiten) im System öffnen
   win.webContents.setWindowOpenHandler(({ url }) => { shell.openExternal(url); return { action: 'deny' }; });
   win.webContents.on('will-navigate', (e, url) => { if (!url.startsWith('app://')) { e.preventDefault(); shell.openExternal(url); } });
+}
+
+function macMenu() {
+  return Menu.buildFromTemplate([
+    { label: 'Schulplan', submenu: [
+      { role: 'about', label: 'Über Schulplan' }, { type: 'separator' },
+      { role: 'hide', label: 'Schulplan ausblenden' }, { role: 'hideOthers', label: 'Andere ausblenden' }, { type: 'separator' },
+      { label: 'Schulplan beenden', accelerator: 'Cmd+Q', click: () => { quitting = true; app.quit(); } },
+    ] },
+    { label: 'Bearbeiten', submenu: [
+      { role: 'undo', label: 'Widerrufen' }, { role: 'redo', label: 'Wiederholen' }, { type: 'separator' },
+      { role: 'cut', label: 'Ausschneiden' }, { role: 'copy', label: 'Kopieren' }, { role: 'paste', label: 'Einfügen' }, { role: 'selectAll', label: 'Alles auswählen' },
+    ] },
+    { label: 'Ansicht', submenu: [
+      { label: 'Heute', accelerator: 'Cmd+1', click: () => { showWindow(); call('navigate', '/today'); } },
+      { label: 'Stundenplan', accelerator: 'Cmd+2', click: () => { showWindow(); call('navigate', '/timetable'); } },
+      { label: 'Klassen', accelerator: 'Cmd+3', click: () => { showWindow(); call('navigate', '/classes'); } },
+      { label: 'Kalender', accelerator: 'Cmd+4', click: () => { showWindow(); call('navigate', '/calendar'); } },
+      { type: 'separator' }, { role: 'togglefullscreen', label: 'Vollbild' },
+    ] },
+    { label: 'Fenster', submenu: [{ role: 'minimize', label: 'Im Dock ablegen' }, { role: 'zoom', label: 'Zoomen' }, { label: 'Schulplan anzeigen', click: showWindow }] },
+  ]);
 }
 
 function createTray() {
@@ -198,7 +222,7 @@ const async_ = {
   },
   async shareFile(filename, mime, content) { return async_.saveFile(filename, mime, content, false); },
   shareText(title, text) { clipboard.writeText(text); toast('In die Zwischenablage kopiert – jetzt z. B. in E-Mail oder Messenger einfügen (Strg+V)'); },
-  shareApk() { clipboard.writeText(INSTALLER_URL); toast('Download-Link für Schulplan (Windows) kopiert'); },
+  shareApk() { clipboard.writeText('https://github.com/superali99-tech/Schul-Organisation-App#readme'); toast('Download-Link für Schulplan (Windows, Mac, Android) kopiert'); },
   print(job) { win.webContents.print({ printBackground: true }, () => call('onPrintDone')); },
   syncReminders(json) { try { scheduleReminders(JSON.parse(json)); } catch (e) { /* ignorieren */ } },
   requestNotificationPermission() { call('onNotifPermission', true); },
@@ -223,7 +247,7 @@ const async_ = {
       try {
         const buf = await httpGet(u + (u.includes('?') ? '&' : '?') + 't=' + Date.now());
         const j = JSON.parse(buf.toString('utf8'));
-        const d = j.desktop;
+        const d = IS_MAC ? (j.mac && { ...j.mac, url: j.mac[process.arch === 'arm64' ? 'arm64' : 'x64'] }) : j.desktop;
         if (!d || !d.version || !d.url) { call('onUpdateInfo', reqId, true, JSON.stringify({ versionCode: 0 })); return; }
         call('onUpdateInfo', reqId, true, JSON.stringify({ versionCode: versionCode(d.version), versionName: d.version, apk: d.url, notes: d.notes || j.notes || [], date: d.date || j.date }));
         return;
@@ -232,6 +256,17 @@ const async_ = {
     call('onUpdateInfo', reqId, false, lastErr);
   },
   async startUpdate(url) {
+    if (IS_MAC) {
+      // Mac: neue Version in den Download-Ordner laden und im Finder zeigen
+      try {
+        const buf = await httpGet(url, (pct) => call('onUpdateProgress', pct));
+        const file = path.join(app.getPath('downloads'), path.basename(new URL(url).pathname));
+        fs.writeFileSync(file, buf);
+        shell.showItemInFolder(file);
+        call('onUpdateState', 'mac-ready', '');
+      } catch (e) { call('onUpdateState', 'error', e.message); }
+      return;
+    }
     try {
       const buf = await httpGet(url, (pct) => call('onUpdateProgress', pct));
       const file = path.join(os.tmpdir(), `Schulplan-Setup-${Date.now()}.exe`);
@@ -290,7 +325,7 @@ if (!app.requestSingleInstanceLock()) {
   });
 
   app.whenReady().then(() => {
-    Menu.setApplicationMenu(null);
+    Menu.setApplicationMenu(IS_MAC ? macMenu() : null);
     pendingIncoming = incomingFromArgv(process.argv);
     protocol.handle('app', (req) => {
       const u = new URL(req.url);
@@ -302,9 +337,10 @@ if (!app.requestSingleInstanceLock()) {
     // Kamera (QR-Code) und Mikrofon (Lautstärke-Ampel) erlauben
     session.defaultSession.setPermissionRequestHandler((wc, permission, cb) => cb(['media', 'notifications', 'clipboard-sanitized-write', 'fullscreen'].includes(permission)));
     createWindow();
-    createTray();
+    if (!IS_MAC) createTray();
   });
+  app.on('activate', showWindow); // Mac: Klick aufs Dock-Symbol
 
   app.on('before-quit', () => { quitting = true; });
-  app.on('window-all-closed', () => { if (!tray) app.quit(); });
+  app.on('window-all-closed', () => { if (!tray && !IS_MAC) app.quit(); });
 }

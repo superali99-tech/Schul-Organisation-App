@@ -5,6 +5,10 @@ const UPDATE_URLS = ['https://raw.githubusercontent.com/superali99-tech/Schul-Or
 
 /** Neuerungen je Version (neueste zuerst) */
 const CHANGELOG = [
+  { v: '1.3.2', items: [
+    'Schulplan gibt es jetzt auch für den Mac (Apple Silicon und Intel)',
+    'Die Suche nach Updates bricht nach spätestens 15 Sekunden ab, statt endlos zu laufen',
+  ] },
   { v: '1.3.1', items: [
     'Schulplan gibt es jetzt auch für Windows (Desktop-Version mit Installer)',
     'Zurück-Taste funktioniert wieder richtig (geht zur vorherigen Seite statt die App zu schließen)',
@@ -72,6 +76,8 @@ const Update = {
         res(Update.info);
       };
       Native.call('checkUpdate', id, JSON.stringify(Update.urls()));
+      // Nie endlos suchen: nach 15 Sekunden abbrechen
+      setTimeout(() => { const f = Update.waits[id]; if (f) { delete Update.waits[id]; f(false, 'keine Antwort vom Server (Internet prüfen)'); } }, 15000);
     });
   },
   start() {
@@ -93,6 +99,9 @@ const Update = {
     const i = Update.info;
     if (Update.state === 'downloading') {
       return `<div class="upd-progress"><div class="progress" style="height:10px"><i style="width:${Update.pct}%"></i></div><p class="center muted small">Wird heruntergeladen … ${Update.pct} %</p></div>`;
+    }
+    if (Update.state === 'mac-ready') {
+      return `<div class="banner ok">${icon('download')}<div><b>Heruntergeladen!</b><br>Die neue Version liegt in deinem Download-Ordner. Doppelklick zum Entpacken, dann „Schulplan" in den Ordner <b>Programme</b> ziehen und ersetzen. Deine Daten bleiben erhalten.</div></div>`;
     }
     if (Update.state === 'installing' && window.SCHULPLAN_DESKTOP) {
       return `<div class="banner ok">${icon('refresh-cw')}<div><b>Wird installiert …</b><br>Schulplan schließt sich kurz und startet dann in der neuen Version. Deine Daten bleiben erhalten.</div></div>`;
