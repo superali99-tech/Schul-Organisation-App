@@ -5,6 +5,11 @@ const UPDATE_URLS = ['https://raw.githubusercontent.com/superali99-tech/Schul-Or
 
 /** Neuerungen je Version (neueste zuerst) */
 const CHANGELOG = [
+  { v: '1.4.3', items: [
+    'Updates am Computer zuverlässiger: Schulplan startet die Installation mehrmals, statt bei „Wird installiert …“ hängen zu bleiben',
+    'Ein Update läuft weiter, auch wenn du das Fenster schließt oder Schulplan beendest – danach startet Schulplan von selbst neu',
+    'Schulplan gibt es jetzt auch für Linux (.deb und AppImage) – mit Desktop-Widget',
+  ] },
   { v: '1.4.2', items: [
     'Windows, Mac und große Bildschirme: Alles steht jetzt sauber in der Mitte – Schnellzugriffe, Knöpfe, Hinweise und die Kopfzeile',
   ] },
@@ -118,7 +123,9 @@ const Update = {
       return `<div class="banner ok">${icon('download')}<div><b>Heruntergeladen!</b><br>Die neue Version liegt in deinem Download-Ordner. Doppelklick zum Entpacken, dann „Schulplan" in den Ordner <b>Programme</b> ziehen und ersetzen. Deine Daten bleiben erhalten.</div></div>`;
     }
     if (Update.state === 'installing' && window.SCHULPLAN_DESKTOP) {
-      return `<div class="banner ok">${icon('refresh-cw')}<div><b>Wird installiert …</b><br>Schulplan schließt sich kurz und startet dann in der neuen Version. Deine Daten bleiben erhalten.</div></div>`;
+      return `<div class="banner ok">${icon('refresh-cw')}<div><b>Wird installiert …</b><br>Schulplan schließt sich kurz und startet dann in der neuen Version. Deine Daten bleiben erhalten. Du kannst das Fenster ruhig schließen – das Update läuft weiter.</div></div>
+        <div class="late-hint"><p class="muted small center">Dauert es ungewöhnlich lange? Versuche es noch einmal – oder lade die neue Version von der Website und installiere sie einfach drüber.</p>
+        <button class="btn btn-block" data-act="upd-start">${icon('refresh-cw')}Erneut versuchen</button></div>`;
     }
     if (Update.state === 'installing') {
       return `<div class="banner ok">${icon('download')}<div><b>Fast geschafft!</b><br>Bestätige im nächsten Fenster mit <b>„Aktualisieren"</b>. Deine Daten bleiben erhalten.</div></div>

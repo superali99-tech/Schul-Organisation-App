@@ -865,3 +865,7 @@ h1, h2, h3, h4 { letter-spacing: -.02em; }
 
 .accept-steps { margin: 0; padding-left: 1.3em; display: grid; gap: 6px; color: var(--text2); font-size: .92rem; }
 .inv-err { background: rgba(220, 38, 38, .08); border-radius: 12px; padding: 10px 12px; }
+
+/* Hinweis, der erst nach einer Weile erscheint (z. B. wenn eine Installation hängt) */
+.late-hint { margin-top: 10px; animation: lateHint .3s 40s both; }
+@keyframes lateHint { from { opacity: 0; visibility: hidden; } to { opacity: 1; visibility: visible; } }

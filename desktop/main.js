@@ -264,17 +264,78 @@ function createTray() {
   } catch (e) { tray = null; }
 }
 
-// ------------------------------------------------------------------ Linux-Update
-// AppImage: neue Datei laden und die alte direkt ersetzen (ohne Passwort), dann neu starten.
-// .deb: Paket laden und mit pkexec installieren (das System fragt nach dem Passwort), dann neu starten.
+// ------------------------------------------------------------------ Updates
+// Läuft komplett im Hintergrund: Fenster schließen oder Schulplan beenden bricht ein laufendes
+// Update nicht ab – es wird fertig installiert und Schulplan startet danach neu.
+let updateBusy = false;        // Download oder Installation läuft
+let quitAfterUpdate = false;   // jemand wollte beenden, während das Update lief
+let exitingForUpdate = false;  // Schulplan beendet sich gerade für die Installation
+let updatePhase = '';          // 'downloading' oder 'installing'
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+function exitForUpdate(relaunch) {
+  exitingForUpdate = true;
+  quitting = true;
+  if (relaunch) relaunch();
+  app.quit();
+  // Falls sich etwas querstellt: nach kurzer Zeit hart beenden, damit der Installer weitermachen kann
+  setTimeout(() => app.exit(0), 3000);
+}
+
+function saveToDownloads(buf, name, mode) {
+  const f = path.join(app.getPath('downloads'), name);
+  fs.writeFileSync(f, buf, mode ? { mode } : undefined);
+  return f;
+}
+
+// Startet ein Programm und meldet zuverlässig, ob es wirklich gestartet ist
+function spawnChecked(file, args) {
+  return new Promise((resolve) => {
+    let child;
+    try { child = spawn(file, args, { detached: true, stdio: 'ignore' }); } catch (e) { resolve(e); return; }
+    child.once('error', (e) => resolve(e));
+    child.once('spawn', () => { child.unref(); resolve(null); });
+  });
+}
+
+// Windows: stiller Installer (/S), der Schulplan danach selbst wieder startet (--force-run)
+async function windowsUpdate(url) {
+  const buf = await httpGet(url, (pct) => call('onUpdateProgress', pct));
+  // Lokaler (nicht servergespeicherter) Ordner, wie bei anderen Desktop-Apps üblich
+  const dir = path.join(process.env.LOCALAPPDATA || os.tmpdir(), 'schulplan-updater');
+  fs.mkdirSync(dir, { recursive: true });
+  for (const n of fs.readdirSync(dir)) { try { fs.unlinkSync(path.join(dir, n)); } catch (e) { /* noch in Benutzung */ } }
+  const file = path.join(dir, `Schulplan-Setup-${Date.now()}.exe`);
+  fs.writeFileSync(file, buf);
+  updatePhase = 'installing';
+  call('onUpdateState', 'installing', '');
+  // Virenscanner prüfen eine frisch geladene Datei oft einige Sekunden lang – deshalb mehrere Versuche
+  let err = null;
+  for (let i = 0; i < 12; i++) {
+    await sleep(i === 0 ? 1000 : 1500);
+    err = await spawnChecked(file, ['/S', '--force-run']);
+    if (!err) { exitForUpdate(); return; }
+  }
+  // Rückfall: über die Windows-Shell öffnen – der Installer zeigt dann ein Fenster und startet Schulplan danach
+  const shellErr = await shell.openPath(file);
+  if (!shellErr) { exitForUpdate(); return; }
+  let hint = '';
+  try { const f = saveToDownloads(buf, 'Schulplan-Setup.exe'); shell.showItemInFolder(f); hint = ' Der Installer liegt jetzt in deinem Download-Ordner: „Schulplan-Setup.exe“ doppelklicken – deine Daten bleiben erhalten.'; } catch (e) { /* egal */ }
+  throw new Error(`Das Update konnte nicht automatisch gestartet werden (${(err && (err.code || err.message)) || shellErr}).${hint}`);
+}
+
+// Mac: neue Version in den Download-Ordner laden und im Finder zeigen
+async function macUpdate(url) {
+  const buf = await httpGet(url, (pct) => call('onUpdateProgress', pct));
+  const file = saveToDownloads(buf, path.basename(new URL(url).pathname));
+  shell.showItemInFolder(file);
+  call('onUpdateState', 'mac-ready', '');
+}
+
+// Linux – AppImage: die Datei direkt ersetzen (ohne Passwort) und neu starten.
+// .deb: Paket mit pkexec installieren (das System fragt nach dem Passwort) und neu starten.
 async function linuxUpdate(url) {
-  let buf;
-  try { buf = await httpGet(url, (pct) => call('onUpdateProgress', pct)); } catch (e) { call('onUpdateState', 'error', e.message); return; }
-  const toDownloads = (name) => {
-    const f = path.join(app.getPath('downloads'), name);
-    fs.writeFileSync(f, buf, { mode: 0o755 });
-    return f;
-  };
+  const buf = await httpGet(url, (pct) => call('onUpdateProgress', pct));
   if (APPIMAGE) {
     try {
       const tmp = APPIMAGE + '.update';
@@ -282,43 +343,68 @@ async function linuxUpdate(url) {
       fs.chmodSync(tmp, 0o755);
       fs.renameSync(tmp, APPIMAGE);
     } catch (e) {
-      try {
-        const f = toDownloads('Schulplan-Linux.AppImage');
-        shell.showItemInFolder(f);
-        call('onUpdateState', 'error', 'Die AppImage-Datei konnte nicht ersetzt werden. Die neue Version liegt im Download-Ordner – einfach von dort starten.');
-      } catch (e2) { call('onUpdateState', 'error', e.message); }
-      return;
+      const f = saveToDownloads(buf, 'Schulplan-Linux.AppImage', 0o755);
+      shell.showItemInFolder(f);
+      throw new Error('Die AppImage-Datei konnte nicht ersetzt werden. Die neue Version liegt im Download-Ordner – einfach von dort starten.');
     }
-    call('onUpdateState', 'installing', '');
-    setTimeout(() => { quitting = true; app.relaunch({ execPath: APPIMAGE, args: [] }); app.exit(0); }, 1200);
+    updatePhase = 'installing';
+  call('onUpdateState', 'installing', '');
+    await sleep(1200);
+    exitForUpdate(() => app.relaunch({ execPath: APPIMAGE, args: [] }));
     return;
   }
   const file = path.join(os.tmpdir(), `schulplan-update-${Date.now()}.deb`);
-  try { fs.writeFileSync(file, buf); } catch (e) { call('onUpdateState', 'error', e.message); return; }
+  fs.writeFileSync(file, buf);
+  updatePhase = 'installing';
   call('onUpdateState', 'installing', '');
   toast('Bitte gib im nächsten Fenster dein Passwort ein, um das Update zu installieren.');
-  let p;
-  try {
-    p = spawn('pkexec', ['sh', '-c', 'apt-get install -y "$1" || dpkg -i "$1"', 'sh', file], { stdio: 'ignore' });
-  } catch (e) { p = null; }
-  const fallback = () => {
-    try {
-      const f = toDownloads('Schulplan-Linux.deb');
-      shell.openPath(f);
-      call('onUpdateState', 'error', 'Installation nicht abgeschlossen. Die neue Version liegt im Download-Ordner (Schulplan-Linux.deb) – Doppelklick zum Installieren.');
-    } catch (e) { call('onUpdateState', 'error', e.message); }
-  };
-  if (!p) { fallback(); return; }
-  let done = false;
-  const finish = (ok) => {
-    if (done) return;
-    done = true;
-    fs.unlink(file, () => {});
-    if (ok) { quitting = true; app.relaunch(); app.exit(0); } else fallback();
-  };
-  p.on('error', () => finish(false));
-  p.on('exit', (code) => finish(code === 0));
+  const ok = await new Promise((resolve) => {
+    let p;
+    try { p = spawn('pkexec', ['sh', '-c', 'apt-get install -y "$1" || dpkg -i "$1"', 'sh', file], { stdio: 'ignore' }); } catch (e) { resolve(false); return; }
+    p.once('error', () => resolve(false));
+    p.once('exit', (code) => resolve(code === 0));
+  });
+  fs.unlink(file, () => {});
+  if (ok) { exitForUpdate(() => app.relaunch()); return; }
+  const f = saveToDownloads(buf, 'Schulplan-Linux.deb');
+  shell.openPath(f);
+  throw new Error('Installation nicht abgeschlossen. Die neue Version liegt im Download-Ordner (Schulplan-Linux.deb) – Doppelklick zum Installieren.');
 }
+
+async function runUpdate(url) {
+  if (updateBusy) {
+    // Läuft schon: Anzeige nur wieder auf den aktuellen Stand bringen
+    if (updatePhase === 'installing') call('onUpdateState', 'installing', '');
+    return;
+  }
+  updateBusy = true;
+  updatePhase = 'downloading';
+  quitAfterUpdate = false;
+  try {
+    if (IS_LINUX) await linuxUpdate(url);
+    else if (IS_MAC) await macUpdate(url);
+    else await windowsUpdate(url);
+  } catch (e) {
+    call('onUpdateState', 'error', (e && e.message) || 'Fehler beim Update');
+  }
+  if (exitingForUpdate) return;
+  updateBusy = false;
+  updatePhase = '';
+  // Wurde während des Updates „Beenden“ gewählt, jetzt wirklich beenden
+  if (quitAfterUpdate) { quitting = true; app.exit(0); }
+}
+
+// Unerwartete Fehler dürfen ein laufendes Update nie in „Wird installiert …“ hängen lassen
+function onUnexpected(e) {
+  console.error(e);
+  if (updateBusy && !exitingForUpdate) {
+    updateBusy = false;
+    call('onUpdateState', 'error', 'Update fehlgeschlagen: ' + ((e && e.message) || e));
+    if (quitAfterUpdate) { quitting = true; app.exit(0); }
+  }
+}
+process.on('uncaughtException', onUnexpected);
+process.on('unhandledRejection', onUnexpected);
 
 // ------------------------------------------------------------------ Brücke (gleiche Funktionen wie in der Android-App)
 const sync = {
@@ -394,34 +480,7 @@ const async_ = {
     }
     call('onUpdateInfo', reqId, false, lastErr);
   },
-  async startUpdate(url) {
-    if (IS_LINUX) { linuxUpdate(url); return; }
-    if (IS_MAC) {
-      // Mac: neue Version in den Download-Ordner laden und im Finder zeigen
-      try {
-        const buf = await httpGet(url, (pct) => call('onUpdateProgress', pct));
-        const file = path.join(app.getPath('downloads'), path.basename(new URL(url).pathname));
-        fs.writeFileSync(file, buf);
-        shell.showItemInFolder(file);
-        call('onUpdateState', 'mac-ready', '');
-      } catch (e) { call('onUpdateState', 'error', e.message); }
-      return;
-    }
-    try {
-      const buf = await httpGet(url, (pct) => call('onUpdateProgress', pct));
-      const file = path.join(os.tmpdir(), `Schulplan-Setup-${Date.now()}.exe`);
-      fs.writeFileSync(file, buf);
-      call('onUpdateState', 'installing', '');
-      setTimeout(() => {
-        // Stille Installation, danach startet Schulplan automatisch neu
-        spawn(file, ['/S', '--force-run'], { detached: true, stdio: 'ignore' }).unref();
-        quitting = true;
-        app.quit();
-      }, 1200);
-    } catch (e) {
-      call('onUpdateState', 'error', e.message);
-    }
-  },
+  startUpdate(url) { runUpdate(url); },
   async syncPick(create, suggestedName) {
     const r = create
       ? await dialog.showSaveDialog(win, { title: 'Team-Datei anlegen (z. B. im OneDrive-Ordner)', defaultPath: path.join(app.getPath('documents'), suggestedName || 'Schulplan-Team.json'), filters: [{ name: 'Team-Datei', extensions: ['json'] }] })
@@ -482,6 +541,17 @@ if (!app.requestSingleInstanceLock()) {
   });
   app.on('activate', showWindow); // Mac: Klick aufs Dock-Symbol
 
-  app.on('before-quit', () => { quitting = true; });
+  app.on('before-quit', (e) => {
+    if (updateBusy && !exitingForUpdate) {
+      // Update läuft noch: nicht abbrechen, sondern im Hintergrund fertig machen und danach neu starten
+      e.preventDefault();
+      quitting = false;
+      quitAfterUpdate = true;
+      [win, widget].forEach((w) => { if (w && !w.isDestroyed()) w.hide(); });
+      try { new Notification({ title: 'Schulplan wird aktualisiert', body: 'Das Update wird im Hintergrund fertig installiert. Danach startet Schulplan neu.' }).show(); } catch (err) { /* egal */ }
+      return;
+    }
+    quitting = true;
+  });
   app.on('window-all-closed', () => { if (!tray && !IS_MAC) app.quit(); });
 }

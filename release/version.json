@@ -1,19 +1,21 @@
 {
-  "versionCode": 10,
-  "versionName": "1.4.2",
+  "versionCode": 11,
+  "versionName": "1.4.3",
   "date": "2026-11-26",
   "apk": "https://raw.githubusercontent.com/superali99-tech/Schul-Organisation-App/HEAD/release/Schulplan.apk",
   "notes": [
-    "Windows, Mac und große Bildschirme: Alles steht jetzt sauber in der Mitte – Schnellzugriffe, Knöpfe, Hinweise und die Kopfzeile",
-    "Einladung annehmen: Einladungs-Nachricht und PIN in einem Formular"
+    "Updates am Computer zuverlässiger: Schulplan startet die Installation mehrmals, statt bei „Wird installiert …“ hängen zu bleiben",
+    "Ein Update läuft weiter, auch wenn du das Fenster schließt oder Schulplan beendest – danach startet Schulplan von selbst neu",
+    "Schulplan gibt es jetzt auch für Linux (.deb und AppImage) – mit Desktop-Widget"
   ],
   "desktop": {
-    "version": "1.4.2",
+    "version": "1.4.3",
     "date": "2026-11-26",
     "url": "https://raw.githubusercontent.com/superali99-tech/Schul-Organisation-App/HEAD/release/Schulplan-Setup.exe",
     "notes": [
-      "Windows, Mac und große Bildschirme: Alles steht jetzt sauber in der Mitte – Schnellzugriffe, Knöpfe, Hinweise und die Kopfzeile",
-      "Einladung annehmen: Einladungs-Nachricht und PIN in einem Formular"
+      "Updates am Computer zuverlässiger: Schulplan startet die Installation mehrmals, statt bei „Wird installiert …“ hängen zu bleiben",
+      "Ein Update läuft weiter, auch wenn du das Fenster schließt oder Schulplan beendest – danach startet Schulplan von selbst neu",
+      "Schulplan gibt es jetzt auch für Linux (.deb und AppImage) – mit Desktop-Widget"
     ]
   },
   "mac": {
