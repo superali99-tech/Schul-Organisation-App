@@ -1,32 +1,31 @@
 {
-  "versionCode": 7,
-  "versionName": "1.3.2",
+  "versionCode": 8,
+  "versionName": "1.4.0",
   "date": "2026-11-26",
   "apk": "https://raw.githubusercontent.com/superali99-tech/Schul-Organisation-App/HEAD/release/Schulplan.apk",
   "notes": [
-    "Schulplan gibt es jetzt auch für den Mac (Apple Silicon und Intel)",
-    "Die Suche nach Updates bricht nach spätestens 15 Sekunden ab, statt endlos zu laufen"
+    "Desktop-Widget für Windows und Mac: nächste Stunde, heutige Stunden, Aufgaben und nächste Prüfung immer im Blick",
+    "Web-App: Zahl am App-Symbol für fällige Aufgaben und Hausaufgaben",
+    "Bessere Darstellung auf iPhone und iPad (Notch und Home-Leiste)",
+    "Web-App als Alternative, wenn Windows die App blockiert (Smart App Control)"
   ],
   "desktop": {
-    "version": "1.3.1",
+    "version": "1.4.0",
     "date": "2026-11-26",
     "url": "https://raw.githubusercontent.com/superali99-tech/Schul-Organisation-App/HEAD/release/Schulplan-Setup.exe",
     "notes": [
-      "Erste Windows-Version von Schulplan",
-      "Seitenleiste für große Bildschirme",
-      "Erinnerungen als Windows-Benachrichtigungen, Schulplan läuft dafür im Infobereich weiter",
-      "Updates kommen automatisch"
+      "Desktop-Widget für Windows und Mac: nächste Stunde, heutige Stunden, Aufgaben und nächste Prüfung immer im Blick",
+      "Erinnerungen und Updates wie gewohnt"
     ]
   },
   "mac": {
-    "version": "1.3.2",
+    "version": "1.4.0",
     "date": "2026-11-26",
     "arm64": "https://raw.githubusercontent.com/superali99-tech/Schul-Organisation-App/HEAD/release/Schulplan-Mac-AppleSilicon.zip",
     "x64": "https://raw.githubusercontent.com/superali99-tech/Schul-Organisation-App/HEAD/release/Schulplan-Mac-Intel.zip",
     "notes": [
-      "Erste Mac-Version von Schulplan",
-      "Menüleiste mit Tastenkürzeln (⌘1–⌘4)",
-      "Erinnerungen als Mac-Mitteilungen"
+      "Desktop-Widget für Windows und Mac: nächste Stunde, heutige Stunden, Aufgaben und nächste Prüfung immer im Blick",
+      "Widget über Menü „Fenster\" oder ⌘⇧W"
     ]
   }
 }

@@ -103,6 +103,16 @@ const syncReminders = debounce(() => {
 }, 1500);
 Store.onSave(syncReminders);
 
+// ------------------------------------------------------------------ Web-App: Zahl am App-Symbol
+function updateAppBadge() {
+  if (Native.has || !('setAppBadge' in navigator)) return;
+  const td = today();
+  const n = S.settings.appBadge === false ? 0
+    : S.tasks.filter((t) => !t.done && t.due && t.due <= td).length + S.homework.filter((h) => !h.done && h.due === td).length;
+  try { (n ? navigator.setAppBadge(n) : navigator.clearAppBadge()).catch(() => {}); } catch (e) { /* nicht unterstützt */ }
+}
+Store.onSave(debounce(updateAppBadge, 800));
+
 // ------------------------------------------------------------------ Web-App: offline nutzbar und automatisch aktuell
 if (!Native.has && 'serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
   navigator.serviceWorker.register('sw.js').then((reg) => {
@@ -234,6 +244,7 @@ if (window.matchMedia) {
   setInterval(() => { if ((App.path === '/today' || App.path.startsWith('/timetable')) && !UI.stack.length && !document.hidden && !document.activeElement.matches('input,textarea,select')) App.refresh(); }, 60000);
   syncReminders();
   syncWidgets();
+  updateAppBadge();
   // Neuerungen nach einem Update, Update-Prüfung, Benachrichtigungs-Erlaubnis
   setTimeout(() => {
     if (!UI.stack.length && !Lock.active) showWhatsNew();

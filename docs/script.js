@@ -3,10 +3,11 @@
   'use strict';
   var BASE = 'https://raw.githubusercontent.com/superali99-tech/Schul-Organisation-App/HEAD/release/';
   var DL = {
-    android: { url: BASE + 'Schulplan.apk', label: 'Für Android herunterladen', sub: 'Version 1.3.2 · 0,4 MB' },
-    windows: { url: BASE + 'Schulplan-Setup.exe', label: 'Für Windows herunterladen', sub: 'Version 1.3.1 · 82 MB' },
-    macArm: { url: BASE + 'Schulplan-Mac-AppleSilicon.zip', label: 'Für Mac herunterladen', sub: 'Apple Silicon · Version 1.3.2 · 95 MB' },
-    macIntel: { url: BASE + 'Schulplan-Mac-Intel.zip', label: 'Für Mac herunterladen', sub: 'Intel · Version 1.3.2 · 100 MB' }
+    android: { url: BASE + 'Schulplan.apk', label: 'Für Android herunterladen', sub: 'Version 1.4.0 · 0,6 MB' },
+    windows: { url: BASE + 'Schulplan-Setup.exe', label: 'Für Windows herunterladen', sub: 'Version 1.4.0 · 82 MB' },
+    macArm: { url: BASE + 'Schulplan-Mac-AppleSilicon.zip', label: 'Für Mac herunterladen', sub: 'Apple Silicon · Version 1.4.0 · 95 MB' },
+    macIntel: { url: BASE + 'Schulplan-Mac-Intel.zip', label: 'Für Mac herunterladen', sub: 'Intel · Version 1.4.0 · 100 MB' },
+    ios: { url: 'app/', label: 'Für iPhone öffnen', sub: 'In Safari → Teilen → Zum Home-Bildschirm' }
   };
 
   // Menü auf kleinen Bildschirmen
@@ -41,6 +42,7 @@
 
   var key = os === 'mac' ? (macChip === 'intel' ? 'macIntel' : 'macArm') : os;
   var card = document.querySelector('[data-platform="' + (os === 'mac' ? 'mac' : os) + '"]');
+  if (os === 'ios') { var ih = document.getElementById('ios-note'); if (ih) ih.remove(); }
   if (card) {
     card.classList.add('recommended');
     var b = document.createElement('span');

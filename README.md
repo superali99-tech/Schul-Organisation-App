@@ -9,6 +9,8 @@ Eine Android-App, die den Schulalltag für Lehrerinnen und Lehrer organisiert. S
 
 🌐 **Website:** https://superali99-tech.github.io/Schul-Organisation-App/ – Downloads, ausführliche Anleitung, Datenschutzerklärung, Nutzungsrichtlinien und Lizenz (Quelle im Ordner `docs/`).
 
+**Neu in 1.4:** Desktop-Widget für Windows und Mac · Zahl am App-Symbol der Web-App · bessere Darstellung auf iPhone/iPad.
+
 **Neu in 1.3.2:** Mac-Version · Update-Suche mit Zeitlimit (kein endloses Suchen mehr).
 
 **Neu in 1.3.1:** Windows-Version · Seitenleiste für große Bildschirme · Zurück-Taste, Update-Prüfung und Cloud-Abgleich repariert.

@@ -847,3 +847,13 @@ h1, h2, h3, h4 { letter-spacing: -.02em; }
 @media (min-width: 1300px) {
   .two-col { gap: 16px; }
 }
+
+/* iPhone/iPad & Geräte mit Gestenleiste: sichere Bereiche (in der Android-App 0) */
+@media (max-width: 899px) {
+  #bottomnav { bottom: calc(var(--nav-gap) + env(safe-area-inset-bottom, 0px)); left: max(12px, env(safe-area-inset-left, 0px)); right: max(12px, env(safe-area-inset-right, 0px)); }
+  .fab { bottom: calc(var(--nav-h) + var(--nav-gap) + 14px + env(safe-area-inset-bottom, 0px)); }
+  #toasts { bottom: calc(var(--nav-h) + var(--nav-gap) + 18px + env(safe-area-inset-bottom, 0px)); }
+  .view { padding-bottom: calc(var(--nav-h) + var(--nav-gap) + 96px + env(safe-area-inset-bottom, 0px)); }
+}
+#topbar { padding-top: env(safe-area-inset-top, 0px); height: calc(62px + env(safe-area-inset-top, 0px)); }
+.sheet-b { padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px)); }

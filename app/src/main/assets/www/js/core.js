@@ -302,7 +302,7 @@ const Store = {
     let ok = false;
     if (Native.has) ok = !!Native.call('saveData', json);
     if (!ok) { try { localStorage.setItem(this.key, json); ok = true; } catch (e) { console.error(e); } }
-    if (!ok) UI && UI.toast && UI.toast('Speichern fehlgeschlagen!', { type: 'err' });
+    if (!ok && typeof UI !== 'undefined') UI.toast('Speichern fehlgeschlagen!', { type: 'err' });
     this._listeners.forEach((f) => f());
   },
   save: null,

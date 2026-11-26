@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Schulplan Widget</title>
+<style>
+  @font-face { font-family: "Inter"; src: url("fonts/inter.woff2") format("woff2"); font-weight: 100 900; }
+  :root { --bg: rgba(255,255,255,.94); --ink: #12162a; --muted: #6b7290; --line: rgba(20,26,46,.09); --soft: #eef0fb; --accent: #4f46e5; --accent2: #8b5cf6; }
+  [data-theme="dark"] { --bg: rgba(24,27,38,.94); --ink: #eceef7; --muted: #959cb2; --line: rgba(255,255,255,.08); --soft: #23283a; --accent: #8f97ff; --accent2: #b39cff; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: transparent; font-family: "Inter", system-ui, sans-serif; color: var(--ink); -webkit-font-smoothing: antialiased; user-select: none; overflow: hidden; }
+  .card { position: absolute; inset: 6px; background: var(--bg); border: 1px solid var(--line); border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,.18); display: flex; flex-direction: column; overflow: hidden; backdrop-filter: blur(20px); }
+  .head { display: flex; align-items: center; gap: 8px; padding: 12px 10px 8px 14px; -webkit-app-region: drag; }
+  .logo { width: 22px; height: 22px; border-radius: 7px; background: linear-gradient(135deg, var(--accent), var(--accent2)); display: grid; place-items: center; color: #fff; }
+  .logo svg { width: 13px; height: 13px; }
+  .title { font-weight: 750; font-size: 13px; flex: 1; letter-spacing: -.01em; }
+  .title small { color: var(--muted); font-weight: 550; margin-left: 4px; }
+  .hb { -webkit-app-region: no-drag; border: 0; background: transparent; color: var(--muted); width: 26px; height: 26px; border-radius: 8px; display: grid; place-items: center; cursor: pointer; }
+  .hb:hover { background: var(--soft); color: var(--ink); }
+  .hb.on { color: var(--accent); }
+  .hb svg { width: 15px; height: 15px; }
+  .body { padding: 2px 12px 12px; overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 10px; }
+  .body::-webkit-scrollbar { width: 0; }
+  .now { background: linear-gradient(135deg, #4f46e5, #8b5cf6); color: #fff; border-radius: 15px; padding: 11px 12px; cursor: pointer; }
+  .now .l { font-size: 10px; font-weight: 750; letter-spacing: .07em; text-transform: uppercase; opacity: .85; }
+  .now .t { font-size: 16px; font-weight: 800; margin: 2px 0 1px; letter-spacing: -.01em; }
+  .now .m { font-size: 12px; opacity: .9; }
+  .bar { height: 5px; border-radius: 3px; background: rgba(255,255,255,.28); margin-top: 8px; overflow: hidden; }
+  .bar i { display: block; height: 100%; background: #fff; border-radius: 3px; }
+  .sec { font-size: 10.5px; font-weight: 750; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); margin: 2px 2px -4px; }
+  .row { display: flex; align-items: center; gap: 9px; padding: 6px 6px; border-radius: 10px; cursor: pointer; }
+  .row:hover { background: var(--soft); }
+  .row .n { width: 30px; font-size: 11px; font-weight: 700; color: var(--muted); text-align: right; flex: none; }
+  .row .c { width: 4px; height: 26px; border-radius: 2px; flex: none; }
+  .row .x { min-width: 0; flex: 1; }
+  .row .x b { display: block; font-size: 12.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .row .x span { display: block; font-size: 11px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .row.past { opacity: .45; }
+  .row.cancel b { text-decoration: line-through; }
+  .empty { font-size: 12px; color: var(--muted); padding: 4px 6px; }
+  .pill { font-size: 10.5px; font-weight: 700; padding: 2px 7px; border-radius: 999px; background: var(--soft); color: var(--accent); flex: none; }
+  .pill.red { color: #dc2626; background: rgba(220,38,38,.1); }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="head">
+    <span class="logo" id="logo"></span>
+    <div class="title" id="title">Schulplan</div>
+    <button class="hb" id="pin" title="Immer im Vordergrund"></button>
+    <button class="hb" id="open" title="Schulplan öffnen"></button>
+    <button class="hb" id="close" title="Widget ausblenden"></button>
+  </div>
+  <div class="body" id="body"></div>
+</div>
+<script src="js/icons.js"></script>
+<script src="js/core.js"></script>
+<script src="js/widget.js"></script>
+</body>
+</html>

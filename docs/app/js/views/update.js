@@ -5,6 +5,12 @@ const UPDATE_URLS = ['https://raw.githubusercontent.com/superali99-tech/Schul-Or
 
 /** Neuerungen je Version (neueste zuerst) */
 const CHANGELOG = [
+  { v: '1.4.0', items: [
+    'Desktop-Widget für Windows und Mac: nächste Stunde, heutige Stunden, Aufgaben und nächste Prüfung immer im Blick',
+    'Web-App: Zahl am App-Symbol für fällige Aufgaben und Hausaufgaben',
+    'Bessere Darstellung auf iPhone und iPad (Notch und Home-Leiste)',
+    'Web-App als Alternative, wenn Windows die App blockiert (Smart App Control)',
+  ] },
   { v: '1.3.2', items: [
     'Schulplan gibt es jetzt auch für den Mac (Apple Silicon und Intel)',
     'Die Suche nach Updates bricht nach spätestens 15 Sekunden ab, statt endlos zu laufen',

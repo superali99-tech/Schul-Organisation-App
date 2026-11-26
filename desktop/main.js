@@ -25,6 +25,7 @@ let quitting = false;
 let blocker = null;
 let reminderTimers = [];
 let pendingIncoming = '';
+let widget = null;
 
 // ------------------------------------------------------------------ Einstellungen der Desktop-Hülle
 function conf() { try { return JSON.parse(fs.readFileSync(CONF(), 'utf8')); } catch (e) { return {}; } }
@@ -168,7 +169,57 @@ function macMenu() {
       { label: 'Kalender', accelerator: 'Cmd+4', click: () => { showWindow(); call('navigate', '/calendar'); } },
       { type: 'separator' }, { role: 'togglefullscreen', label: 'Vollbild' },
     ] },
-    { label: 'Fenster', submenu: [{ role: 'minimize', label: 'Im Dock ablegen' }, { role: 'zoom', label: 'Zoomen' }, { label: 'Schulplan anzeigen', click: showWindow }] },
+    { label: 'Fenster', submenu: [{ role: 'minimize', label: 'Im Dock ablegen' }, { role: 'zoom', label: 'Zoomen' }, { label: 'Schulplan anzeigen', click: showWindow }, { type: 'separator' },
+      { label: 'Desktop-Widget anzeigen', type: 'checkbox', checked: !!conf().widget, accelerator: 'Cmd+Shift+W', click: (item) => setWidget(item.checked) }] },
+  ]);
+}
+
+// ------------------------------------------------------------------ Desktop-Widget
+function createWidget() {
+  if (widget && !widget.isDestroyed()) { widget.show(); return; }
+  const c = conf();
+  const b = c.widgetBounds || {};
+  const { screen } = require('electron');
+  const area = screen.getPrimaryDisplay().workArea;
+  widget = new BrowserWindow({
+    width: b.width || 320, height: b.height || 470,
+    x: b.x != null ? b.x : area.x + area.width - 340, y: b.y != null ? b.y : area.y + 20,
+    minWidth: 260, minHeight: 220, frame: false, transparent: true, resizable: true, skipTaskbar: true,
+    alwaysOnTop: !!c.widgetPinned, minimizable: false, maximizable: false, fullscreenable: false, hasShadow: false,
+    show: false, title: 'Schulplan Widget', backgroundColor: '#00000000',
+    webPreferences: { preload: path.join(__dirname, 'preload.js'), contextIsolation: true, sandbox: false },
+  });
+  if (IS_MAC) widget.setVisibleOnAllWorkspaces(true);
+  widget.loadURL('app://schulplan/www/widget.html' + (c.widgetPinned ? '#pinned' : ''));
+  widget.once('ready-to-show', () => widget.showInactive());
+  const save = () => { if (widget && !widget.isDestroyed()) setConf({ widgetBounds: widget.getBounds() }); };
+  widget.on('moved', save);
+  widget.on('resized', save);
+  widget.on('closed', () => { widget = null; });
+}
+function setWidget(on) {
+  setConf({ widget: !!on });
+  if (on) createWidget();
+  else if (widget && !widget.isDestroyed()) widget.close();
+  updateMenus();
+}
+function refreshWidget() {
+  if (widget && !widget.isDestroyed()) widget.webContents.send('refresh');
+}
+function updateMenus() {
+  if (tray) tray.setContextMenu(trayMenu());
+  if (IS_MAC) Menu.setApplicationMenu(macMenu());
+}
+
+function trayMenu() {
+  return Menu.buildFromTemplate([
+    { label: 'Schulplan öffnen', click: showWindow },
+    { label: 'Heute', click: () => { showWindow(); call('navigate', '/today'); } },
+    { label: 'Stundenplan', click: () => { showWindow(); call('navigate', '/timetable'); } },
+    { type: 'separator' },
+    { label: 'Desktop-Widget anzeigen', type: 'checkbox', checked: !!conf().widget, click: (item) => setWidget(item.checked) },
+    { type: 'separator' },
+    { label: 'Beenden', click: () => { quitting = true; app.quit(); } },
   ]);
 }
 
@@ -176,13 +227,7 @@ function createTray() {
   try {
     tray = new Tray(path.join(__dirname, 'build', 'icon.png'));
     tray.setToolTip('Schulplan');
-    tray.setContextMenu(Menu.buildFromTemplate([
-      { label: 'Schulplan öffnen', click: showWindow },
-      { label: 'Heute', click: () => { showWindow(); call('navigate', '/today'); } },
-      { label: 'Stundenplan', click: () => { showWindow(); call('navigate', '/timetable'); } },
-      { type: 'separator' },
-      { label: 'Beenden', click: () => { quitting = true; app.quit(); } },
-    ]));
+    tray.setContextMenu(trayMenu());
     tray.on('click', showWindow);
     tray.on('double-click', showWindow);
   } catch (e) { tray = null; }
@@ -191,7 +236,8 @@ function createTray() {
 // ------------------------------------------------------------------ Brücke (gleiche Funktionen wie in der Android-App)
 const sync = {
   loadData: () => { try { return fs.readFileSync(FILE(), 'utf8'); } catch (e) { return ''; } },
-  saveData: (json) => { try { writeAtomic(FILE(), json); dailyBackup(json); return true; } catch (e) { return false; } },
+  saveData: (json) => { try { writeAtomic(FILE(), json); dailyBackup(json); setTimeout(refreshWidget, 50); return true; } catch (e) { return false; } },
+  widgetEnabled: () => !!conf().widget,
   listBackups: () => {
     try {
       return JSON.stringify(fs.readdirSync(BACKUPS()).filter((n) => n.endsWith('.json')).sort().reverse().map((name) => {
@@ -237,7 +283,11 @@ const async_ = {
   toast(msg) { toast(msg); },
   exitApp() { quitting = true; app.quit(); },
   appReady() { if (win && !win.isVisible()) win.show(); },
-  updateWidgets() {},
+  updateWidgets() { refreshWidget(); },
+  toggleWidget(on) { setWidget(on); },
+  widgetClose() { setWidget(false); call('onWidgetState', false); },
+  widgetPin(on) { setConf({ widgetPinned: !!on }); if (widget && !widget.isDestroyed()) widget.setAlwaysOnTop(!!on, 'floating'); },
+  openRoute(route) { showWindow(); call('navigate', route); },
   setUpdateUrls() {},
   async checkUpdate(reqId, urlsJson) {
     let urls = [];
@@ -338,6 +388,7 @@ if (!app.requestSingleInstanceLock()) {
     session.defaultSession.setPermissionRequestHandler((wc, permission, cb) => cb(['media', 'notifications', 'clipboard-sanitized-write', 'fullscreen'].includes(permission)));
     createWindow();
     if (!IS_MAC) createTray();
+    if (conf().widget) createWidget();
   });
   app.on('activate', showWindow); // Mac: Klick aufs Dock-Symbol
 
