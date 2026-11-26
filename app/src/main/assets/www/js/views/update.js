@@ -5,6 +5,12 @@ const UPDATE_URLS = ['https://raw.githubusercontent.com/superali99-tech/Schul-Or
 
 /** Neuerungen je Version (neueste zuerst) */
 const CHANGELOG = [
+  { v: '1.6.0', video: 'sub', items: [
+    'Vertretung gezielt zuweisen: Nur die Vertretung bekommt die Meldung „Du vertrittst …" – oder auf Wunsch das ganze Kollegium',
+    'Meldung mit einem Tipp versenden (WhatsApp, E-Mail …) – die Stunde landet direkt im Stundenplan der Kollegin oder des Kollegen',
+    'Neue Vertretungen erscheinen beim Öffnen groß mit „Alles klar"-Bestätigung und auf der Startseite',
+    'Kurzes Anleitungs-Video: Vertretungen → „So geht\'s"',
+  ] },
   { v: '1.5.0', items: [
     'Neu: Schulleitermodus – Anmeldung mit eigenen Zugangsdaten (änderbar unter Einstellungen → Schulleitermodus)',
     'Schulleitungs-Cockpit: Abwesenheiten, offene Vertretungen, Lesebestätigungen und nächste Schultermine auf einen Blick',
@@ -183,12 +189,48 @@ App.def('/update', () => {
   if (i) h += `<div class="card"><div class="card-h"><h3>${icon('sparkles')}Neu in ${esc(i.versionName)}</h3></div>${Update.notesHTML(i)}<div id="upd-box">${Update.boxHTML()}</div></div>`;
   else h += `<button class="btn btn-primary btn-block btn-lg" data-act="upd-check" ${Update.state === 'checking' ? 'disabled' : ''}>${icon('refresh-cw')}Nach Updates suchen</button>`;
   h += `<div class="section-title">${icon('history')}Bisherige Neuerungen</div>`;
-  h += CHANGELOG.map((c) => `<div class="card"><div class="card-h"><h3>Version ${c.v}</h3>${c.v === Update.versionName() ? '<span class="badge acc">installiert</span>' : ''}</div><ul class="upd-notes">${c.items.map((n) => `<li>${icon('check')}<span>${esc(n)}</span></li>`).join('')}</ul></div>`).join('');
+  h += CHANGELOG.map((c) => `<div class="card"><div class="card-h"><h3>Version ${c.v}</h3>${c.v === Update.versionName() ? '<span class="badge acc">installiert</span>' : ''}</div><ul class="upd-notes">${c.items.map((n) => `<li>${icon('check')}<span>${esc(n)}</span></li>`).join('')}</ul>${c.video ? `<button class="btn btn-sm btn-soft mt" data-act="howto-${c.video}">${icon('play')}Video ansehen</button>` : ''}</div>`).join('');
   h += `<p class="muted small center">Die App prüft automatisch auf neue Versionen und benachrichtigt dich. <a data-act="upd-source">Update-Quelle</a></p>`;
   return { title: 'App-Updates', tab: 'more', html: h };
 });
 
 /** Nach einem Update einmalig zeigen, was neu ist */
+// Kurze Anleitungs-Videos (über eine Blob-Adresse geladen: funktioniert in Android, Desktop und Browser gleich)
+const HOWTO = {
+  sub: { src: 'media/vertretung.mp4', webm: 'media/vertretung.webm', poster: 'media/vertretung.jpg', title: 'So geht\'s: Vertretung zuweisen', text: 'Vertretung eintragen → „Nur die Vertretung" → Meldung senden – fertig. Die Kollegin öffnet die Datei, die Stunde steht in ihrem Stundenplan.' },
+};
+let howtoUrls = [];
+function howtoVideoHTML(key, cls = '') {
+  const h = HOWTO[key];
+  return h ? `<video class="howto-video ${cls}" data-howto="${key}" poster="${h.poster}" muted playsinline loop controls preload="auto"></video>` : '';
+}
+async function mountHowto(el) {
+  for (const v of el.querySelectorAll('video[data-howto]')) {
+    const h = HOWTO[v.dataset.howto];
+    // MP4 (H.264) für Android, iPhone, Windows, Mac – WebM als Ersatz, wo H.264 fehlt (z. B. Chromium unter Linux)
+    const useWebm = h.webm && !v.canPlayType('video/mp4; codecs="avc1.4d401f"') && v.canPlayType('video/webm; codecs="vp9"');
+    const src = useWebm ? h.webm : h.src;
+    try {
+      const b = await (await fetch(src)).blob();
+      const url = URL.createObjectURL(new Blob([b], { type: useWebm ? 'video/webm' : 'video/mp4' }));
+      howtoUrls.push(url);
+      v.src = url;
+    } catch (e) { v.src = src; }
+    v.play().catch(() => {});
+  }
+}
+function releaseHowto() { howtoUrls.forEach((u) => URL.revokeObjectURL(u)); howtoUrls = []; }
+function showHowto(key) {
+  const h = HOWTO[key];
+  UI.open({
+    title: h.title,
+    body: `${howtoVideoHTML(key)}<p class="muted small center" style="margin:0">${esc(h.text)}</p>`,
+    onMount: (el) => mountHowto(el),
+    onClose: () => releaseHowto(),
+  });
+}
+A['howto-sub'] = () => showHowto('sub');
+
 function showWhatsNew() {
   if (!Native.has) return;
   const v = Update.versionName();
@@ -202,9 +244,9 @@ function showWhatsNew() {
   if (!items.length) return;
   UI.open({
     title: `Neu in Schulplan ${v} 🎉`,
-    body: `${items.map((c) => `<div class="f-section">${icon('sparkles')}Version ${c.v}</div><ul class="upd-notes">${c.items.map((n) => `<li>${icon('check')}<span>${esc(n)}</span></li>`).join('')}</ul>`).join('')}`,
+    body: `${items.map((c) => `${c.video ? howtoVideoHTML(c.video, 'sm') : ''}<div class="f-section">${icon('sparkles')}Version ${c.v}</div><ul class="upd-notes">${c.items.map((n) => `<li>${icon('check')}<span>${esc(n)}</span></li>`).join('')}</ul>`).join('')}`,
     foot: '<span class="sp"></span><button class="btn btn-primary" data-x="ok">Super!</button>',
-    onMount: (el, m) => el.querySelector('[data-x="ok"]').addEventListener('click', () => m.close()),
-    onClose: () => { if (App.path === '/today') App.refresh(); },
+    onMount: (el, m) => { mountHowto(el); el.querySelector('[data-x="ok"]').addEventListener('click', () => m.close()); },
+    onClose: () => { releaseHowto(); if (App.path === '/today') App.refresh(); },
   });
 }

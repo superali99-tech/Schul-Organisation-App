@@ -246,3 +246,8 @@ tr:last-child td { border-bottom: 0; }
 @media (max-width: 900px) { .hero::before { left: 6px; } }
 .platforms.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 @media (max-width: 900px) { .platforms.two { grid-template-columns: 1fr; } }
+
+/* Anleitungs-Video */
+.guide-video { max-width: 300px; margin: 6px auto 24px; text-align: center; }
+.guide-video video { display: block; width: 100%; aspect-ratio: 390 / 844; object-fit: cover; border-radius: 24px; background: #0b0d13; box-shadow: 0 18px 40px -12px rgba(15, 18, 34, .45); }
+.guide-video p { font-size: .82rem; margin: 10px 0 0; }

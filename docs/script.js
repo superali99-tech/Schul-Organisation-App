@@ -3,12 +3,12 @@
   'use strict';
   var BASE = 'https://raw.githubusercontent.com/superali99-tech/Schul-Organisation-App/HEAD/release/';
   var DL = {
-    android: { url: BASE + 'Schulplan.apk', label: 'Für Android herunterladen', sub: 'Version 1.5.0 · 0,6 MB' },
-    windows: { url: BASE + 'Schulplan-Setup.exe', label: 'Für Windows herunterladen', sub: 'Version 1.5.0 · 82 MB' },
-    macArm: { url: BASE + 'Schulplan-Mac-AppleSilicon.zip', label: 'Für Mac herunterladen', sub: 'Apple Silicon · Version 1.5.0 · 95 MB' },
-    macIntel: { url: BASE + 'Schulplan-Mac-Intel.zip', label: 'Für Mac herunterladen', sub: 'Intel · Version 1.5.0 · 100 MB' },
-    linux: { url: BASE + 'Schulplan-Linux.deb', label: 'Für Linux herunterladen', sub: '.deb für Ubuntu, Mint, Debian · Version 1.5.0 · 69 MB' },
-    linuxAppImage: { url: BASE + 'Schulplan-Linux.AppImage', label: 'Für Linux herunterladen', sub: 'AppImage · Version 1.5.0 · 77 MB' },
+    android: { url: BASE + 'Schulplan.apk', label: 'Für Android herunterladen', sub: 'Version 1.6.0 · 2,3 MB' },
+    windows: { url: BASE + 'Schulplan-Setup.exe', label: 'Für Windows herunterladen', sub: 'Version 1.6.0 · 77 MB' },
+    macArm: { url: BASE + 'Schulplan-Mac-AppleSilicon.zip', label: 'Für Mac herunterladen', sub: 'Apple Silicon · Version 1.6.0 · 97 MB' },
+    macIntel: { url: BASE + 'Schulplan-Mac-Intel.zip', label: 'Für Mac herunterladen', sub: 'Intel · Version 1.6.0 · 102 MB' },
+    linux: { url: BASE + 'Schulplan-Linux.deb', label: 'Für Linux herunterladen', sub: '.deb für Ubuntu, Mint, Debian · Version 1.6.0 · 70 MB' },
+    linuxAppImage: { url: BASE + 'Schulplan-Linux.AppImage', label: 'Für Linux herunterladen', sub: 'AppImage · Version 1.6.0 · 78 MB' },
     web: { url: 'app/', label: 'Web-App öffnen', sub: 'Läuft im Browser, auch offline' },
     ios: { url: 'app/', label: 'Für iPhone öffnen', sub: 'In Safari → Teilen → Zum Home-Bildschirm' }
   };

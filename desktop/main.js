@@ -439,7 +439,10 @@ const async_ = {
     if (r.canceled || !r.filePath) { call('onFileSaved', false); return; }
     try { fs.writeFileSync(r.filePath, isB64 ? Buffer.from(content, 'base64') : content); call('onFileSaved', true); shell.showItemInFolder(r.filePath); } catch (e) { call('onFileSaved', false); }
   },
-  async shareFile(filename, mime, content) { return async_.saveFile(filename, mime, content, false); },
+  async shareFile(filename, mime, content, text) {
+    if (text) { clipboard.writeText(text); toast('Nachricht kopiert – füge sie in E-Mail oder Messenger ein und hänge die gespeicherte Datei an.'); }
+    return async_.saveFile(filename, mime, content, false);
+  },
   shareText(title, text) { clipboard.writeText(text); toast('In die Zwischenablage kopiert – jetzt z. B. in E-Mail oder Messenger einfügen (Strg+V)'); },
   shareApk() { clipboard.writeText('https://github.com/superali99-tech/Schul-Organisation-App#readme'); toast('Download-Link für Schulplan (Windows, Mac, Linux, Android) kopiert'); },
   print(job) { win.webContents.print({ printBackground: true }, () => call('onPrintDone')); },

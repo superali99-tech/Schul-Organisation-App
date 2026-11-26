@@ -1,47 +1,43 @@
 {
-  "versionCode": 12,
-  "versionName": "1.5.0",
+  "versionCode": 13,
+  "versionName": "1.6.0",
   "date": "2026-11-26",
   "apk": "https://raw.githubusercontent.com/superali99-tech/Schul-Organisation-App/HEAD/release/Schulplan.apk",
   "notes": [
-    "Neu: Schulleitermodus – Cockpit für die Schulleitung mit Abwesenheiten, Vertretungen und Lesebestätigungen",
-    "Verbindliche Termine, Pflichttermine, Mitteilungen und Schulvorgaben der Schulleitung – digital unterschrieben",
-    "Für Lehrkräfte: Abwesenheit melden, Mitteilungen bestätigen, Ferien-Countdown",
-    "Frischeres Design und dunkler Modus in Nachtblau"
+    "Vertretung gezielt zuweisen: Nur die Vertretung bekommt die Meldung „Du vertrittst …\" – oder auf Wunsch das ganze Kollegium",
+    "Meldung mit einem Tipp versenden – die Stunde landet direkt im Stundenplan",
+    "Kurzes Anleitungs-Video unter Kollegium → Vertretungen → „So geht's\""
   ],
   "desktop": {
-    "version": "1.5.0",
+    "version": "1.6.0",
     "date": "2026-11-26",
     "url": "https://raw.githubusercontent.com/superali99-tech/Schul-Organisation-App/HEAD/release/Schulplan-Setup.exe",
     "notes": [
-      "Neu: Schulleitermodus – Cockpit für die Schulleitung mit Abwesenheiten, Vertretungen und Lesebestätigungen",
-      "Verbindliche Termine, Pflichttermine, Mitteilungen und Schulvorgaben der Schulleitung – digital unterschrieben",
-      "Für Lehrkräfte: Abwesenheit melden, Mitteilungen bestätigen, Ferien-Countdown",
-      "Frischeres Design und dunkler Modus in Nachtblau"
+      "Vertretung gezielt zuweisen: Nur die Vertretung bekommt die Meldung „Du vertrittst …\" – oder auf Wunsch das ganze Kollegium",
+      "Meldung mit einem Tipp versenden – die Stunde landet direkt im Stundenplan",
+      "Kurzes Anleitungs-Video unter Kollegium → Vertretungen → „So geht's\""
     ]
   },
   "mac": {
-    "version": "1.5.0",
+    "version": "1.6.0",
     "date": "2026-11-26",
     "arm64": "https://raw.githubusercontent.com/superali99-tech/Schul-Organisation-App/HEAD/release/Schulplan-Mac-AppleSilicon.zip",
     "x64": "https://raw.githubusercontent.com/superali99-tech/Schul-Organisation-App/HEAD/release/Schulplan-Mac-Intel.zip",
     "notes": [
-      "Neu: Schulleitermodus – Cockpit für die Schulleitung mit Abwesenheiten, Vertretungen und Lesebestätigungen",
-      "Verbindliche Termine, Pflichttermine, Mitteilungen und Schulvorgaben der Schulleitung – digital unterschrieben",
-      "Für Lehrkräfte: Abwesenheit melden, Mitteilungen bestätigen, Ferien-Countdown",
-      "Frischeres Design und dunkler Modus in Nachtblau"
+      "Vertretung gezielt zuweisen: Nur die Vertretung bekommt die Meldung „Du vertrittst …\" – oder auf Wunsch das ganze Kollegium",
+      "Meldung mit einem Tipp versenden – die Stunde landet direkt im Stundenplan",
+      "Kurzes Anleitungs-Video unter Kollegium → Vertretungen → „So geht's\""
     ]
   },
   "linux": {
-    "version": "1.5.0",
+    "version": "1.6.0",
     "date": "2026-11-26",
     "appimage": "https://raw.githubusercontent.com/superali99-tech/Schul-Organisation-App/HEAD/release/Schulplan-Linux.AppImage",
     "deb": "https://raw.githubusercontent.com/superali99-tech/Schul-Organisation-App/HEAD/release/Schulplan-Linux.deb",
     "notes": [
-      "Neu: Schulleitermodus – Cockpit für die Schulleitung mit Abwesenheiten, Vertretungen und Lesebestätigungen",
-      "Verbindliche Termine, Pflichttermine, Mitteilungen und Schulvorgaben der Schulleitung – digital unterschrieben",
-      "Für Lehrkräfte: Abwesenheit melden, Mitteilungen bestätigen, Ferien-Countdown",
-      "Frischeres Design und dunkler Modus in Nachtblau"
+      "Vertretung gezielt zuweisen: Nur die Vertretung bekommt die Meldung „Du vertrittst …\" – oder auf Wunsch das ganze Kollegium",
+      "Meldung mit einem Tipp versenden – die Stunde landet direkt im Stundenplan",
+      "Kurzes Anleitungs-Video unter Kollegium → Vertretungen → „So geht's\""
     ]
   }
 }

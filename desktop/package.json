@@ -1,7 +1,7 @@
 {
   "name": "schulplan",
   "productName": "Schulplan",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "description": "Schulplan – der Organisations-Planer für Lehrkräfte der Astrid Lindgren Schule",
   "author": "Astrid Lindgren Schule",
   "license": "UNLICENSED",
@@ -42,6 +42,11 @@
     ],
     "afterPack": "./scripts/afterPack.js",
     "compression": "maximum",
+    "electronLanguages": [
+      "de",
+      "en",
+      "en-US"
+    ],
     "win": {
       "target": [
         {
@@ -87,11 +92,7 @@
         "NSCameraUsageDescription": "Schulplan nutzt die Kamera nur zum Scannen von Einladungs-QR-Codes.",
         "NSMicrophoneUsageDescription": "Schulplan nutzt das Mikrofon nur für die Lautstärke-Ampel. Es wird nichts aufgenommen.",
         "LSApplicationCategoryType": "public.app-category.education"
-      },
-      "electronLanguages": [
-        "de",
-        "en"
-      ]
+      }
     },
     "linux": {
       "target": [
@@ -106,10 +107,6 @@
       "maintainer": "Schulplan-Projekt <noreply@schulplan.invalid>",
       "vendor": "Astrid Lindgren Schule",
       "artifactName": "Schulplan-Linux.${ext}",
-      "electronLanguages": [
-        "de",
-        "en-US"
-      ],
       "desktop": {
         "entry": {
           "Name": "Schulplan",

@@ -440,6 +440,9 @@ public class MainActivity extends Activity {
         if (p.endsWith(".json")) return "application/json";
         if (p.endsWith(".woff2")) return "font/woff2";
         if (p.endsWith(".mp3")) return "audio/mpeg";
+        if (p.endsWith(".mp4")) return "video/mp4";
+        if (p.endsWith(".webm")) return "video/webm";
+        if (p.endsWith(".webp")) return "image/webp";
         return "application/octet-stream";
     }
 

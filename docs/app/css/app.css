@@ -979,3 +979,20 @@ body { background:
 .lead-set-hero.on span { color: rgba(255, 255, 255, .85); }
 .post > .row { flex-wrap: wrap; row-gap: 6px; }
 .post > .row > .sp { flex: 1 1 140px; }
+
+/* Vertretung: Meldung an die Vertretung, Kurzanleitung */
+.banner.sub-banner { cursor: pointer; background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 14%, var(--card)), color-mix(in srgb, var(--accent2) 10%, var(--card))); border: 1px solid color-mix(in srgb, var(--accent) 25%, transparent); }
+.sub-notice { display: grid; gap: 10px; margin-bottom: 10px; }
+.sub-card { background: var(--card2); border-radius: 18px; padding: 14px; border: 1px solid color-mix(in srgb, var(--accent) 22%, transparent); }
+.sub-card-top { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.sub-when { display: flex; align-items: center; gap: 8px; font-weight: 750; font-size: 1.05rem; }
+.sub-when .i { color: var(--accent); width: 20px; height: 20px; }
+.sub-what { font-size: 1.15rem; font-weight: 800; margin: 4px 0 2px; letter-spacing: -.02em; }
+.howto { display: flex; align-items: center; gap: 12px; background: var(--card); border-radius: 18px; padding: 10px 12px; margin-bottom: 12px; cursor: pointer; box-shadow: var(--shadow); border: 1px solid color-mix(in srgb, var(--line) 70%, transparent); }
+.howto .sp { display: flex; flex-direction: column; min-width: 0; }
+.howto span:not(.howto-play) { font-size: .8rem; color: var(--muted); }
+.howto > .i { color: var(--muted); margin-left: auto; }
+.howto-play { width: 42px; height: 42px; border-radius: 14px; background: var(--grad); color: #fff; display: grid; place-items: center; flex: none; box-shadow: 0 6px 14px var(--accent-line); }
+.howto-play .i { width: 20px; height: 20px; margin-left: 2px; }
+.howto-video { display: block; width: min(100%, calc(70vh * .462)); height: auto; aspect-ratio: 390 / 844; object-fit: cover; border-radius: 22px; background: #0b0d13; box-shadow: 0 14px 34px -10px rgba(15, 18, 34, .45); margin: 0 auto 12px; }
+.howto-video.sm { width: min(100%, calc(52vh * .462)); }

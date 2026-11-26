@@ -402,7 +402,13 @@ const Files = {
   csv(filename, rows) { this.save(filename, 'text/csv', toCSV(rows)); },
   shareFile(filename, mime, content, text = '') {
     if (Native.has) { Native.call('shareFile', filename, mime, content, text); return; }
+    // Web-App: am Handy über das Teilen-Menü (Datei + Nachricht), sonst Datei laden und Nachricht kopieren
+    try {
+      const file = new File([content], filename, { type: mime });
+      if (navigator.canShare && navigator.canShare({ files: [file] })) { navigator.share({ files: [file], text: text || undefined }).catch(() => {}); return; }
+    } catch (e) { /* weiter mit Download */ }
     this.save(filename, mime, content);
+    if (text) setTimeout(() => this.copy(text), 600);
   },
   share(title, text) {
     if (Native.has) { Native.call('shareText', title, text); return; }

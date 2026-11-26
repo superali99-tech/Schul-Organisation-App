@@ -116,7 +116,7 @@ const Team = {
   },
   merge(d) {
     const t = S.team;
-    const sum = { posts: 0, members: 0, events: 0, subs: 0, classes: 0, absences: 0, acks: 0, school: false, schoolApplied: false, leader: false, n: 0 };
+    const sum = { _subs: 0, subsForMe: 0, posts: 0, members: 0, events: 0, subs: 0, classes: 0, absences: 0, acks: 0, school: false, schoolApplied: false, leader: false, n: 0 };
     t.acks = t.acks || []; t.absences = t.absences || []; t.delSig = t.delSig || {}; t.removed = t.removed || {};
     // Bereits geprüft (Leader.verifyIncoming): Schulleitung, unterschriebene Löschungen und Entfernungen
     if (d.leader) { if (!t.leader || t.leader.member !== d.leader.member) sum.leader = true; t.leader = d.leader; }
@@ -138,7 +138,10 @@ const Team = {
     t.acks = mergeList(t.acks, d.acks, 'acks');
     t.absences = mergeList(t.absences, d.absences, 'absences');
     t.posts = mergeList(t.posts, d.posts, 'posts');
-    t.subs = mergeList(t.subs, d.subs, 'subs');
+    const subIds = new Set(t.subs.map((x) => x.id));
+    t.subs = mergeList(t.subs, d.subs, '_subs');
+    sum.subs = t.subs.filter((x) => !subIds.has(x.id) && x.by !== t.me && subVisible(x)).length;
+    sum.subsForMe = SubNotice.pending().length;
     t.classes = mergeList(t.classes, d.classes, 'classes');
     const own = S.events.filter((e) => e.team !== t.id);
     const mine = S.events.filter((e) => e.team === t.id);
@@ -475,6 +478,7 @@ const Team = {
     const sum = await Team.mergeVerified(data);
     save();
     App.navigate('/team', { root: true });
+    if (sum.subsForMe) { setTimeout(() => SubNotice.check(), 450); return; }
     UI.toast(sum.n || sum.school || sum.leader ? `Übernommen: ${Team.summaryText(sum)}` : 'Alles ist bereits aktuell ✓', { ms: 4500 });
   },
   summaryText(sum) {
@@ -482,7 +486,8 @@ const Team = {
     if (sum.members) p.push(plural(sum.members, 'neues Mitglied', 'neue Mitglieder'));
     if (sum.posts) p.push(plural(sum.posts, 'Beitrag', 'Beiträge'));
     if (sum.events) p.push(plural(sum.events, 'Termin', 'Termine'));
-    if (sum.subs) p.push(plural(sum.subs, 'Vertretung', 'Vertretungen'));
+    if (sum.subsForMe) p.push(plural(sum.subsForMe, 'Vertretung für dich', 'Vertretungen für dich'));
+    else if (sum.subs) p.push(plural(sum.subs, 'Vertretung', 'Vertretungen'));
     if (sum.classes) p.push(plural(sum.classes, 'Klassenliste', 'Klassenlisten'));
     if (sum.absences) p.push(plural(sum.absences, 'Abwesenheit', 'Abwesenheiten'));
     if (sum.leader) p.push('Schulleitung eingetragen');
@@ -539,8 +544,9 @@ const Sync = {
       S.team.lastSync = new Date().toISOString();
       S.team.syncError = null;
       save();
-      if (!silent || (sum && (sum.n || sum.school || sum.leader))) UI.toast(sum && (sum.n || sum.school || sum.leader) ? `Synchronisiert – ${Team.summaryText(sum)}` : 'Synchronisiert ✓');
+      if (sum && sum.subsForMe) { /* die Vertretungs-Meldung ersetzt den Hinweis */ } else if (!silent || (sum && (sum.n || sum.school || sum.leader))) UI.toast(sum && (sum.n || sum.school || sum.leader) ? `Synchronisiert – ${Team.summaryText(sum)}` : 'Synchronisiert ✓');
       if (!UI.stack.length && (App.path.startsWith('/team') || App.path === '/today')) App.refresh();
+      if (sum && sum.subsForMe) setTimeout(() => SubNotice.check(), 500);
     } catch (e) {
       if (S.team) { S.team.syncError = e.message; save(); }
       if (!silent) UI.toast('Synchronisierung: ' + e.message, { type: 'err', ms: 5000 });
@@ -695,20 +701,29 @@ function teamDates() {
   return h;
 }
 
+// Vertretungen „nur an die Vertretung": sichtbar für Vertretung, abwesende Lehrkraft, Absender:in und Schulleitung
+function subVisible(x) {
+  const t = S.team;
+  if (!t || !x) return false;
+  if (x.audience !== 'person') return true;
+  const me = t.me;
+  return x.sub === me || x.absent === me || x.by === me || x.creator === me || !!(t.leader && t.leader.member === me);
+}
 function subItem(x) {
   const t = S.team;
   const mine = x.sub === t.me || x.absent === t.me;
   return `<div class="li ${mine ? 'li-hl' : ''}" data-act="sub-edit" data-id="${x.id}">
     <div class="li-ic" style="flex-direction:column;line-height:1.05;font-size:.72rem">${fmtDS(x.date)}<small>${Number(x.period) + 1}.</small></div>
-    <div class="li-main"><div class="li-t">${esc(x.className || 'Klasse ?')}${x.subject ? ' · ' + esc(x.subject) : ''}${x.sub === t.me ? ' <span class="badge acc">Du vertrittst</span>' : ''}${!x.sub ? ' <span class="badge red">offen</span>' : ''}</div>
+    <div class="li-main"><div class="li-t">${esc(x.className || 'Klasse ?')}${x.subject ? ' · ' + esc(x.subject) : ''}${x.sub === t.me ? ' <span class="badge acc">Du vertrittst</span>' : ''}${!x.sub ? ' <span class="badge red">offen</span>' : ''}${x.audience === 'person' ? ` <span class="badge" title="Nur die Beteiligten sehen diese Vertretung">${icon('lock')}Nur Beteiligte</span>` : ''}</div>
     <div class="li-s">für ${esc(teamMemberName(x.absent, true))}${x.sub ? ' → ' + esc(teamMemberName(x.sub, true)) : ''}${x.room ? ' · Raum ' + esc(x.room) : ''}${x.note ? ' · ' + esc(x.note) : ''}</div></div></div>`;
 }
 function teamSubs() {
   const td = today();
-  const list = S.team.subs;
+  const list = S.team.subs.filter(subVisible);
   const up = sortBy(list.filter((x) => x.date >= td), 'date', (x) => Number(x.period));
   const past = sortBy(list.filter((x) => x.date < td), 'date').reverse();
-  let h = `<p class="muted small" style="margin:0 4px 10px">Vertretungen, die dich betreffen, erscheinen automatisch in deinem Stundenplan.</p>`;
+  let h = `<div class="howto" data-act="howto-sub"><span class="howto-play">${icon('play')}</span><div class="sp"><b>So geht's: Vertretung zuweisen</b><span>Kurzes Video · 30 Sekunden</span></div>${icon('chevron-right')}</div>
+  <p class="muted small" style="margin:0 4px 10px">Vertretungen, die dich betreffen, erscheinen automatisch in deinem Stundenplan. Du entscheidest, ob nur die Vertretung oder das ganze Kollegium Bescheid bekommt.</p>`;
   if (!list.length) return h + UI.empty('replace', 'Noch keine Vertretungen eingetragen.');
   if (up.length) h += `<div class="section-title">Anstehend</div><div class="card pad0"><div class="list">${up.map(subItem).join('')}</div></div>`;
   if (past.length) h += `<div class="section-title">Vergangen</div><div class="card pad0"><div class="list">${past.slice(0, 30).map(subItem).join('')}</div></div>`;
@@ -907,6 +922,96 @@ function editMember(m) {
 // Gemeinsame Termine
 A['team-event-add'] = () => editEvent(null, { shared: true, type: 'konferenz' });
 
+// Vertretungen – Meldung nur an die Vertretung (oder an alle)
+// „für Herrn Kurz" statt „für Herr Kurz"
+function memberDat(id) {
+  const m = S.team && S.team.members.find((x) => x.id === id);
+  if (!m) return 'Unbekannt';
+  return [m.title === 'Herr' ? 'Herrn' : m.title, m.name].filter(Boolean).join(' ');
+}
+function memberFull(id) {
+  const m = S.team && S.team.members.find((x) => x.id === id);
+  return m ? [m.title, m.name].filter(Boolean).join(' ') : '';
+}
+const SubNotice = {
+  pending() {
+    const t = S.team;
+    if (!t || !t.id) return [];
+    const seen = t.subSeen || {};
+    return sortBy(t.subs.filter((x) => x.sub === t.me && x.by !== t.me && x.date >= today() && (seen[x.id] || 0) < (x.updatedAt || 0)), 'date', (x) => Number(x.period));
+  },
+  when(x) {
+    const p = periodTime(Number(x.period));
+    return `${fmtDW(x.date)} · ${Number(x.period) + 1}. Stunde${p ? ` (${p.s}–${p.e})` : ''}`;
+  },
+  what(x) { return [x.className || 'Klasse ?', x.subject, x.room ? 'Raum ' + x.room : ''].filter(Boolean).join(' · '); },
+  message(x) {
+    const t = S.team;
+    const lines = [];
+    if (x.audience === 'person' && x.sub) {
+      const m = t.members.find((y) => y.id === x.sub);
+      lines.push(`Hallo ${m ? [m.title, m.name].filter(Boolean).join(' ') : ''},`.replace(' ,', ','), '', 'du übernimmst eine Vertretung:');
+    } else lines.push(`Vertretung im Kollegium „${t.name}":`);
+    lines.push(`📅 ${SubNotice.when(x)}`, `🏫 ${SubNotice.what(x)}`);
+    if (x.absent) lines.push(`👤 für ${memberDat(x.absent)}`);
+    if (x.sub && x.audience !== 'person') lines.push(`➡️ Vertretung: ${memberFull(x.sub)}`);
+    if (!x.sub) lines.push('❓ Noch offen – wer kann übernehmen? In Schulplan: „Ich übernehme"');
+    if (x.note) lines.push(`📝 ${x.note}`);
+    lines.push('', 'Öffne die angehängte Datei in Schulplan – dann steht die Stunde direkt in deinem Stundenplan.', `– ${memberFull(t.me) || teamMemberName(t.me)}`);
+    return lines.join('\n');
+  },
+  async offer(x) {
+    const target = x.audience === 'person' && x.sub ? memberFull(x.sub) || teamMemberName(x.sub) : 'das Kollegium';
+    const r = await UI.menu(`Meldung an ${target}`, [
+      { l: 'Meldung jetzt senden', s: 'Per WhatsApp, E-Mail … – mit Team-Datei, die Stunde landet direkt im Stundenplan', i: 'send', v: 'send' },
+      Sync.connected() ? { l: 'Über die Cloud-Datei zustellen', s: 'Kommt beim nächsten Abgleich automatisch an', i: 'refresh-cw', v: 'sync' } : null,
+      { l: 'Später', i: 'x', v: 'later' },
+    ]);
+    if (r === 'send') SubNotice.send(x);
+    else if (r === 'sync') { await Sync.run(false); }
+    else UI.toast('Gespeichert – die Meldung geht beim nächsten Abgleich mit');
+  },
+  async send(x) {
+    const json = await Team.buildUpdate();
+    S.team.lastShared = new Date().toISOString();
+    save();
+    Files.shareFile(`Schulplan-Vertretung-${x.date}.json`, 'application/json', json, SubNotice.message(x));
+  },
+  markSeen(list) {
+    const t = S.team;
+    t.subSeen = t.subSeen || {};
+    list.forEach((x) => { t.subSeen[x.id] = x.updatedAt || Date.now(); });
+    save();
+  },
+  check() {
+    const list = SubNotice.pending();
+    if (!list.length || UI.stack.length || Lock.active) return;
+    SubNotice.show(list);
+  },
+  show(list = SubNotice.pending()) {
+    if (!list.length) return;
+    const t = S.team;
+    const seen = t.subSeen || {};
+    UI.open({
+      title: list.length === 1 ? 'Du vertrittst' : `${list.length} Vertretungen für dich`,
+      body: `<div class="sub-notice">${list.map((x) => `<div class="sub-card">
+          <div class="sub-card-top"><span class="badge ${seen[x.id] ? 'orange' : 'acc'}">${seen[x.id] ? 'Geändert' : 'Neu'}</span><span class="muted small">von ${esc(memberDat(x.by))}</span></div>
+          <div class="sub-when">${icon('calendar-clock')}${esc(SubNotice.when(x))}</div>
+          <div class="sub-what">${esc(SubNotice.what(x))}</div>
+          ${x.absent ? `<div class="muted small">für ${esc(memberDat(x.absent))}</div>` : ''}
+          ${x.note ? `<div class="banner mt">${icon('message-square-text')}<div>${nl2br(x.note)}</div></div>` : ''}
+        </div>`).join('')}</div>
+        <p class="muted small center">Die ${list.length === 1 ? 'Stunde steht' : 'Stunden stehen'} bereits in deinem Stundenplan.</p>`,
+      foot: `<button class="btn btn-ghost" data-x="tt">${icon('calendar-days')}Stundenplan</button><span class="sp"></span><button class="btn btn-primary" data-x="ok">${icon('check')}Alles klar</button>`,
+      onMount: (el, m) => {
+        el.querySelector('[data-x="ok"]').addEventListener('click', () => { SubNotice.markSeen(list); m.close(); App.refresh(); });
+        el.querySelector('[data-x="tt"]').addEventListener('click', () => { SubNotice.markSeen(list); m.close(); App.navigate('/timetable', { root: true }); });
+      },
+    });
+  },
+};
+A['sub-notice'] = () => SubNotice.show();
+
 // Vertretungen
 A['sub-add'] = () => editSub();
 A['sub-edit'] = (el) => editSub(S.team.subs.find((x) => x.id === el.dataset.id));
@@ -925,14 +1030,21 @@ function editSub(x, preset = {}) {
       { k: 'sub', label: 'Vertretung durch', type: 'select', opts: [{ v: '', l: '– noch offen –' }, ...memberOpts] },
       { k: 'room', label: 'Raum', half: true },
       { k: 'note', label: 'Hinweis', half: true, ph: 'z. B. Aufgaben im Fach' },
+      { k: 'audience', label: 'Wer bekommt die Meldung?', type: 'seg', opts: [{ v: 'person', l: 'Nur die Vertretung', i: 'user' }, { v: 'all', l: 'Ganzes Kollegium', i: 'users' }], hint: '„Nur die Vertretung": Die Stunde sehen nur die Vertretung, die abwesende Lehrkraft und die Schulleitung. Offene Vertretungen gehen immer an alle.' },
       { type: 'html', html: `<datalist id="dl-classes">${S.classes.map((c) => `<option value="${esc(c.name)}">`).join('')}</datalist><datalist id="dl-subjects">${S.subjects.map((s) => `<option value="${esc(s.name)}">`).join('')}</datalist>` },
     ],
-    values: x || { date: today(), period: 0, absent: '', sub: '', ...preset },
+    values: x ? { audience: 'all', ...x } : { date: today(), period: 0, absent: '', sub: '', audience: 'person', ...preset },
     onSave: (v) => {
       v.period = Number(v.period);
-      if (isNew) S.team.subs.push(Team.touch({ id: uid(), ...v }));
-      else Object.assign(x, v, Team.touch({}));
-      Team.changed(); App.refresh(); UI.toast('Gespeichert');
+      if (!v.sub) v.audience = 'all';
+      const before = x ? x.sub : '';
+      let obj;
+      if (isNew) { obj = Team.touch({ id: uid(), creator: S.team.me, ...v }); S.team.subs.push(obj); }
+      else obj = Object.assign(x, v, Team.touch({}));
+      Team.changed(); App.refresh();
+      const newPerson = obj.sub && obj.sub !== S.team.me && (isNew || before !== obj.sub);
+      if (newPerson || (isNew && obj.audience === 'all')) setTimeout(() => SubNotice.offer(obj), 380);
+      else UI.toast('Gespeichert');
     },
     onDelete: isNew ? null : async () => {
       S.team.subs = S.team.subs.filter((y) => y.id !== x.id); Team.markDeleted(x.id); Team.changed(); App.refresh();

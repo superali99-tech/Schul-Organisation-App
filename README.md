@@ -10,7 +10,7 @@ Eine Android-App, die den Schulalltag für Lehrerinnen und Lehrer organisiert. S
 
 🌐 **Website:** https://superali99-tech.github.io/Schul-Organisation-App/ – Downloads, ausführliche Anleitung, Datenschutzerklärung, Nutzungsrichtlinien und Lizenz (Quelle im Ordner `docs/`).
 
-**Neu in 1.5:** Schulleitermodus mit Cockpit · Abwesenheit melden · frischeres Design · Linux-Version (.deb und AppImage) · Zahl am App-Symbol der Web-App · bessere Darstellung auf iPhone/iPad.
+**Neu in 1.6:** Vertretung gezielt zuweisen – nur die Vertretung bekommt die Meldung (oder auf Wunsch alle), Meldung mit einem Tipp versenden, Anleitungs-Video · **1.5:** Schulleitermodus mit Cockpit · Abwesenheit melden · Linux-Version · Zahl am App-Symbol der Web-App · bessere Darstellung auf iPhone/iPad.
 
 **Neu in 1.3.2:** Mac-Version · Update-Suche mit Zeitlimit (kein endloses Suchen mehr).
 
@@ -72,6 +72,10 @@ Unter **Mehr → Schulleitermodus** meldet sich die Schulleitung mit eigenen Zug
 * das **Kollegium verwalten** (Mitglieder entfernen, Schulleitung übergeben).
 
 Verbindliche Einträge werden mit einem ECDSA-Schlüssel des Schulleitungs-Geräts **digital unterschrieben**; andere Geräte prüfen die Unterschrift beim Abgleich und lehnen Änderungen, Löschungen oder Fälschungen ab. Lehrkräfte melden **Abwesenheiten** (ihre betroffenen Stunden gehen automatisch an die Vertretungsplanung) und bestätigen Mitteilungen.
+
+## Vertretung zuweisen
+
+*Kollegium → Vertretungen → + Vertretung*: Tag, Stunde, Klasse, abwesende Lehrkraft und Vertretung wählen. Unter **„Wer bekommt die Meldung?“** entscheidest du: **Nur die Vertretung** (sichtbar nur für Vertretung, abwesende Lehrkraft und Schulleitung) oder **Ganzes Kollegium**. Danach **Meldung jetzt senden** (WhatsApp, E-Mail … mit Team-Datei) – die Kollegin öffnet die Datei, sieht „Du vertrittst …“ und hat die Stunde im Stundenplan. Ein kurzes Anleitungs-Video gibt es in der App unter *Vertretungen → So geht's* und in den Neuerungen.
 
 ## Kollegium: mit anderen Lehrkräften der Schule zusammenarbeiten
 
