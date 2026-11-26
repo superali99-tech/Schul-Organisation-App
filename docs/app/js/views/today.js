@@ -8,6 +8,15 @@ function greeting() {
   if (h < 17) return 'Guten Tag';
   return 'Guten Abend';
 }
+function holidayCountdown(d, hol) {
+  if (hol) return '';
+  const next = sortBy(S.events.filter((e) => e.type === 'ferien' && e.date > d), 'date')[0];
+  if (!next) return '';
+  const n = daysBetween(d, next.date);
+  if (n > 70) return '';
+  const name = /ferien$/i.test(next.title || '') ? `zu den ${esc(next.title)}` : `: ${esc(next.title || 'Ferien')}`;
+  return `<div class="th-count">${icon('umbrella')}${n === 1 ? 'Morgen beginnen die Ferien!' : `Noch ${n} Tage bis ${name}`}</div>`;
+}
 function teacherName() {
   const st = S.settings;
   return [st.title, st.teacher].filter(Boolean).join(' ');
@@ -80,11 +89,27 @@ App.def('/today', () => {
     <div class="th-date">${WD[dow(d)]}, ${dd.getDate()}. ${MONTHS[dd.getMonth()]}</div>
     <h2>${greeting()}${teacherName() ? ', ' + esc(teacherName()) : ''}!</h2>
     <div class="th-sub">KW ${isoWeek(d)}${wt ? ` · ${wt}-Woche` : ''}${st.school ? ' · ' + esc(st.school) : ''}</div>
+    ${holidayCountdown(d, hol)}
     <div class="th-stats">
       <div data-nav="/timetable" data-root><b>${lessonsToday}</b><span>${lessonsToday === 1 ? 'Stunde' : 'Stunden'} heute</span></div>
       <div data-nav="/tasks"><b>${openTasks}</b><span>Aufgaben fällig</span></div>
       <div data-nav="/overview/exams"><b>${examsWeek}</b><span>Prüfungen</span></div>
     </div></div>`);
+
+  if (Leader.active()) {
+    const abs = absencesOn(d).length;
+    const open = Team.on() ? S.team.subs.filter((x) => !x.sub && x.date >= d).length : 0;
+    out.push(`<div class="lead-strip" data-nav="/leader"><div class="lead-strip-ic">${icon('crown')}</div><div class="sp"><b>Schulleitung</b><span>${Team.on() ? `${abs} heute abwesend · ${open} offene ${open === 1 ? 'Vertretung' : 'Vertretungen'}` : 'Cockpit öffnen – Schulteam gründen'}</span></div>${icon('chevron-right')}</div>`);
+  }
+  unreadOfficial().slice(0, 2).forEach((p) => {
+    const txt = (p.text || '').replace(/\s+/g, ' ');
+    out.push(`<div class="banner lead-banner" data-act="post-open" data-id="${p.id}">${icon('megaphone')}<div><b>Mitteilung der Schulleitung${p.title ? ': ' + esc(p.title) : ''}</b><br><span class="text2">${esc(txt.slice(0, 140))}${txt.length > 140 ? ' …' : ''}</span>${p.requireAck ? '<div class="mt"><span class="badge red">Bitte lesen & bestätigen</span></div>' : ''}</div></div>`);
+  });
+  const myAbs = Team.on() ? absencesOn(d).find((a) => a.member === S.team.me) : null;
+  if (myAbs) {
+    const k = ABS_KINDS[myAbs.kind] || ABS_KINDS.sonstiges;
+    out.push(`<div class="banner" data-act="absence-open" data-id="${myAbs.id}">${icon(k.i)}<div><b>Du bist heute als abwesend gemeldet</b> (${esc(k.l)}${myAbs.to && myAbs.to !== myAbs.from ? ', bis ' + fmtDW(myAbs.to) : ''}).<br><span class="text2">${myAbs.kind === 'krank' ? 'Gute Besserung! ' : ''}Tippe hier, um die Meldung zu sehen oder zu ändern.</span></div></div>`);
+  }
 
   if (Update.info) {
     out.push(`<div class="promo" data-act="upd-open"><div class="promo-ic">${icon('download')}</div><div class="sp"><b>Neue Version ${esc(Update.info.versionName || '')} verfügbar</b><span>Tippe hier – mit einem Tipp aktualisiert, deine Daten bleiben erhalten.</span></div><button class="btn btn-sm btn-white" data-act="upd-open">Update</button></div>`);

@@ -5,6 +5,15 @@ const UPDATE_URLS = ['https://raw.githubusercontent.com/superali99-tech/Schul-Or
 
 /** Neuerungen je Version (neueste zuerst) */
 const CHANGELOG = [
+  { v: '1.5.0', items: [
+    'Neu: Schulleitermodus – Anmeldung mit eigenen Zugangsdaten (änderbar unter Einstellungen → Schulleitermodus)',
+    'Schulleitungs-Cockpit: Abwesenheiten, offene Vertretungen, Lesebestätigungen und nächste Schultermine auf einen Blick',
+    'Verbindliche Termine, Pflichttermine, Mitteilungen und Schulvorgaben der Schulleitung – digital unterschrieben, nur die Schulleitung kann sie ändern',
+    'Jahresplanung für das ganze Schuljahr, Kollegium verwalten, Schulleitung übergeben',
+    'Für Lehrkräfte: Abwesenheit melden – deine betroffenen Stunden gehen automatisch an die Vertretungsplanung',
+    'Mitteilungen der Schulleitung auf der Startseite mit „Gelesen"-Bestätigung und Ferien-Countdown',
+    'Frischeres Design: sanfte Farbverläufe, feinere Karten, dunkler Modus in Nachtblau',
+  ] },
   { v: '1.4.3', items: [
     'Updates am Computer zuverlässiger: Schulplan startet die Installation mehrmals, statt bei „Wird installiert …“ hängen zu bleiben',
     'Ein Update läuft weiter, auch wenn du das Fenster schließt oder Schulplan beendest – danach startet Schulplan von selbst neu',

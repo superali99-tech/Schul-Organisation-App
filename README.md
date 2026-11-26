@@ -10,7 +10,7 @@ Eine Android-App, die den Schulalltag für Lehrerinnen und Lehrer organisiert. S
 
 🌐 **Website:** https://superali99-tech.github.io/Schul-Organisation-App/ – Downloads, ausführliche Anleitung, Datenschutzerklärung, Nutzungsrichtlinien und Lizenz (Quelle im Ordner `docs/`).
 
-**Neu:** Linux-Version (.deb und AppImage) · Desktop-Widget für Windows, Mac und Linux · Zahl am App-Symbol der Web-App · bessere Darstellung auf iPhone/iPad.
+**Neu in 1.5:** Schulleitermodus mit Cockpit · Abwesenheit melden · frischeres Design · Linux-Version (.deb und AppImage) · Zahl am App-Symbol der Web-App · bessere Darstellung auf iPhone/iPad.
 
 **Neu in 1.3.2:** Mac-Version · Update-Suche mit Zeitlimit (kein endloses Suchen mehr).
 
@@ -60,6 +60,18 @@ Daten liegen unter `~/Library/Application Support/Schulplan` (mit täglichen Sic
 * **Andere Systeme (Fedora, openSUSE, Arch …):** `Schulplan-Linux.AppImage` laden, ausführbar machen (Rechtsklick → Eigenschaften → „Als Programm ausführen“ bzw. `chmod +x Schulplan-Linux.AppImage`) und doppelklicken. Startet es unter Ubuntu nicht, fehlt FUSE: `sudo apt install libfuse2` (24.04: `libfuse2t64`).
 
 Daten liegen unter `~/.config/Schulplan` (mit täglichen Sicherungen). Beim Schließen läuft Schulplan im Hintergrund weiter, damit Erinnerungen ankommen; **Strg+Q** beendet die App, **Strg+Umschalt+W** schaltet das Desktop-Widget ein. Updates: Das AppImage ersetzt sich selbst; beim .deb fragt das System einmal nach dem Passwort.
+
+## Schulleitermodus
+
+Unter **Mehr → Schulleitermodus** meldet sich die Schulleitung mit eigenen Zugangsdaten an (Name und Passwort, änderbar unter *Einstellungen → Schulleitermodus*; gespeichert nur als verschlüsselter Prüfwert). Das **Cockpit** zeigt Kollegium, heutige Abwesenheiten, offene Vertretungen, Lesebestätigungen und die nächsten Schultermine. Die Schulleitung kann
+
+* **verbindliche Termine** und **Pflichttermine** (Erinnerung am Vortag) für alle anlegen,
+* **Mitteilungen** mit **Lesebestätigung** verschicken,
+* **Schulvorgaben** (Schuljahr, Stundenraster, Fächer) verbindlich verteilen – die Geräte übernehmen sie automatisch,
+* Ferien festlegen, die **Jahresplanung** ansehen und exportieren,
+* das **Kollegium verwalten** (Mitglieder entfernen, Schulleitung übergeben).
+
+Verbindliche Einträge werden mit einem ECDSA-Schlüssel des Schulleitungs-Geräts **digital unterschrieben**; andere Geräte prüfen die Unterschrift beim Abgleich und lehnen Änderungen, Löschungen oder Fälschungen ab. Lehrkräfte melden **Abwesenheiten** (ihre betroffenen Stunden gehen automatisch an die Vertretungsplanung) und bestätigen Mitteilungen.
 
 ## Kollegium: mit anderen Lehrkräften der Schule zusammenarbeiten
 

@@ -1,40 +1,47 @@
 {
-  "versionCode": 11,
-  "versionName": "1.4.3",
+  "versionCode": 12,
+  "versionName": "1.5.0",
   "date": "2026-11-26",
   "apk": "https://raw.githubusercontent.com/superali99-tech/Schul-Organisation-App/HEAD/release/Schulplan.apk",
   "notes": [
-    "Updates am Computer zuverlässiger: Schulplan startet die Installation mehrmals, statt bei „Wird installiert …“ hängen zu bleiben",
-    "Ein Update läuft weiter, auch wenn du das Fenster schließt oder Schulplan beendest – danach startet Schulplan von selbst neu",
-    "Schulplan gibt es jetzt auch für Linux (.deb und AppImage) – mit Desktop-Widget"
+    "Neu: Schulleitermodus – Cockpit für die Schulleitung mit Abwesenheiten, Vertretungen und Lesebestätigungen",
+    "Verbindliche Termine, Pflichttermine, Mitteilungen und Schulvorgaben der Schulleitung – digital unterschrieben",
+    "Für Lehrkräfte: Abwesenheit melden, Mitteilungen bestätigen, Ferien-Countdown",
+    "Frischeres Design und dunkler Modus in Nachtblau"
   ],
   "desktop": {
-    "version": "1.4.3",
+    "version": "1.5.0",
     "date": "2026-11-26",
     "url": "https://raw.githubusercontent.com/superali99-tech/Schul-Organisation-App/HEAD/release/Schulplan-Setup.exe",
     "notes": [
-      "Updates am Computer zuverlässiger: Schulplan startet die Installation mehrmals, statt bei „Wird installiert …“ hängen zu bleiben",
-      "Ein Update läuft weiter, auch wenn du das Fenster schließt oder Schulplan beendest – danach startet Schulplan von selbst neu",
-      "Schulplan gibt es jetzt auch für Linux (.deb und AppImage) – mit Desktop-Widget"
+      "Neu: Schulleitermodus – Cockpit für die Schulleitung mit Abwesenheiten, Vertretungen und Lesebestätigungen",
+      "Verbindliche Termine, Pflichttermine, Mitteilungen und Schulvorgaben der Schulleitung – digital unterschrieben",
+      "Für Lehrkräfte: Abwesenheit melden, Mitteilungen bestätigen, Ferien-Countdown",
+      "Frischeres Design und dunkler Modus in Nachtblau"
     ]
   },
   "mac": {
-    "version": "1.4.2",
+    "version": "1.5.0",
     "date": "2026-11-26",
     "arm64": "https://raw.githubusercontent.com/superali99-tech/Schul-Organisation-App/HEAD/release/Schulplan-Mac-AppleSilicon.zip",
     "x64": "https://raw.githubusercontent.com/superali99-tech/Schul-Organisation-App/HEAD/release/Schulplan-Mac-Intel.zip",
     "notes": [
-      "Windows, Mac und große Bildschirme: Alles steht jetzt sauber in der Mitte – Schnellzugriffe, Knöpfe, Hinweise und die Kopfzeile",
-      "Einladung annehmen: Einladungs-Nachricht und PIN in einem Formular"
+      "Neu: Schulleitermodus – Cockpit für die Schulleitung mit Abwesenheiten, Vertretungen und Lesebestätigungen",
+      "Verbindliche Termine, Pflichttermine, Mitteilungen und Schulvorgaben der Schulleitung – digital unterschrieben",
+      "Für Lehrkräfte: Abwesenheit melden, Mitteilungen bestätigen, Ferien-Countdown",
+      "Frischeres Design und dunkler Modus in Nachtblau"
     ]
   },
   "linux": {
-    "version": "1.4.2",
+    "version": "1.5.0",
     "date": "2026-11-26",
     "appimage": "https://raw.githubusercontent.com/superali99-tech/Schul-Organisation-App/HEAD/release/Schulplan-Linux.AppImage",
     "deb": "https://raw.githubusercontent.com/superali99-tech/Schul-Organisation-App/HEAD/release/Schulplan-Linux.deb",
     "notes": [
-      "Schulplan gibt es jetzt auch für Linux (AppImage und .deb) – mit Desktop-Widget, Erinnerungen und automatischen Updates"
+      "Neu: Schulleitermodus – Cockpit für die Schulleitung mit Abwesenheiten, Vertretungen und Lesebestätigungen",
+      "Verbindliche Termine, Pflichttermine, Mitteilungen und Schulvorgaben der Schulleitung – digital unterschrieben",
+      "Für Lehrkräfte: Abwesenheit melden, Mitteilungen bestätigen, Ferien-Countdown",
+      "Frischeres Design und dunkler Modus in Nachtblau"
     ]
   }
 }

@@ -14,6 +14,11 @@ App.def('/more', () => {
     <div class="sp"><b>Kollegium</b><span>${Team.on() ? esc(S.team.name) + ' · ' + plural(S.team.members.length, 'Mitglied', 'Mitglieder') : 'Kolleg:innen einladen & zusammenarbeiten'}</span></div>
     ${Team.on() && S.team.posts.some((x) => x.by !== S.team.me && (x.updatedAt || 0) > (S.team.seenPosts || 0)) ? '<span class="badge red">Neu</span>' : ''}${icon('chevron-right')}
   </div>
+  <div class="team-tile lead-tile ${Leader.active() ? 'on' : ''}" data-nav="/leader">
+    <div class="team-logo">${icon('crown')}</div>
+    <div class="sp"><b>${Leader.active() ? 'Schulleitung · Cockpit' : 'Schulleitermodus'}</b><span>${Leader.active() ? 'Termine & Mitteilungen für alle, Abwesenheiten, Jahresplanung' : 'Anmelden für die Schulleitung'}</span></div>
+    ${Leader.active() ? '<span class="badge lead">Aktiv</span>' : ''}${icon('chevron-right')}
+  </div>
   <div class="section-title">Organisation</div>
   <div class="tiles">
     ${tile('/tasks', 'list-todo', 'Aufgaben', '#4f46e5', openTasks ? { v: openTasks, cls: overdue ? 'red' : 'acc' } : null)}

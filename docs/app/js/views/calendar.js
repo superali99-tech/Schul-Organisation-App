@@ -6,7 +6,7 @@ function eventItem(e) {
   const multi = e.end && e.end !== e.date;
   return `<div class="li" data-act="event-edit" data-id="${e.id}">
     <div class="li-ic" style="background:${rgba(t.c, .14)};color:${t.c}">${icon(t.i)}</div>
-    <div class="li-main"><div class="li-t">${esc(e.title)}${e.team ? ` <span class="badge acc">${icon('users')}Team</span>` : ''}</div>
+    <div class="li-main"><div class="li-t">${esc(e.title)}${e.official ? ` <span class="badge lead">${icon('crown')}Schulleitung</span>` : e.team ? ` <span class="badge acc">${icon('users')}Team</span>` : ''}${e.mandatory && e.official ? ' <span class="badge red">Pflicht</span>' : ''}</div>
     <div class="li-s">${esc(t.l)}${e.time ? ' · ' + esc(e.time) + (e.endTime ? '–' + esc(e.endTime) : '') + ' Uhr' : ''}${e.place ? ' · ' + esc(e.place) : ''}${e.classId ? ' · ' + esc(cName(e.classId)) : ''}${multi ? ` · bis ${fmtDS(e.end)}` : ''}</div></div>
     <div class="li-end">${relDay(e.date) && e.date >= today() ? `<span class="badge">${e.date === today() ? 'Heute' : fmtDW(e.date)}</span>` : ''}${e.remind !== '' && e.remind != null ? icon('bell') : ''}</div>
   </div>`;
@@ -111,8 +111,23 @@ A['cal-menu'] = () => UI.menu('Kalender', [
 A['event-add'] = (el) => editEvent(null, { date: (el && el.dataset && el.dataset.d) || App.calSel || today() });
 A['event-edit'] = (el) => editEvent(byId('events', el.dataset.id));
 
+function showOfficialEvent(e) {
+  const t = EVENT_TYPES[e.type] || EVENT_TYPES.termin;
+  const multi = e.end && e.end !== e.date;
+  UI.open({
+    title: e.title,
+    body: `<div class="row mb" style="gap:12px"><div class="li-ic" style="background:${rgba(t.c, .14)};color:${t.c}">${icon(t.i)}</div><div><b>${esc(t.l)}</b><div class="muted small">${fmtDW(e.date)}${multi ? ' – ' + fmtDW(e.end) : ''}${e.time ? ' · ' + esc(e.time) + (e.endTime ? '–' + esc(e.endTime) : '') + ' Uhr' : ''}</div></div></div>
+      <div class="row row-wrap" style="gap:6px"><span class="badge lead">${icon('crown')}Termin der Schulleitung</span>${e.mandatory ? '<span class="badge red">Pflichttermin</span>' : ''}${e.by ? `<span class="badge">${esc(teamMemberName(e.by))}</span>` : ''}</div>
+      ${e.place ? `<p class="mt">${icon('map-pin')} ${esc(e.place)}</p>` : ''}
+      ${e.notes ? `<div class="banner mt">${icon('message-square-text')}<div>${nl2br(e.notes)}</div></div>` : ''}
+      <p class="muted small mt">Verbindlicher Termin – nur die Schulleitung kann ihn ändern oder löschen.${e.mandatory ? ' Du wirst am Vortag erinnert.' : ''}</p>`,
+  });
+}
+
 function editEvent(e, preset = {}) {
+  if (e && e.official && !Leader.isTeamLeader()) { showOfficialEvent(e); return; }
   const isNew = !e;
+  const leader = Team.on() && Leader.isTeamLeader();
   UI.form({
     title: isNew ? (preset.type === 'ferien' ? 'Ferien eintragen' : 'Neuer Termin') : 'Termin bearbeiten',
     fields: [
@@ -127,24 +142,36 @@ function editEvent(e, preset = {}) {
       { k: 'remind', label: 'Erinnerung', type: 'select', opts: [{ v: '', l: 'Keine' }, { v: '0', l: 'Zum Beginn' }, { v: '15', l: '15 Minuten vorher' }, { v: '30', l: '30 Minuten vorher' }, { v: '60', l: '1 Stunde vorher' }, { v: '1440', l: '1 Tag vorher' }, { v: '2880', l: '2 Tage vorher' }, { v: '10080', l: '1 Woche vorher' }] },
       { k: 'notes', label: 'Notizen', type: 'textarea', rows: 3 },
       Team.on() ? { k: 'shared', label: `Mit dem Kollegium teilen`, type: 'switch', hint: `Erscheint bei allen im Team „${S.team.name}"` } : null,
+      leader ? { k: 'official', label: 'Verbindlich – Termin der Schulleitung', type: 'switch', hint: 'Digital unterschrieben: nur du kannst ihn ändern oder löschen' } : null,
+      leader ? { k: 'mandatory', label: 'Pflichttermin', type: 'switch', hint: 'Alle werden am Vortag erinnert' } : null,
     ],
     values: e ? { ...e, remind: e.remind == null ? '' : String(e.remind), shared: !!e.team } : { type: 'termin', date: today(), remind: '', ...preset, shared: !!preset.shared || (Team.on() && ['ferien', 'feiertag', 'konferenz', 'sprechtag'].includes(preset.type) && !!preset.shared) },
-    onSave: (v) => {
+    onSave: async (v) => {
       if (v.end && v.end < v.date) { UI.toast('„bis" liegt vor dem Startdatum', { type: 'err' }); return false; }
       if (v.remind !== '' && !S.settings.remind.on) { S.settings.remind.on = true; requestNotifPermission(); }
-      const shared = !!v.shared;
+      let shared = !!v.shared;
       delete v.shared;
+      const wasOfficial = !!(e && e.official);
+      if (leader) {
+        v.official = !!v.official;
+        v.mandatory = v.official && !!v.mandatory;
+        if (v.official) shared = true;
+      }
       const obj = upsert('events', { ...(e || {}), ...v });
       if (Team.on()) {
-        if (shared) { obj.team = S.team.id; Team.touch(obj); Team.changed(); }
-        else if (e && e.team) {
+        if (shared) {
+          obj.team = S.team.id; Team.touch(obj);
+          if (leader && (obj.official || wasOfficial)) await Leader.signItem(obj);
+          Team.changed();
+        } else if (e && e.team) {
           // Nicht mehr teilen: bei allen entfernen, lokal als eigener Termin behalten
-          Team.markDeleted(obj.id); delete obj.team; obj.id = uid(); Team.changed();
+          if (wasOfficial && leader) await Leader.signDelete(obj.id); else Team.markDeleted(obj.id);
+          delete obj.team; delete obj.official; delete obj.mandatory; delete obj.sig; obj.id = uid(); Team.changed();
         }
       }
       save(); App.refresh(); UI.toast(shared ? 'Gespeichert & mit dem Kollegium geteilt' : 'Gespeichert');
     },
-    onDelete: isNew ? null : () => deleteWithUndo('events', e.id, e.title, { confirm: !!e.team, after: () => { if (e.team && Team.on()) { Team.markDeleted(e.id); Team.changed(); } } }),
+    onDelete: isNew ? null : () => deleteWithUndo('events', e.id, e.title, { confirm: !!e.team, after: async () => { if (e.team && Team.on()) { if (e.official && leader) await Leader.signDelete(e.id); else Team.markDeleted(e.id); Team.changed(); } } }),
   });
 }
 

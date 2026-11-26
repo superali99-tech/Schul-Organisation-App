@@ -96,7 +96,7 @@ const App = {
     $('#topbar').innerHTML = `
       ${showBack ? `<button class="tb-btn" data-act="app-back" aria-label="Zurück">${icon('arrow-left')}</button>` : `<div class="tb-logo">${icon(v.icon || 'graduation-cap')}</div>`}
       <div class="tb-title"><h1>${esc(v.title || '')}</h1>${v.sub ? `<div class="tb-sub">${esc(v.sub)}</div>` : ''}</div>
-      <div class="tb-actions">${(v.actions || []).map((a) => `<button class="tb-btn" ${attrs({ 'data-act': a.act, 'data-nav': a.nav, 'data-id': a.id, 'aria-label': a.label, title: a.label })}>${icon(a.icon)}</button>`).join('')}</div>`;
+      <div class="tb-actions">${typeof Leader !== 'undefined' && Leader.active() && !String(App.path || '').startsWith('/leader') ? `<button class="tb-btn tb-lead" data-nav="/leader" aria-label="Schulleitungs-Cockpit" title="Schulleitungs-Cockpit">${icon('crown')}</button>` : ''}${(v.actions || []).map((a) => `<button class="tb-btn" ${attrs({ 'data-act': a.act, 'data-nav': a.nav, 'data-id': a.id, 'aria-label': a.label, title: a.label })}>${icon(a.icon)}</button>`).join('')}</div>`;
     main.className = 'view ' + (v.cls || '');
     main.innerHTML = v.html || '';
     // FAB
