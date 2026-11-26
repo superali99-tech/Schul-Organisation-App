@@ -271,6 +271,7 @@ function defaultData() {
     seating: {},
     pickHistory: {},
     team: null,
+    leader: null,
   };
 }
 
@@ -293,6 +294,11 @@ const Store = {
     d.settings = { ...def.settings, ...d.settings, remind: { ...def.settings.remind, ...(d.settings || {}).remind } };
     if (oldVersion < 2 && !d.settings.school) d.settings.school = DEFAULT_SCHOOL;
     if (oldVersion < 3) { d.settings.remind.on = true; d.settings.remind.lessons = true; }
+    if (d.team) {
+      const t = d.team;
+      ['acks', 'absences', 'posts', 'subs', 'classes', 'members'].forEach((k) => { if (!Array.isArray(t[k])) t[k] = []; });
+      ['delSig', 'removed', 'deleted'].forEach((k) => { if (!t[k] || typeof t[k] !== 'object') t[k] = {}; });
+    }
     d.version = DATA_VERSION;
     return d;
   },

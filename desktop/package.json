@@ -87,7 +87,11 @@
         "NSCameraUsageDescription": "Schulplan nutzt die Kamera nur zum Scannen von Einladungs-QR-Codes.",
         "NSMicrophoneUsageDescription": "Schulplan nutzt das Mikrofon nur für die Lautstärke-Ampel. Es wird nichts aufgenommen.",
         "LSApplicationCategoryType": "public.app-category.education"
-      }
+      },
+      "electronLanguages": [
+        "de",
+        "en"
+      ]
     },
     "linux": {
       "target": [

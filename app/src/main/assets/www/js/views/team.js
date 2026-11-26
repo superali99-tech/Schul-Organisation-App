@@ -111,11 +111,17 @@ const Team = {
   },
   collect() {
     const t = S.team;
-    return deepCopy({ members: t.members, events: S.events.filter((e) => e.team === t.id), posts: t.posts, subs: t.subs, classes: t.classes, school: t.school, deleted: t.deleted });
+    return deepCopy({ members: t.members, events: S.events.filter((e) => e.team === t.id), posts: t.posts, subs: t.subs, classes: t.classes, school: t.school, deleted: t.deleted,
+      acks: t.acks || [], absences: t.absences || [], leader: t.leader || null, delSig: t.delSig || {}, removed: t.removed || {} });
   },
   merge(d) {
     const t = S.team;
-    const sum = { posts: 0, members: 0, events: 0, subs: 0, classes: 0, school: false, n: 0 };
+    const sum = { posts: 0, members: 0, events: 0, subs: 0, classes: 0, absences: 0, acks: 0, school: false, schoolApplied: false, leader: false, n: 0 };
+    t.acks = t.acks || []; t.absences = t.absences || []; t.delSig = t.delSig || {}; t.removed = t.removed || {};
+    // Bereits geprüft (Leader.verifyIncoming): Schulleitung, unterschriebene Löschungen und Entfernungen
+    if (d.leader) { if (!t.leader || t.leader.member !== d.leader.member) sum.leader = true; t.leader = d.leader; }
+    Object.assign(t.delSig, d.delSig || {});
+    Object.assign(t.removed, d.removed || {});
     Object.entries(d.deleted || {}).forEach(([id, ts]) => { if (!t.deleted[id] || t.deleted[id] < ts) t.deleted[id] = ts; });
     const alive = (it) => !(t.deleted[it.id] && t.deleted[it.id] >= (it.updatedAt || 0));
     const mergeList = (local, incoming, key) => {
@@ -128,7 +134,9 @@ const Team = {
       }
       return [...map.values()].filter(alive);
     };
-    t.members = mergeList(t.members, d.members, 'members');
+    t.members = mergeList(t.members, d.members, 'members').filter((m) => m.id === t.me || !t.removed[m.id]);
+    t.acks = mergeList(t.acks, d.acks, 'acks');
+    t.absences = mergeList(t.absences, d.absences, 'absences');
     t.posts = mergeList(t.posts, d.posts, 'posts');
     t.subs = mergeList(t.subs, d.subs, 'subs');
     t.classes = mergeList(t.classes, d.classes, 'classes');
@@ -137,13 +145,18 @@ const Team = {
     S.events = [...own, ...mergeList(mine, (d.events || []).map((e) => ({ ...e, team: t.id })), 'events')];
     if (d.school && (!t.school || (d.school.updatedAt || 0) > (t.school.updatedAt || 0))) {
       t.school = d.school;
-      if (d.school.by !== t.me) sum.school = true;
+      if (d.school.by !== t.me) {
+        sum.school = true;
+        // Verbindliche Schulvorgaben der Schulleitung werden automatisch übernommen
+        if (d.school.official) { Team.applySchool(d.school); sum.schoolApplied = true; }
+      }
     }
-    sum.n = sum.posts + sum.members + sum.events + sum.subs + sum.classes;
+    sum.n = sum.posts + sum.members + sum.events + sum.subs + sum.classes + sum.absences;
     return sum;
   },
+  async mergeVerified(d) { return Team.merge(await Leader.verifyIncoming(d)); },
   newTeam(name, key, id) {
-    return { id: id || uid(), name, key, me: uid(), created: new Date().toISOString(), members: [], posts: [], subs: [], classes: [], school: null, deleted: {}, lastSync: null, seenPosts: Date.now(), autoSync: true };
+    return { id: id || uid(), name, key, me: uid(), created: new Date().toISOString(), members: [], posts: [], subs: [], classes: [], school: null, deleted: {}, lastSync: null, seenPosts: Date.now(), autoSync: true, acks: [], absences: [], leader: null, delSig: {}, removed: {} };
   },
   memberFromForm(v, id) {
     return { id, title: v.title || '', name: v.name || '', short: (v.short || '').toUpperCase(), role: v.role || 'Lehrkraft', subjects: v.subjects || '', classes: v.classes || '', email: v.email || '', phone: v.phone || '', updatedAt: Date.now(), by: id };
@@ -153,7 +166,7 @@ const Team = {
   async buildInvite(minimal) {
     const t = S.team;
     const payload = { k: 'invite', v: 1, team: { id: t.id, name: t.name, key: t.key }, from: t.me };
-    if (minimal) Object.assign(payload, { members: t.members, school: t.school, events: S.events.filter((e) => e.team === t.id && (e.type === 'ferien' || e.type === 'feiertag')) });
+    if (minimal) Object.assign(payload, { members: t.members, school: t.school, events: S.events.filter((e) => e.team === t.id && (e.type === 'ferien' || e.type === 'feiertag')), leader: t.leader || null, removed: t.removed || {} });
     else Object.assign(payload, Team.collect());
     return 'SO1I.' + Codec.b64u(await Codec.pack(payload));
   },
@@ -188,7 +201,7 @@ const Team = {
     }
     if (!inv) return;
     if (Team.on() && S.team.id === inv.team.id) {
-      const sum = Team.merge(inv);
+      const sum = await Team.mergeVerified(inv);
       save(); App.navigate('/team', { root: true });
       UI.toast(`Du bist bereits in diesem Team${sum.n ? ` – ${sum.n} Neuigkeiten übernommen` : ''}`);
       return;
@@ -215,11 +228,12 @@ const Team = {
       ],
       values: { title: st.title, name: st.teacher, short: st.short || '', role: 'Lehrkraft', subjects: S.subjects.map((s) => s.name).join(', '), email: st.email || '', applySchool: true },
       submit: 'Beitreten',
-      onSave: (v) => {
+      onSave: async (v) => {
+        const prevTeam = S.team;
         S.team = Team.newTeam(inv.team.name, inv.team.key, inv.team.id);
         const me = Team.memberFromForm(v, S.team.me);
         S.team.members = [me];
-        Team.merge(inv);
+        try { await Team.mergeVerified(inv); } catch (e) { S.team = prevTeam; UI.toast('Einladung konnte nicht gelesen werden', { type: 'err' }); return false; }
         if (v.applySchool && S.team.school) Team.applySchool(S.team.school);
         Object.assign(st, { title: v.title, teacher: v.name, short: me.short });
         st.onboarded = true;
@@ -458,10 +472,10 @@ const Team = {
     if (obj.team !== S.team.id) { UI.toast(`Diese Datei gehört zum Team „${obj.name || '?'}"`, { type: 'err' }); return; }
     let data;
     try { data = await Team.readUpdate(obj); } catch (e) { UI.toast('Datei konnte nicht entschlüsselt werden', { type: 'err' }); return; }
-    const sum = Team.merge(data);
+    const sum = await Team.mergeVerified(data);
     save();
     App.navigate('/team', { root: true });
-    UI.toast(sum.n || sum.school ? `Übernommen: ${Team.summaryText(sum)}` : 'Alles ist bereits aktuell ✓', { ms: 4500 });
+    UI.toast(sum.n || sum.school || sum.leader ? `Übernommen: ${Team.summaryText(sum)}` : 'Alles ist bereits aktuell ✓', { ms: 4500 });
   },
   summaryText(sum) {
     const p = [];
@@ -470,7 +484,10 @@ const Team = {
     if (sum.events) p.push(plural(sum.events, 'Termin', 'Termine'));
     if (sum.subs) p.push(plural(sum.subs, 'Vertretung', 'Vertretungen'));
     if (sum.classes) p.push(plural(sum.classes, 'Klassenliste', 'Klassenlisten'));
-    if (sum.school) p.push('neue Schulvorgaben');
+    if (sum.absences) p.push(plural(sum.absences, 'Abwesenheit', 'Abwesenheiten'));
+    if (sum.leader) p.push('Schulleitung eingetragen');
+    if (sum.schoolApplied) p.push('Schulvorgaben der Schulleitung übernommen');
+    else if (sum.school) p.push('neue Schulvorgaben');
     return p.join(', ');
   },
   async leave() {
@@ -515,14 +532,14 @@ const Sync = {
         try { obj = JSON.parse(r.content); } catch (e) { throw new Error('Datei ist keine Team-Datei'); }
         if (obj.schulorga !== 'team-update') throw new Error('Datei ist keine Team-Datei');
         if (obj.team !== S.team.id) throw new Error(`Datei gehört zum Team „${obj.name || '?'}"`);
-        sum = Team.merge(await Team.readUpdate(obj));
+        sum = await Team.mergeVerified(await Team.readUpdate(obj));
       }
       const w = await this._req('syncWrite', await Team.buildUpdate());
       if (!w.ok) throw new Error('Datei konnte nicht gespeichert werden');
       S.team.lastSync = new Date().toISOString();
       S.team.syncError = null;
       save();
-      if (!silent || (sum && (sum.n || sum.school))) UI.toast(sum && (sum.n || sum.school) ? `Synchronisiert – ${Team.summaryText(sum)}` : 'Synchronisiert ✓');
+      if (!silent || (sum && (sum.n || sum.school || sum.leader))) UI.toast(sum && (sum.n || sum.school || sum.leader) ? `Synchronisiert – ${Team.summaryText(sum)}` : 'Synchronisiert ✓');
       if (!UI.stack.length && (App.path.startsWith('/team') || App.path === '/today')) App.refresh();
     } catch (e) {
       if (S.team) { S.team.syncError = e.message; save(); }
@@ -567,6 +584,7 @@ const TEAM_TABS = [
   { v: 'members', l: 'Kollegium', i: 'users' },
   { v: 'dates', l: 'Termine', i: 'calendar' },
   { v: 'subs', l: 'Vertretungen', i: 'replace' },
+  { v: 'absent', l: 'Abwesend', i: 'thermometer' },
   { v: 'lists', l: 'Klassenlisten', i: 'clipboard-list' },
 ];
 
@@ -613,6 +631,9 @@ App.def('/team/:tab?', (p) => {
     <div class="btn-row mt"><button class="btn btn-white" data-act="team-invite">${icon('user-plus')}Einladen</button>
     ${syncInfo ? `<button class="btn btn-glass" data-act="team-sync">${icon('refresh-cw')}Sync</button>` : `<button class="btn btn-glass" data-act="team-share">${icon('share-2')}Senden</button><button class="btn btn-glass" data-act="team-receive">${icon('download')}Empfangen</button>`}</div>
   </div>`;
+  if (t.leader) h += `<div class="lead-line" data-nav="${Leader.active() ? '/leader' : '/team/members'}">${icon('crown')}<span>Schulleitung: <b>${esc(teamMemberName(t.leader.member))}</b>${t.leader.member === t.me ? ' (du)' : ''}</span>${Leader.isTeamLeader() ? '<span class="sp"></span><span class="badge lead">Cockpit</span>' : ''}</div>`;
+  if ((t.removed || {})[t.me]) h += `<div class="banner err">${icon('user-x')}<div><b>Du wurdest von der Schulleitung aus dem Kollegium entfernt.</b><br><span class="text2">Du kannst das Team über „⋯ → Team verlassen" von diesem Gerät entfernen. Deine eigenen Daten bleiben erhalten.</span></div></div>`;
+  if (Leader.canClaim()) h += `<div class="banner lead-banner" data-nav="/leader">${icon('crown')}<div><b>${Leader.handoverToMe() ? 'Dir wurde die Schulleitung übergeben' : 'Schulleitermodus aktiv'}</b><br><span class="text2">${Leader.handoverToMe() ? 'Tippe hier, um die Schulleitung zu übernehmen.' : 'Trage dich im Cockpit als Schulleitung ein, um verbindliche Termine und Mitteilungen zu verteilen.'}</span></div></div>`;
   if (t.school && t.schoolApplied !== t.school.updatedAt && t.school.by !== t.me) {
     h += `<div class="banner">${icon('school')}<div><b>Neue Schulvorgaben</b> (Stundenraster, Schuljahr, Fächer) von ${esc(teamMemberName(t.school.by))}.<div class="btn-row mt"><button class="btn btn-sm btn-primary" data-act="team-apply-school">Übernehmen</button><button class="btn btn-sm" data-act="team-ignore-school">Ignorieren</button></div></div></div>`;
   }
@@ -622,6 +643,7 @@ App.def('/team/:tab?', (p) => {
   if (tab === 'members') h += teamMembers();
   if (tab === 'dates') { h += teamDates(); fab = { act: 'team-event-add', label: 'Termin' }; }
   if (tab === 'subs') { h += teamSubs(); fab = { act: 'sub-add', label: 'Vertretung' }; }
+  if (tab === 'absent') { h += teamAbsent(); fab = { act: 'absence-add', icon: 'thermometer', label: 'Abwesenheit melden' }; }
   if (tab === 'lists') { h += teamLists(); fab = { act: 'list-share', icon: 'share-2', label: 'Klasse teilen' }; }
   if (p.tab === 'sync') setTimeout(() => teamSyncSheet(), 50);
   return {
@@ -633,15 +655,17 @@ App.def('/team/:tab?', (p) => {
 
 function teamBoard() {
   const t = S.team;
-  const posts = sortBy(t.posts, (x) => (x.pinned ? 0 : 1), (x) => -(x.updatedAt || 0));
+  const posts = sortBy(t.posts, (x) => (x.official && x.pinned ? 0 : x.pinned ? 1 : 2), (x) => -(x.updatedAt || 0));
   if (!posts.length) return UI.empty('megaphone', 'Noch keine Beiträge. Teile Infos, Erinnerungen oder Fragen mit dem ganzen Kollegium.');
   const seen = t.seenPosts || 0;
   return posts.map((x) => {
     const m = t.members.find((y) => y.id === x.by);
     const isNew = x.by !== t.me && (x.updatedAt || 0) > seen;
-    return `<div class="post ${x.important ? 'important' : ''}" data-act="post-open" data-id="${x.id}">
+    const ackInfo = x.official && x.requireAck ? (x.by === t.me ? (() => { const s = ackStats(x); return `<span class="badge ${s.n >= s.total ? 'green' : 'acc'}">${icon('check')}${s.n}/${s.total} gelesen</span>`; })() : ackedByMe(x) ? `<span class="badge green">${icon('check')}Bestätigt</span>` : '<span class="badge red">Bitte bestätigen</span>') : '';
+    return `<div class="post ${x.important ? 'important' : ''} ${x.official ? 'official' : ''}" data-act="post-open" data-id="${x.id}">
+      ${x.official ? `<div class="post-lead">${icon('crown')}Mitteilung der Schulleitung</div>` : ''}
       <div class="row">${memberAvatar(m, 'sm')}<div class="sp" style="min-width:0"><div class="b ellip">${esc(teamMemberName(x.by))}</div><div class="muted small">${relTime(x.created || x.updatedAt)}</div></div>
-      ${x.pinned ? `<span class="badge acc">${icon('pin')}Angeheftet</span>` : ''}${isNew ? '<span class="badge green">Neu</span>' : ''}</div>
+      ${x.pinned ? `<span class="badge acc">${icon('pin')}Angeheftet</span>` : ''}${isNew ? '<span class="badge green">Neu</span>' : ''}${ackInfo}</div>
       ${x.title ? `<h4>${x.important ? icon('triangle-alert') : ''}${esc(x.title)}</h4>` : ''}
       <div class="post-text">${nl2br(x.text || '')}</div>
     </div>`;
@@ -650,9 +674,10 @@ function teamBoard() {
 
 function teamMembers() {
   const t = S.team;
-  const list = sortBy(t.members, (m) => (m.id === t.me ? 0 : 1), (m) => (m.name || '').toLowerCase());
+  const list = sortBy(teamMembersAlive(), (m) => (t.leader && m.id === t.leader.member ? 0 : m.id === t.me ? 1 : 2), (m) => (m.name || '').toLowerCase());
+  const absentIds = new Set(absencesOn(today()).map((a) => a.member));
   return `<div class="card pad0"><div class="list">${list.map((m) => `
-    <div class="li" data-act="member-open" data-id="${m.id}">${memberAvatar(m)}<div class="li-main"><div class="li-t">${esc([m.title, m.name].filter(Boolean).join(' '))}${m.id === t.me ? ' <span class="badge acc">Du</span>' : ''}</div>
+    <div class="li" data-act="member-open" data-id="${m.id}">${memberAvatar(m)}<div class="li-main"><div class="li-t">${esc([m.title, m.name].filter(Boolean).join(' '))}${m.id === t.me ? ' <span class="badge acc">Du</span>' : ''}${t.leader && t.leader.member === m.id ? ` <span class="badge lead">${icon('crown')}Schulleitung</span>` : ''}${absentIds.has(m.id) ? ' <span class="badge red">heute abwesend</span>' : ''}</div>
     <div class="li-s">${esc([m.short, m.role, m.subjects].filter(Boolean).join(' · '))}</div></div>${icon('chevron-right', 'chev')}</div>`).join('')}</div></div>
     <button class="btn btn-block btn-soft mt" data-act="team-invite">${icon('user-plus')}Weitere Kolleg:innen einladen</button>
     <p class="muted small center">Neue Mitglieder erscheinen hier, sobald sie ihre Antwort gesendet haben oder über die Cloud-Datei synchronisiert wurde.</p>`;
@@ -690,6 +715,22 @@ function teamSubs() {
   return h;
 }
 
+function teamAbsent() {
+  const t = S.team;
+  const td = today();
+  const list = (t.absences || []).filter((a) => !(t.removed || {})[a.member]);
+  const now = sortBy(list.filter((a) => a.from <= td && (a.to || a.from) >= td), (a) => teamMemberName(a.member));
+  const later = sortBy(list.filter((a) => a.from > td), 'from');
+  const past = sortBy(list.filter((a) => (a.to || a.from) < td), 'from').reverse();
+  let h = `<p class="muted small" style="margin:0 4px 10px">Krank, Fortbildung oder Klassenfahrt? Melde dich hier ab – deine betroffenen Stunden gehen automatisch an die Vertretungsplanung.</p>
+    <button class="btn btn-block btn-soft mb" data-act="absence-add">${icon('thermometer')}Abwesenheit melden</button>`;
+  if (!list.length) return h + UI.empty('thermometer', 'Keine Abwesenheiten gemeldet.');
+  h += `<div class="section-title">Heute</div>` + (now.length ? `<div class="card pad0"><div class="list">${now.map(absenceItem).join('')}</div></div>` : `<div class="card"><p class="muted small" style="margin:0">Heute fehlt niemand.</p></div>`);
+  if (later.length) h += `<div class="section-title">Demnächst</div><div class="card pad0"><div class="list">${later.map(absenceItem).join('')}</div></div>`;
+  if (past.length) h += `<div class="section-title">Vergangen</div><div class="card pad0"><div class="list">${past.slice(0, 20).map(absenceItem).join('')}</div></div>`;
+  return h;
+}
+
 function teamLists() {
   const t = S.team;
   let h = `<p class="muted small" style="margin:0 4px 10px">Die Klassenleitung teilt ihre Schülerliste einmal – Fachlehrkräfte übernehmen sie mit einem Tipp. Noten und Beobachtungen bleiben immer privat.</p>`;
@@ -720,10 +761,14 @@ A['team-apply-school'] = async () => {
 };
 A['team-ignore-school'] = () => { S.team.schoolApplied = S.team.school.updatedAt; save(); App.refresh(); };
 A['team-menu'] = () => UI.menu(S.team.name, [
+  Leader.active() ? { l: 'Schulleitungs-Cockpit', i: 'crown', s: 'Überblick, verbindliche Termine & Mitteilungen', fn: () => App.navigate('/leader') } : null,
+  { l: 'Abwesenheit melden', i: 'thermometer', s: 'Krank, Fortbildung, Klassenfahrt …', fn: () => editAbsence() },
   { l: 'Kolleg:innen einladen', i: 'user-plus', fn: () => Team.inviteSheet() },
   { l: 'Synchronisieren & Teilen', i: 'refresh-cw', fn: () => teamSyncSheet() },
   { l: 'Mein Profil bearbeiten', i: 'user', fn: () => editMember(Team.me()) },
-  { l: 'Meine Schulvorgaben teilen', i: 'school', s: 'Stundenraster, Schuljahr, Fächer für alle', fn: async () => {
+  { l: Leader.isTeamLeader() ? 'Verbindliche Schulvorgaben verteilen' : 'Meine Schulvorgaben teilen', i: 'school', s: 'Stundenraster, Schuljahr, Fächer für alle', fn: async () => {
+    if (Leader.isTeamLeader()) { A['lead-school'](); return; }
+    if (S.team.school && S.team.school.official) { UI.toast('Die Schulleitung hat verbindliche Schulvorgaben festgelegt – nur sie kann sie ändern', { type: 'err', ms: 4500 }); return; }
     if (!(await UI.confirm('Deine Einstellungen (Stundenraster, Schuljahr, Fächer) als Vorgabe für das ganze Team teilen?', { ok: 'Teilen' }))) return;
     S.team.school = Team.schoolSnapshot(); S.team.schoolApplied = S.team.school.updatedAt; Team.changed(); UI.toast('Schulvorgaben werden beim nächsten Abgleich geteilt');
   } },
@@ -765,35 +810,66 @@ function teamSyncSheet() {
 // Pinnwand
 A['post-add'] = () => editPost();
 A['post-open'] = (el) => {
-  const x = S.team.posts.find((p) => p.id === el.dataset.id);
+  const t = S.team;
+  const x = t.posts.find((p) => p.id === el.dataset.id);
   if (!x) return;
-  if (x.by === S.team.me) { editPost(x); return; }
+  const leader = Leader.isTeamLeader();
+  if (x.by === t.me && (!x.official || leader)) { editPost(x); return; }
+  const needAck = x.official && x.requireAck && !ackedByMe(x);
+  const st = x.official && x.requireAck && leader ? ackStats(x) : null;
   UI.open({
-    title: x.title || 'Beitrag',
-    body: `<div class="row mb">${memberAvatar(S.team.members.find((m) => m.id === x.by))}<div><b>${esc(teamMemberName(x.by))}</b><div class="muted small">${relTime(x.created || x.updatedAt)}</div></div></div><div class="post-text">${nl2br(x.text || '')}</div>`,
+    title: x.title || (x.official ? 'Mitteilung der Schulleitung' : 'Beitrag'),
+    body: `${x.official ? `<div class="post-lead mb">${icon('crown')}Mitteilung der Schulleitung</div>` : ''}<div class="row mb">${memberAvatar(t.members.find((m) => m.id === x.by))}<div><b>${esc(teamMemberName(x.by))}</b><div class="muted small">${relTime(x.created || x.updatedAt)}</div></div></div><div class="post-text">${nl2br(x.text || '')}</div>
+      ${needAck ? `<button class="btn btn-primary btn-block btn-lg mt" data-x="ack">${icon('circle-check')}Gelesen – bestätigen</button>` : x.official && x.requireAck ? `<div class="banner ok mt">${icon('circle-check')}<div>Du hast diese Mitteilung bestätigt.</div></div>` : ''}
+      ${st && st.missing.length ? `<div class="f-section mt">${icon('eye')}Noch nicht gelesen (${st.missing.length})</div><p class="muted small">${st.missing.map((m) => esc(teamMemberName(m.id, true))).join(', ')}</p>` : ''}
+      ${leader && x.by !== t.me ? `<button class="btn btn-ghost danger mt" data-x="del">${icon('trash-2')}Beitrag für alle löschen</button>` : ''}`,
+    onMount: (box, m) => {
+      const a = box.querySelector('[data-x="ack"]');
+      if (a) a.addEventListener('click', () => {
+        t.acks = t.acks || [];
+        if (!ackedByMe(x)) t.acks.push(Team.touch({ id: `${x.id}:${t.me}`, post: x.id, at: new Date().toISOString() }));
+        Team.changed(); m.close(); App.refresh(); UI.toast('Bestätigt ✓ – die Schulleitung sieht es beim nächsten Abgleich');
+      });
+      const d = box.querySelector('[data-x="del"]');
+      if (d) d.addEventListener('click', async () => {
+        if (!(await UI.confirm('Diesen Beitrag für alle löschen?', { danger: true, ok: 'Löschen' }))) return;
+        t.posts = t.posts.filter((p) => p.id !== x.id);
+        if (x.official) await Leader.signDelete(x.id); else Team.markDeleted(x.id);
+        Team.changed(); m.close(); App.refresh(); UI.toast('Gelöscht');
+      });
+    },
   });
 };
-function editPost(x) {
+function editPost(x, preset = {}) {
   const isNew = !x;
+  const leader = Leader.isTeamLeader();
   UI.form({
-    title: isNew ? 'Neuer Beitrag ans Kollegium' : 'Beitrag bearbeiten',
+    title: isNew ? (preset.official ? 'Mitteilung an das Kollegium' : 'Neuer Beitrag ans Kollegium') : 'Beitrag bearbeiten',
     fields: [
-      { k: 'title', label: 'Überschrift', ph: 'z. B. Kopierer im 2. OG defekt' },
+      { k: 'title', label: 'Überschrift', ph: preset.official ? 'z. B. Zeugniskonferenz verschoben' : 'z. B. Kopierer im 2. OG defekt' },
       { k: 'text', label: 'Text', type: 'textarea', rows: 6, req: true },
+      leader ? { k: 'official', label: 'Mitteilung der Schulleitung', type: 'switch', hint: 'Hervorgehoben und digital unterschrieben – nur du kannst sie ändern' } : null,
+      leader ? { k: 'requireAck', label: 'Lesebestätigung anfordern', type: 'switch', hint: 'Du siehst, wer die Mitteilung schon gelesen hat' } : null,
       { k: 'important', label: 'Wichtig', type: 'switch' },
       { k: 'pinned', label: 'Oben anheften', type: 'switch' },
     ],
-    values: x || {},
+    values: x || preset,
     submit: isNew ? 'Veröffentlichen' : 'Speichern',
-    onSave: (v) => {
-      if (isNew) S.team.posts.push(Team.touch({ id: uid(), created: new Date().toISOString(), ...v }));
-      else Object.assign(x, v, Team.touch({}));
+    onSave: async (v) => {
+      const wasOfficial = !!(x && x.official);
+      if (leader) { v.official = !!v.official; v.requireAck = v.official && !!v.requireAck; }
+      let obj;
+      if (isNew) { obj = Team.touch({ id: uid(), created: new Date().toISOString(), ...v }); S.team.posts.push(obj); }
+      else { obj = Object.assign(x, v, Team.touch({})); }
+      if (leader && (obj.official || wasOfficial)) await Leader.signItem(obj);
       Team.changed(); App.refresh();
       UI.toast(isNew ? 'Veröffentlicht – wird beim nächsten Abgleich verteilt' : 'Gespeichert');
     },
     onDelete: isNew ? null : async () => {
       if (!(await UI.confirm('Beitrag für alle löschen?', { danger: true, ok: 'Löschen' }))) return false;
-      S.team.posts = S.team.posts.filter((p) => p.id !== x.id); Team.markDeleted(x.id); Team.changed(); App.refresh();
+      S.team.posts = S.team.posts.filter((p) => p.id !== x.id);
+      if (x.official && leader) await Leader.signDelete(x.id); else Team.markDeleted(x.id);
+      Team.changed(); App.refresh();
     },
   });
 }
@@ -834,9 +910,10 @@ A['team-event-add'] = () => editEvent(null, { shared: true, type: 'konferenz' })
 // Vertretungen
 A['sub-add'] = () => editSub();
 A['sub-edit'] = (el) => editSub(S.team.subs.find((x) => x.id === el.dataset.id));
-function editSub(x) {
+function editSub(x, preset = {}) {
   const isNew = !x;
-  const memberOpts = sortBy(S.team.members, (m) => m.name || '').map((m) => ({ v: m.id, l: teamMemberName(m.id) }));
+  const absentToday = new Set(absencesOn((x && x.date) || preset.date || today()).map((a) => a.member));
+  const memberOpts = sortBy(teamMembersAlive(), (m) => m.name || '').map((m) => ({ v: m.id, l: teamMemberName(m.id) + (absentToday.has(m.id) ? ' – abwesend' : '') }));
   UI.form({
     title: isNew ? 'Vertretung eintragen' : 'Vertretung',
     fields: [
@@ -850,7 +927,7 @@ function editSub(x) {
       { k: 'note', label: 'Hinweis', half: true, ph: 'z. B. Aufgaben im Fach' },
       { type: 'html', html: `<datalist id="dl-classes">${S.classes.map((c) => `<option value="${esc(c.name)}">`).join('')}</datalist><datalist id="dl-subjects">${S.subjects.map((s) => `<option value="${esc(s.name)}">`).join('')}</datalist>` },
     ],
-    values: x || { date: today(), period: 0, absent: '', sub: '' },
+    values: x || { date: today(), period: 0, absent: '', sub: '', ...preset },
     onSave: (v) => {
       v.period = Number(v.period);
       if (isNew) S.team.subs.push(Team.touch({ id: uid(), ...v }));

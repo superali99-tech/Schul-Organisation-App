@@ -63,6 +63,7 @@ function buildReminders() {
     }
     if (!r.events) return;
     const place = e.place ? ' · ' + e.place : '';
+    if (e.mandatory && e.official && (e.remind === '' || e.remind == null)) add('evm' + e.id, dateTimeMs(addDays(e.date, -1), '17:00'), `Morgen Pflichttermin: ${e.title}`, `${t.l}${e.time ? ' um ' + e.time + ' Uhr' : ''}${place} – Termin der Schulleitung`, '/calendar');
     if (e.remind !== '' && e.remind != null) add('ev' + e.id, dateTimeMs(e.date, e.time || '07:30') - Number(e.remind) * 60000, `Erinnerung: ${e.title}`, `${t.l}${e.time ? ' um ' + e.time + ' Uhr' : ''}${place}`, '/calendar');
     if (r.eventStart) {
       if (e.time) add('evs' + e.id, dateTimeMs(e.date, e.time), `Jetzt: ${e.title}`, `${t.l}${e.endTime ? ' bis ' + e.endTime + ' Uhr' : ''}${place}`, '/calendar');
@@ -222,6 +223,7 @@ if (window.matchMedia) {
   Store.load();
   applyTheme();
   if (S.settings.secure) Native.call('setSecure', true);
+  applyLeaderClass();
   // Navigationssymbole
   const navIcons = { 'nav-today': 'house', 'nav-tt': 'calendar-days', 'nav-cl': 'users', 'nav-cal': 'calendar', 'nav-more': 'layout-grid' };
   Object.entries(navIcons).forEach(([id, ic]) => { $('#' + id).innerHTML = icon(ic); });

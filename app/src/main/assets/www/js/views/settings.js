@@ -13,6 +13,7 @@ App.def('/settings', () => {
   <div class="card pad0"><div class="list">
     ${setItem('user', 'Profil & Schule', [teacherName(), st.school].filter(Boolean).join(' · ') || 'Name, Schule, Schuljahr', 'data-act="set-profile"')}
     ${setItem('calendar-range' in ICONS ? 'calendar-range' : 'calendar', 'Schuljahr & Halbjahre', `${st.year} · 2. Halbjahr ab ${fmtD(st.hj2)}`, 'data-act="set-year"')}
+    ${setItem('crown', 'Schulleitermodus', Leader.active() ? 'Angemeldet als ' + Leader.name() + ' · Zugangsdaten ändern' : 'Lehrermodus · Anmeldung für die Schulleitung', 'data-nav="/settings/leader"', Leader.active() ? '<span class="badge lead">Aktiv</span>' : '')}
     ${setItem('palette', 'Darstellung', `${themeL} · Schrift ${Math.round((st.fontScale || 1) * 100)} %`, 'data-act="set-look"')}
     ${window.SCHULPLAN_DESKTOP ? setItem('layout-grid', 'Desktop-Widget', 'Nächste Stunde, heutige Stunden und Aufgaben immer auf dem Desktop', '', `<input type="checkbox" class="switch" data-change="desk-widget" ${Native.call('widgetEnabled') ? 'checked' : ''}>`) : ''}
     ${!Native.has && 'setAppBadge' in navigator ? setItem('bell', 'Zahl am App-Symbol', 'Fällige Aufgaben und Hausaufgaben am Symbol der installierten Web-App', '', `<input type="checkbox" class="switch" data-change="app-badge" ${st.appBadge !== false ? 'checked' : ''}>`) : ''}
