@@ -234,7 +234,8 @@ function navBadges() {
     const t = S.team;
     news = t.posts.some((x) => x.by !== t.me && (x.updatedAt || 0) > (t.seenPosts || 0))
       || (typeof SubNotice !== 'undefined' && SubNotice.pending().length > 0)
-      || (typeof openPollsForMe === 'function' && openPollsForMe().length > 0);
+      || (typeof openPollsForMe === 'function' && openPollsForMe().length > 0)
+      || (typeof chatUnreadTotal === 'function' && chatUnreadTotal() > 0);
   }
   btn.classList.toggle('has-dot', news);
 }
@@ -267,6 +268,8 @@ function navBadges() {
   setInterval(() => { if ((App.path === '/today' || App.path.startsWith('/timetable')) && !UI.stack.length && !document.hidden && !document.activeElement.matches('input,textarea,select')) App.refresh(); }, 60000);
   // Erinnerungen, Widgets und App-Symbol nach dem ersten Bild – die Startseite erscheint so schneller
   setTimeout(() => { syncReminders(); syncWidgets(); updateAppBadge(); }, 250);
+  // Chat-Schlüssel einmalig erzeugen (wird mit dem Profil im Kollegium geteilt)
+  setTimeout(() => { if (Team.on()) ChatCrypto.ensureKeys().catch(() => {}); }, 2500);
   // Neuerungen nach einem Update, Update-Prüfung, Benachrichtigungs-Erlaubnis
   setTimeout(() => {
     if (!UI.stack.length && !Lock.active) showWhatsNew();

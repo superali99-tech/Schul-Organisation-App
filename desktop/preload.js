@@ -3,7 +3,7 @@
 const { contextBridge, ipcRenderer, webUtils } = require('electron');
 
 const syncFns = ['loadData', 'saveData', 'listBackups', 'readBackup', 'isSystemDark', 'notificationsAllowed', 'appVersion', 'versionCode', 'getLaunchRoute', 'getIncoming', 'syncInfo', 'installDownloaded', 'widgetEnabled'];
-const asyncFns = ['saveFile', 'shareFile', 'shareText', 'shareApk', 'print', 'syncReminders', 'requestNotificationPermission', 'setBarColors', 'setPageBackground', 'vibrate', 'keepScreenOn', 'setSecure', 'toast', 'exitApp', 'appReady', 'updateWidgets', 'setUpdateUrls', 'checkUpdate', 'startUpdate', 'syncPick', 'syncClear', 'syncRead', 'syncWrite', 'toggleWidget', 'widgetClose', 'widgetPin', 'openRoute'];
+const asyncFns = ['saveFile', 'shareFile', 'shareText', 'shareApk', 'print', 'syncReminders', 'requestNotificationPermission', 'setBarColors', 'setPageBackground', 'vibrate', 'keepScreenOn', 'setSecure', 'toast', 'exitApp', 'appReady', 'updateWidgets', 'setUpdateUrls', 'checkUpdate', 'startUpdate', 'syncPick', 'syncClear', 'syncRead', 'syncWrite', 'toggleWidget', 'widgetClose', 'widgetPin', 'openRoute', 'notifyNow'];
 
 const api = { isDesktop: true };
 syncFns.forEach((n) => { api[n] = (...args) => ipcRenderer.sendSync('sync', n, args); });

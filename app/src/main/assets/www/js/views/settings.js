@@ -13,6 +13,8 @@ App.def('/settings', () => {
   <div class="card pad0"><div class="list">
     ${setItem('user', 'Profil & Schule', [teacherName(), st.school].filter(Boolean).join(' · ') || 'Name, Schule, Schuljahr', 'data-act="set-profile"')}
     ${setItem('calendar-range' in ICONS ? 'calendar-range' : 'calendar', 'Schuljahr & Halbjahre', `${st.year} · 2. Halbjahr ab ${fmtD(st.hj2)}`, 'data-act="set-year"')}
+    ${setItem('sparkles', 'Assistent', Assist.aiReady() ? 'KI-Modus aktiv' : 'Offline-Modus · KI-Modus mit eigenem Schlüssel möglich', 'data-act="as-settings"')}
+    ${setItem('presentation', 'Videoanrufe im Chat', (S.settings.callBase || 'https://meet.jit.si/').replace(/^https?:\/\//, ''), 'data-act="set-callbase"')}
     ${setItem('crown', 'Schulleitermodus', Leader.active() ? 'Angemeldet als ' + Leader.name() + ' · Zugangsdaten ändern' : 'Lehrermodus · Anmeldung für die Schulleitung', 'data-nav="/settings/leader"', Leader.active() ? '<span class="badge lead">Aktiv</span>' : '')}
     ${setItem('palette', 'Darstellung', `${themeL} · Schrift ${Math.round((st.fontScale || 1) * 100)} %`, 'data-act="set-look"')}
     ${window.SCHULPLAN_DESKTOP ? setItem('layout-grid', 'Desktop-Widget', 'Nächste Stunde, heutige Stunden und Aufgaben immer auf dem Desktop', '', `<input type="checkbox" class="switch" data-change="desk-widget" ${Native.call('widgetEnabled') ? 'checked' : ''}>`) : ''}
@@ -47,6 +49,13 @@ App.def('/settings', () => {
   return { title: 'Einstellungen', tab: 'more', icon: 'settings', html: h };
 });
 
+A['set-callbase'] = async () => {
+  const v = await UI.prompt('Videoanruf-Dienst', { value: S.settings.callBase || 'https://meet.jit.si/', label: 'Adresse eines Jitsi-Servers (z. B. der Schule). Der Chat erzeugt dort für jeden Anruf einen neuen Raum.' });
+  if (v === null) return;
+  const u = v.trim();
+  if (u && !/^https:\/\/[^\s]+$/.test(u)) { UI.toast('Bitte eine https-Adresse eingeben', { type: 'err' }); return; }
+  S.settings.callBase = u || ''; save(); App.refresh();
+};
 A['set-profile'] = () => {
   const st = S.settings;
   UI.form({
@@ -326,7 +335,7 @@ A['rem-test'] = () => {
 // ------------------------------------------------------------------ Sicherheit
 App.def('/settings/security', () => {
   const st = S.settings;
-  const h = `<div class="banner">${icon('shield')}<div>Alle Daten bleiben ausschließlich auf diesem Gerät. Das Internet wird nur für die Update-Prüfung genutzt. Schütze sensible Schülerdaten zusätzlich mit einer PIN.</div></div>
+  const h = `<div class="banner">${icon('shield')}<div>Alle Daten bleiben auf diesem Gerät. Das Internet wird für die Update-Prüfung genutzt – und nur, wenn du sie einschaltest, für den KI-Modus des Assistenten (Anthropic) und Videoanruf-Links im Chat. Schütze sensible Schülerdaten zusätzlich mit einer PIN.</div></div>
     <div class="card pad0"><div class="list">
       ${setItem('key', st.pin ? 'PIN ändern' : 'PIN festlegen', st.pin ? 'App ist mit PIN geschützt' : '4–6 Ziffern', 'data-act="pin-set"')}
       ${st.pin ? setItem('lock-open', 'PIN entfernen', '', 'data-act="pin-remove"') : ''}
@@ -479,9 +488,9 @@ App.def('/about', () => {
   return {
     title: 'Über Schulplan', tab: 'more',
     html: `<div class="ob"><div class="ob-logo">${icon('graduation-cap')}</div><h2>Schulplan</h2><p class="muted">Der Organisations-Planer für Lehrkräfte · Version ${esc(v)}</p></div>
-      <div class="card"><div class="card-h"><h3>${icon('shield')}Datenschutz</h3></div><p class="text2" style="margin:0">Schulplan speichert alle Daten ausschließlich lokal auf deinem Gerät. Die App nutzt das Internet ausschließlich, um nach Updates zu suchen – dabei werden keine Daten übertragen. Es gibt keine Werbung, kein Tracking und kein Konto. Für die Datensicherung exportierst du selbst eine Datei. Bitte beachte die Vorgaben deines Bundeslandes zur Verarbeitung von Schülerdaten auf privaten Endgeräten.</p></div>
+      <div class="card"><div class="card-h"><h3>${icon('shield')}Datenschutz</h3></div><p class="text2" style="margin:0">Schulplan speichert alle Daten ausschließlich lokal auf deinem Gerät. Die App nutzt das Internet, um nach Updates zu suchen – dabei werden keine Daten übertragen. Nur wenn du den <b>KI-Modus</b> des Assistenten einschaltest, gehen deine Fragen und die dafür nötigen Einträge an Anthropic (Claude); Videoanrufe im Chat laufen über den gewählten Videodienst. Chat-Nachrichten sind Ende-zu-Ende verschlüsselt. Es gibt keine Werbung, kein Tracking und kein Konto. Für die Datensicherung exportierst du selbst eine Datei. Bitte beachte die Vorgaben deines Bundeslandes zur Verarbeitung von Schülerdaten auf privaten Endgeräten.</p></div>
       <div class="card"><div class="card-h"><h3>${icon('sparkles')}Funktionen</h3></div><p class="text2 small" style="margin:0">Stundenplan mit A/B-Wochen & Vertretungen · Klassen & Schülerprofile · Noten mit Gewichtung, Notenschlüssel & Notenspiegel · Anwesenheit & Fehlzeiten · Mitarbeit & Beobachtungen · Hausaufgaben · Klassenbuch & Unterrichtsreihen · Sitzpläne · Kalender, Ferien & Termine · Aufgaben · Notizen · Elterngespräche · Kollegium mit Einladungen, Pinnwand, Vertretungsplan & geteilten Klassenlisten · Zufallsauswahl, Gruppen, Timer, Lautstärke-Ampel u. v. m. · Erinnerungen · PIN-Sperre · CSV/ICS-Export · Drucken/PDF</p></div>
-      <div class="card"><div class="card-h"><h3>${icon('file-text')}Lizenzen</h3></div><p class="text2 small" style="margin:0">Symbole: Lucide Icons (ISC-Lizenz), © Lucide Contributors · Schrift: Inter (SIL Open Font License 1.1), © The Inter Project Authors · QR-Codes: qrcode-generator (MIT), © Kazuhiko Arase; jsQR (Apache License 2.0), © Cosmo Wolfe.</p></div>`,
+      <div class="card"><div class="card-h"><h3>${icon('file-text')}Lizenzen</h3></div><p class="text2 small" style="margin:0">Symbole: Lucide Icons (ISC-Lizenz), © Lucide Contributors · Schrift: Inter (SIL Open Font License 1.1), © The Inter Project Authors · QR-Codes: qrcode-generator (MIT), © Kazuhiko Arase; jsQR (Apache License 2.0), © Cosmo Wolfe · KI-Modus: Anthropic TypeScript SDK (Apache License 2.0), © Anthropic, PBC.</p></div>`,
   };
 });
 

@@ -460,6 +460,12 @@ const async_ = {
   exitApp() { quitting = true; app.quit(); },
   appReady() { if (win && !win.isVisible()) win.show(); },
   updateWidgets() { refreshWidget(); },
+  notifyNow(title, text, route) {
+    if (!Notification.isSupported()) return;
+    const n = new Notification({ title: title || 'Schulplan', body: text || '', icon: path.join(__dirname, 'build', 'icon.png') });
+    n.on('click', () => { showWindow(); if (route) call('navigate', route); });
+    n.show();
+  },
   toggleWidget(on) { setWidget(on); },
   widgetClose() { setWidget(false); call('onWidgetState', false); },
   widgetPin(on) { setConf({ widgetPinned: !!on }); if (widget && !widget.isDestroyed()) widget.setAlwaysOnTop(!!on, 'floating'); },

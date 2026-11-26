@@ -14,6 +14,10 @@ App.def('/more', () => {
     <div class="sp"><b>Kollegium</b><span>${Team.on() ? esc(S.team.name) + ' · ' + plural(S.team.members.length, 'Mitglied', 'Mitglieder') : 'Kolleg:innen einladen & zusammenarbeiten'}</span></div>
     ${Team.on() && S.team.posts.some((x) => x.by !== S.team.me && (x.updatedAt || 0) > (S.team.seenPosts || 0)) ? '<span class="badge red">Neu</span>' : ''}${icon('chevron-right')}
   </div>
+  <div class="duo-tiles">
+    <button class="duo" data-nav="/chat"><span class="duo-ic" style="--dc:#0ea5e9">${icon('message-circle')}</span><span class="sp"><b>Chat</b><small>${Team.on() ? (chatUnreadTotal() ? plural(chatUnreadTotal(), 'neue Nachricht', 'neue Nachrichten') : 'Kollegium, Gruppen, Storys') : 'Mit dem Kollegium'}</small></span>${Team.on() && chatUnreadTotal() ? `<span class="chat-badge">${chatUnreadTotal()}</span>` : ''}</button>
+    <button class="duo" data-nav="/assistant"><span class="duo-ic" style="--dc:#8b5cf6">${icon('sparkles')}</span><span class="sp"><b>Assistent</b><small>${Assist.aiReady() ? 'KI-Modus aktiv' : 'Erstellen, erinnern, fragen'}</small></span></button>
+  </div>
   <div class="team-tile lead-tile ${Leader.active() ? 'on' : ''}" data-nav="/leader">
     <div class="team-logo">${icon('crown')}</div>
     <div class="sp"><b>${Leader.active() ? 'Schulleitung · Cockpit' : 'Schulleitermodus'}</b><span>${Leader.active() ? 'Termine & Mitteilungen für alle, Abwesenheiten, Jahresplanung' : 'Anmelden für die Schulleitung'}</span></div>

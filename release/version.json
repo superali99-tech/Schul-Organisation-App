@@ -1,43 +1,43 @@
 {
-  "versionCode": 14,
-  "versionName": "1.7.0",
+  "versionCode": 15,
+  "versionName": "1.8.0",
   "date": "2026-11-26",
   "apk": "https://raw.githubusercontent.com/superali99-tech/Schul-Organisation-App/HEAD/release/Schulplan.apk",
   "notes": [
-    "Design 2.0: acht Farbthemen, Tagesring auf der Startseite, schnellere Übergänge",
-    "Neu: Pausenaufsicht mit Erinnerung, Räume buchen, Umfragen im Kollegium",
-    "Schulleitung: Aufsicht vertreten, Statistik zu Vertretungen und Abwesenheiten"
+    "Neu: Chat im Kollegium – Einzel- und Gruppenchats, Ende-zu-Ende verschlüsselt, mit Emojis, Fotos, Sprachnachrichten und Storys",
+    "Neu: Assistent – erstellt, ändert und löscht Einträge und erinnert dich; optional mit KI-Modus (Claude)",
+    "Anrufen und Videoanruf aus dem Chat, Benachrichtigung bei neuen Nachrichten"
   ],
   "desktop": {
-    "version": "1.7.0",
+    "version": "1.8.0",
     "date": "2026-11-26",
     "url": "https://raw.githubusercontent.com/superali99-tech/Schul-Organisation-App/HEAD/release/Schulplan-Setup.exe",
     "notes": [
-      "Design 2.0: acht Farbthemen, Tagesring auf der Startseite, schnellere Übergänge",
-      "Neu: Pausenaufsicht mit Erinnerung, Räume buchen, Umfragen im Kollegium",
-      "Schulleitung: Aufsicht vertreten, Statistik zu Vertretungen und Abwesenheiten"
+      "Neu: Chat im Kollegium – Einzel- und Gruppenchats, Ende-zu-Ende verschlüsselt, mit Emojis, Fotos, Sprachnachrichten und Storys",
+      "Neu: Assistent – erstellt, ändert und löscht Einträge und erinnert dich; optional mit KI-Modus (Claude)",
+      "Anrufen und Videoanruf aus dem Chat, Benachrichtigung bei neuen Nachrichten"
     ]
   },
   "mac": {
-    "version": "1.7.0",
+    "version": "1.8.0",
     "date": "2026-11-26",
     "arm64": "https://raw.githubusercontent.com/superali99-tech/Schul-Organisation-App/HEAD/release/Schulplan-Mac-AppleSilicon.zip",
     "x64": "https://raw.githubusercontent.com/superali99-tech/Schul-Organisation-App/HEAD/release/Schulplan-Mac-Intel.zip",
     "notes": [
-      "Design 2.0: acht Farbthemen, Tagesring auf der Startseite, schnellere Übergänge",
-      "Neu: Pausenaufsicht mit Erinnerung, Räume buchen, Umfragen im Kollegium",
-      "Schulleitung: Aufsicht vertreten, Statistik zu Vertretungen und Abwesenheiten"
+      "Neu: Chat im Kollegium – Einzel- und Gruppenchats, Ende-zu-Ende verschlüsselt, mit Emojis, Fotos, Sprachnachrichten und Storys",
+      "Neu: Assistent – erstellt, ändert und löscht Einträge und erinnert dich; optional mit KI-Modus (Claude)",
+      "Anrufen und Videoanruf aus dem Chat, Benachrichtigung bei neuen Nachrichten"
     ]
   },
   "linux": {
-    "version": "1.7.0",
+    "version": "1.8.0",
     "date": "2026-11-26",
     "appimage": "https://raw.githubusercontent.com/superali99-tech/Schul-Organisation-App/HEAD/release/Schulplan-Linux.AppImage",
     "deb": "https://raw.githubusercontent.com/superali99-tech/Schul-Organisation-App/HEAD/release/Schulplan-Linux.deb",
     "notes": [
-      "Design 2.0: acht Farbthemen, Tagesring auf der Startseite, schnellere Übergänge",
-      "Neu: Pausenaufsicht mit Erinnerung, Räume buchen, Umfragen im Kollegium",
-      "Schulleitung: Aufsicht vertreten, Statistik zu Vertretungen und Abwesenheiten"
+      "Neu: Chat im Kollegium – Einzel- und Gruppenchats, Ende-zu-Ende verschlüsselt, mit Emojis, Fotos, Sprachnachrichten und Storys",
+      "Neu: Assistent – erstellt, ändert und löscht Einträge und erinnert dich; optional mit KI-Modus (Claude)",
+      "Anrufen und Videoanruf aus dem Chat, Benachrichtigung bei neuen Nachrichten"
     ]
   }
 }

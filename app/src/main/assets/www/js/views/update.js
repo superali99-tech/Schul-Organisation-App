@@ -5,6 +5,14 @@ const UPDATE_URLS = ['https://raw.githubusercontent.com/superali99-tech/Schul-Or
 
 /** Neuerungen je Version (neueste zuerst) */
 const CHANGELOG = [
+  { v: '1.8.0', items: [
+    'Neu: Chat im Kollegium – Einzel- und Gruppenchats, Ende-zu-Ende verschlüsselt, mit Emojis, Reaktionen, Fotos und Sprachnachrichten',
+    'Storys: Fotos und Grüße für das ganze Kollegium, die nach 24 Stunden verschwinden',
+    'Anrufen und Videoanruf direkt aus dem Chat (Videoraum-Link, Dienst wählbar)',
+    'Neu: Assistent – „Erinnere mich morgen um 7 an die Kopien", „Was steht morgen an?", Aufgaben, Termine, Hausaufgaben und Notizen anlegen, ändern und löschen',
+    'Optionaler KI-Modus mit Claude (eigener API-Schlüssel): beantwortet freie Fragen und erledigt mehrere Aufträge auf einmal – fragt vor dem Löschen nach',
+    'Benachrichtigung bei neuen Chat-Nachrichten',
+  ] },
   { v: '1.7.0', items: [
     'Design 2.0: acht Farbthemen (Indigo, Ozean, Smaragd, Sonnenuntergang …), Hintergrund wählbar, Tagesring „geschafft" auf der Startseite',
     'Neu: Pausenaufsicht – die Schulleitung plant, du siehst deine Aufsichten auf der Startseite und wirst 5 Minuten vorher erinnert',

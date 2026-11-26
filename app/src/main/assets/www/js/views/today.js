@@ -116,6 +116,8 @@ App.def('/today', () => {
     const txt = (p.text || '').replace(/\s+/g, ' ');
     out.push(`<div class="banner lead-banner" data-act="post-open" data-id="${p.id}">${icon('megaphone')}<div><b>Mitteilung der Schulleitung${p.title ? ': ' + esc(p.title) : ''}</b><br><span class="text2">${esc(txt.slice(0, 140))}${txt.length > 140 ? ' …' : ''}</span>${p.requireAck ? '<div class="mt"><span class="badge red">Bitte lesen & bestätigen</span></div>' : ''}</div></div>`);
   });
+  const chatN = Team.on() ? chatUnreadTotal() : 0;
+  if (chatN) out.push(`<div class="banner sub-banner" data-nav="/chat">${icon('message-circle')}<div><b>${plural(chatN, 'neue Chat-Nachricht', 'neue Chat-Nachrichten')}</b><br><span class="text2">Tippe hier, um den Chat zu öffnen.</span></div></div>`);
   const subN = Team.on() ? SubNotice.pending() : [];
   if (subN.length) out.push(`<div class="banner sub-banner" data-act="sub-notice">${icon('replace')}<div><b>${subN.length === 1 ? 'Neue Vertretung für dich' : subN.length + ' neue Vertretungen für dich'}</b><br><span class="text2">${esc(SubNotice.when(subN[0]))} · ${esc(SubNotice.what(subN[0]))}</span><div class="mt"><span class="badge acc">Tippen zum Bestätigen</span></div></div></div>`);
   if (Team.on()) {
@@ -194,6 +196,8 @@ App.def('/today', () => {
   // Schnellaktionen
   const q = (attr, ic, label, c) => `<button ${attr}><span class="q-ic" style="--qc:${c}">${icon(ic)}</span>${label}</button>`;
   out.push(`<div class="quick2">
+    ${q('data-nav="/assistant"', 'sparkles', 'Assistent', '#8b5cf6')}
+    ${q('data-nav="/chat"', 'message-circle', 'Chat', '#0ea5e9')}
     ${q('data-nav="/tool/random"', 'shuffle', 'Zufall', '#6366f1')}
     ${q('data-nav="/tool/timer"', 'timer', 'Timer', '#f97316')}
     ${q('data-act="task-add"', 'list-todo', 'Aufgabe', '#0ea5e9')}

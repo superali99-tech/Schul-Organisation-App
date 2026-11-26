@@ -77,6 +77,18 @@ Verbindliche Einträge werden mit einem ECDSA-Schlüssel des Schulleitungs-Gerä
 
 Unter *Kollegium* gibt es die Reiter **Aufsicht** (Pausenaufsichtsplan der Schulleitung; jede Lehrkraft sieht ihre Aufsichten auf der Startseite und wird 5 Minuten vorher erinnert; fehlt jemand, kann die Schulleitung die Aufsicht für diesen Tag vertreten lassen), **Räume** (buchbare Räume wie Computerraum oder Aula mit Wochenübersicht; freie Stunde antippen = buchen) und **Umfragen** (abstimmen mit Live-Ergebnis, optional anonym und mit Frist). Die Schulleitung findet im Cockpit außerdem eine **Statistik** zu Vertretungen, Abwesenheitstagen, Aufsichten und gelesenen Mitteilungen (CSV-Export). Aufsichtsplan und Räume sind – sobald eine Schulleitung eingetragen ist – digital unterschrieben und nur von ihr änderbar.
 
+## Chat im Kollegium
+
+Unter *Mehr → Chat* schreiben sich Lehrkräfte und Schulleitung gegenseitig: Einzelchats, **Gruppen** (Name, Symbol, Mitglieder) und der Chat **Ganzes Kollegium**. Es gibt **Emojis**, **Reaktionen**, **Fotos** (automatisch verkleinert), **Sprachnachrichten** (bis 2 Minuten), „Für alle löschen“ und **Storys** (Text oder Foto, 24 Stunden sichtbar). **Anrufen** öffnet die Telefon-App, **Videoanruf** verschickt einen Link zu einem Jitsi-Raum (Server unter *Einstellungen → Videoanrufe im Chat* änderbar).
+
+Jede Nachricht wird zusätzlich nur für die Mitglieder des Chats verschlüsselt (ECDH P-256 + AES-GCM); gefälschte Absender werden markiert. Zugestellt wird über den Team-Abgleich: mit verbundener Cloud-Datei alle 15 Sekunden bei geöffnetem Chat, sonst beim Öffnen der App oder per „Senden“. Ein Live-Messenger mit Server ist das nicht. Nachrichten werden nach 30 Tagen gelöscht, Storys nach 24 Stunden. Videos lassen sich nur als Link teilen.
+
+## Assistent
+
+Das ✨-Symbol auf der Startseite öffnet den **Assistenten**. Offline versteht er Befehle wie „Erinnere mich morgen um 7 an die Kopien“, „Erstelle Aufgabe … bis Freitag“, „Verschiebe Termin … auf den 15.12.“, „Lösche Termin …“, „Was steht morgen an?“ oder „Öffne Kalender“.
+
+Optional gibt es den **KI-Modus** mit Claude (Anthropic): Im Assistenten auf das Zahnrad tippen, „KI-Modus“ wählen und einen **eigenen API-Schlüssel** von console.anthropic.com eintragen (Nutzung kostet pro Anfrage). Dann versteht der Assistent freie Fragen und kann Termine, Aufgaben, Hausaufgaben und Notizen anlegen, ändern und löschen – vor dem Löschen fragt die App nach. Der Schlüssel bleibt nur auf dem Gerät. Im KI-Modus werden Fragen und die nötigen Einträge an Anthropic gesendet; Schülerdaten nur, wenn „Schülerdaten freigeben“ eingeschaltet ist.
+
 ## Vertretung zuweisen
 
 *Kollegium → Vertretungen → + Vertretung*: Tag, Stunde, Klasse, abwesende Lehrkraft und Vertretung wählen. Unter **„Wer bekommt die Meldung?“** entscheidest du: **Nur die Vertretung** (sichtbar nur für Vertretung, abwesende Lehrkraft und Schulleitung) oder **Ganzes Kollegium**. Danach **Meldung jetzt senden** (WhatsApp, E-Mail … mit Team-Datei) – die Kollegin öffnet die Datei, sieht „Du vertrittst …“ und hat die Stunde im Stundenplan. Ein kurzes Anleitungs-Video gibt es in der App unter *Vertretungen → So geht's* und in den Neuerungen.
@@ -129,16 +141,19 @@ Alle Team-Daten sind Ende-zu-Ende verschlüsselt (AES-256-GCM). Den Schlüssel h
 | **Aufgaben** | To-dos mit Priorität, Kategorie, Fälligkeit, Wiederholung und Erinnerung |
 | **Notizen** | Farbige Notizen, Anheften, Checklisten, Suche, Zuordnung zu Klassen |
 | **Elterngespräche** | Protokolle mit Teilnehmenden, Vereinbarungen und Wiedervorlage, druckbar mit Unterschriftenfeld |
+| **Chat** | Einzel- und Gruppenchats im Kollegium, Emojis, Reaktionen, Fotos, Sprachnachrichten, Storys, Anruf und Videoanruf per Link, Ende-zu-Ende verschlüsselt |
+| **Assistent** | Befehle in Alltagssprache (offline), optional KI-Modus mit Claude zum Erstellen, Bearbeiten und Löschen |
 | **Werkzeuge** | Zufallsauswahl (ohne Wiederholung, Abwesende ausgeschlossen), Gruppen bilden (gemischt), Timer & Stoppuhr, **Lautstärke-Ampel** (Mikrofon), Ampel, Notenschlüssel-Rechner, Notenrechner, Würfel/Münze/Zufallszahl, Stundenuhr |
 | **Statistik** | Leistung je Klasse, Anwesenheitsquoten, gefährdete Schüler:innen |
 | **Erinnerungen** | Benachrichtigungen für Prüfungen, Termine, Aufgaben, Wiedervorlagen und optional vor jeder Stunde |
-| **Sicherheit** | PIN-Sperre, Bildschirmfotos verhindern, keine Internet-Berechtigung |
+| **Sicherheit** | PIN-Sperre, Bildschirmfotos verhindern, Internet nur für Updates und – wenn du sie nutzt – KI-Modus und Videoanrufe |
 | **Daten** | Sicherung exportieren/wiederherstellen (.json), tägliche automatische Sicherungen auf dem Gerät, CSV-Exporte, Schuljahreswechsel, Drucken bzw. PDF über Android |
 | **Darstellung** | Modernes Design mit Farbverläufen und schwebender Navigation, Hell/Dunkel/System, Akzentfarbe, Schriftgröße, für Handy und Tablet |
 
 ## Datenschutz
 
-* Alle Daten liegen nur im privaten App-Speicher auf dem Gerät. Das Internet wird **ausschließlich für die Update-Prüfung** genutzt (Abruf von `release/version.json`); dabei werden keine Schul- oder Schülerdaten übertragen.
+* Alle Daten liegen nur im privaten App-Speicher auf dem Gerät. Das Internet wird für die **Update-Prüfung** genutzt (Abruf von `release/version.json`); dabei werden keine Schul- oder Schülerdaten übertragen.
+* Nur wenn du ihn selbst einschaltest, sendet der **KI-Modus** des Assistenten deine Fragen und die dafür nötigen Einträge an die Claude-API von Anthropic (Schülerdaten nur mit ausdrücklicher Freigabe). **Videoanrufe** laufen über den gewählten Jitsi-Server.
 * Für Android-Cloud-Backups ist die App gesperrt. Gesichert wird nur, was du selbst exportierst.
 * Bitte beachte die Vorgaben deines Bundeslandes zur Verarbeitung von Schülerdaten auf privaten Geräten. Die PIN-Sperre ist empfohlen.
 

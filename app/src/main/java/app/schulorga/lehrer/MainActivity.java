@@ -921,6 +921,17 @@ public class MainActivity extends Activity {
             Reminders.sync(getApplicationContext(), json);
         }
 
+        /** Sofort eine Benachrichtigung zeigen (z. B. neue Chat-Nachricht) – nutzt den Kanal der Erinnerungen. */
+        @JavascriptInterface
+        public void notifyNow(String title, String text, String route) {
+            Intent i = new Intent(getApplicationContext(), ReminderReceiver.class);
+            i.putExtra("code", (title + "|" + text).hashCode());
+            i.putExtra("title", title);
+            i.putExtra("text", text);
+            i.putExtra("route", route);
+            new ReminderReceiver().onReceive(getApplicationContext(), i);
+        }
+
         @JavascriptInterface
         public boolean notificationsAllowed() {
             if (Build.VERSION.SDK_INT >= 33) {

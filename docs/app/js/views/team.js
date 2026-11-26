@@ -113,7 +113,8 @@ const Team = {
     const t = S.team;
     return deepCopy({ members: t.members, events: S.events.filter((e) => e.team === t.id), posts: t.posts, subs: t.subs, classes: t.classes, school: t.school, deleted: t.deleted,
       acks: t.acks || [], absences: t.absences || [], leader: t.leader || null, delSig: t.delSig || {}, removed: t.removed || {},
-      duties: t.duties || [], rooms: t.rooms || [], bookings: t.bookings || [], polls: t.polls || [], votes: t.votes || [] });
+      duties: t.duties || [], rooms: t.rooms || [], bookings: t.bookings || [], polls: t.polls || [], votes: t.votes || [],
+      chats: t.chats || [], msgs: t.msgs || [], reacts: t.reacts || [], stories: t.stories || [] });
   },
   merge(d) {
     const t = S.team;
@@ -146,6 +147,18 @@ const Team = {
     t.bookings = mergeList(t.bookings, d.bookings, '_x');
     t.polls = mergeList(t.polls, d.polls, 'polls');
     t.votes = mergeList(t.votes, d.votes, '_x');
+    // Chat: Nachrichten, Reaktionen, Storys (abgelaufene werden aufgeräumt)
+    ['chats', 'msgs', 'reacts', 'stories'].forEach((k) => { if (!Array.isArray(t[k])) t[k] = []; });
+    const msgIds = new Set(t.msgs.map((m) => m.id));
+    t.chats = mergeList(t.chats, d.chats, '_x');
+    t.msgs = mergeList(t.msgs, d.msgs, '_x');
+    t.reacts = mergeList(t.reacts, d.reacts, '_x');
+    t.stories = mergeList(t.stories, d.stories, '_x');
+    if (typeof chatPrune === 'function') chatPrune(t);
+    const myChats = new Set(typeof chatsForMe === 'function' ? chatsForMe().map((c) => c.id) : []);
+    const fresh = t.msgs.filter((m) => !msgIds.has(m.id) && m.by !== t.me && !m.del && myChats.has(m.chat));
+    sum.chatNew = fresh.length;
+    if (fresh.length && typeof Chat !== 'undefined') setTimeout(() => Chat.notifyNew(fresh), 0);
     t.absences = mergeList(t.absences, d.absences, 'absences');
     t.posts = mergeList(t.posts, d.posts, 'posts');
     const subIds = new Set(t.subs.map((x) => x.id));
@@ -164,12 +177,12 @@ const Team = {
         if (d.school.official) { Team.applySchool(d.school); sum.schoolApplied = true; }
       }
     }
-    sum.n = sum.posts + sum.members + sum.events + sum.subs + sum.classes + sum.absences + sum.polls + (sum.dutiesChanged ? 1 : 0);
+    sum.n = sum.posts + sum.members + sum.events + sum.subs + sum.classes + sum.absences + sum.polls + (sum.dutiesChanged ? 1 : 0) + (sum.chatNew || 0);
     return sum;
   },
   async mergeVerified(d) { return Team.merge(await Leader.verifyIncoming(d)); },
   newTeam(name, key, id) {
-    return { id: id || uid(), name, key, me: uid(), created: new Date().toISOString(), members: [], posts: [], subs: [], classes: [], school: null, deleted: {}, lastSync: null, seenPosts: Date.now(), autoSync: true, acks: [], absences: [], leader: null, delSig: {}, removed: {}, duties: [], rooms: [], bookings: [], polls: [], votes: [] };
+    return { id: id || uid(), name, key, me: uid(), created: new Date().toISOString(), members: [], posts: [], subs: [], classes: [], school: null, deleted: {}, lastSync: null, seenPosts: Date.now(), autoSync: true, acks: [], absences: [], leader: null, delSig: {}, removed: {}, duties: [], rooms: [], bookings: [], polls: [], votes: [], chats: [], msgs: [], reacts: [], stories: [] };
   },
   memberFromForm(v, id) {
     return { id, title: v.title || '', name: v.name || '', short: (v.short || '').toUpperCase(), role: v.role || 'Lehrkraft', subjects: v.subjects || '', classes: v.classes || '', email: v.email || '', phone: v.phone || '', updatedAt: Date.now(), by: id };
@@ -257,6 +270,7 @@ const Team = {
     });
   },
   async afterJoin() {
+    if (typeof ChatCrypto !== 'undefined') ChatCrypto.ensureKeys();
     const r = await UI.menu(`Willkommen im Team „${S.team.name}" 🎉`, [
       { l: 'Antwort an die einladende Person senden', s: 'Damit das Kollegium dich sieht (Datei per WhatsApp, E-Mail …)', i: 'send', v: 'share' },
       Native.has ? { l: 'Gemeinsame Cloud-Datei verbinden', s: 'Automatisch synchronisieren über Nextcloud, Google Drive …', i: 'refresh-cw', v: 'sync' } : null,
@@ -501,6 +515,7 @@ const Team = {
     if (sum.classes) p.push(plural(sum.classes, 'Klassenliste', 'Klassenlisten'));
     if (sum.absences) p.push(plural(sum.absences, 'Abwesenheit', 'Abwesenheiten'));
     if (sum.polls) p.push(plural(sum.polls, 'neue Umfrage', 'neue Umfragen'));
+    if (sum.chatNew) p.push(plural(sum.chatNew, 'neue Chat-Nachricht', 'neue Chat-Nachrichten'));
     if (sum.dutiesChanged) p.push('deine Aufsichten wurden geändert');
     if (sum.leader) p.push('Schulleitung eingetragen');
     if (sum.schoolApplied) p.push('Schulvorgaben der Schulleitung übernommen');
@@ -795,6 +810,7 @@ A['team-apply-school'] = async () => {
 A['team-ignore-school'] = () => { S.team.schoolApplied = S.team.school.updatedAt; save(); App.refresh(); };
 A['team-menu'] = () => UI.menu(S.team.name, [
   Leader.active() ? { l: 'Schulleitungs-Cockpit', i: 'crown', s: 'Überblick, verbindliche Termine & Mitteilungen', fn: () => App.navigate('/leader') } : null,
+  { l: 'Chat', i: 'message-circle', s: 'Nachrichten, Gruppen, Storys', fn: () => App.navigate('/chat') },
   { l: 'Abwesenheit melden', i: 'thermometer', s: 'Krank, Fortbildung, Klassenfahrt …', fn: () => editAbsence() },
   { l: 'Kolleg:innen einladen', i: 'user-plus', fn: () => Team.inviteSheet() },
   { l: 'Synchronisieren & Teilen', i: 'refresh-cw', fn: () => teamSyncSheet() },
