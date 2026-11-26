@@ -1,0 +1,18 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp" android:height="108dp"
+    android:viewportWidth="108" android:viewportHeight="108">
+    <!-- Klemmbrett -->
+    <path android:fillColor="#FFFFFFFF"
+        android:pathData="M38,30h32a6,6 0,0 1,6 6v40a6,6 0,0 1,-6 6H38a6,6 0,0 1,-6 -6V36a6,6 0,0 1,6 -6z"/>
+    <path android:fillColor="#FFC7D2FE"
+        android:pathData="M45,25h18a3,3 0,0 1,3 3v5a3,3 0,0 1,-3 3H45a3,3 0,0 1,-3 -3v-5a3,3 0,0 1,3 -3z"/>
+    <!-- Haken -->
+    <path android:strokeColor="#FF4F46E5" android:strokeWidth="5" android:strokeLineCap="round"
+        android:strokeLineJoin="round" android:fillColor="#00000000"
+        android:pathData="M41,49l5,5 9,-9"/>
+    <path android:strokeColor="#FF4F46E5" android:strokeWidth="5" android:strokeLineCap="round"
+        android:strokeLineJoin="round" android:fillColor="#00000000"
+        android:pathData="M41,66l5,5 9,-9"/>
+    <path android:fillColor="#FFA5B4FC"
+        android:pathData="M59,47h9a2.5,2.5 0,0 1,0 5h-9a2.5,2.5 0,0 1,0 -5zM59,64h9a2.5,2.5 0,0 1,0 5h-9a2.5,2.5 0,0 1,0 -5z"/>
+</vector>

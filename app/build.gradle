@@ -1,0 +1,55 @@
+plugins {
+    id 'com.android.application'
+}
+
+// Signatur-Schlüssel für Sideload-Installationen. Damit können neue Versionen
+// ohne Deinstallation (und ohne Datenverlust) über die alte App installiert werden.
+// Für eine Veröffentlichung im Play Store bitte einen eigenen, geheimen Schlüssel verwenden
+// (über die Umgebungsvariablen SCHULORGA_KEYSTORE / SCHULORGA_STORE_PASSWORD / ...).
+def ksFile = System.getenv('SCHULORGA_KEYSTORE') ?: 'keystore/schulorga-sideload.jks'
+def ksPass = System.getenv('SCHULORGA_STORE_PASSWORD') ?: 'schulorga-sideload'
+def ksAlias = System.getenv('SCHULORGA_KEY_ALIAS') ?: 'schulorga'
+def ksKeyPass = System.getenv('SCHULORGA_KEY_PASSWORD') ?: 'schulorga-sideload'
+
+android {
+    namespace 'app.schulorga.lehrer'
+    compileSdk 35
+
+    defaultConfig {
+        applicationId 'app.schulorga.lehrer'
+        minSdk 24
+        targetSdk 35
+        versionCode 1
+        versionName '1.0.0'
+    }
+
+    signingConfigs {
+        sideload {
+            storeFile rootProject.file(ksFile)
+            storePassword ksPass
+            keyAlias ksAlias
+            keyPassword ksKeyPass
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.sideload
+        }
+        debug {
+            signingConfig signingConfigs.sideload
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    androidResources {
+        noCompress += ['html', 'js', 'css', 'json']
+    }
+}
