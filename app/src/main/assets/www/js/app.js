@@ -71,6 +71,13 @@ function buildReminders() {
     }
     if (r.eventEnd && e.endTime) add('eve' + e.id, dateTimeMs(e.end || e.date, e.endTime), `Endet jetzt: ${e.title}`, t.l + place, '/calendar');
   });
+  // Pausenaufsichten (5 Minuten vorher)
+  if (S.team && S.team.id && typeof myDutiesOn === 'function') {
+    for (let i = 0; i < 8; i++) {
+      const day = addDays(today(), i);
+      myDutiesOn(day).forEach((x) => { if (x.start) add('duty' + x.id + day, dateTimeMs(day, x.start) - 5 * 60000, `Gleich Aufsicht: ${x.slot || 'Pause'}`, `${x.start}${x.end ? '–' + x.end : ''} Uhr${x.place ? ' · ' + x.place : ''}`, '/team/duties'); });
+    }
+  }
   // Aufgaben
   if (r.tasks) S.tasks.forEach((t) => {
     if (t.done || !t.due) return;
@@ -218,6 +225,20 @@ if (window.matchMedia) {
   try { window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => applyTheme()); } catch (e) { /* alt */ }
 }
 
+// Roter Punkt an „Mehr", wenn im Kollegium etwas auf dich wartet
+function navBadges() {
+  const btn = document.querySelector('#bottomnav [data-tab="more"]');
+  if (!btn) return;
+  let news = false;
+  if (S && S.team && S.team.id) {
+    const t = S.team;
+    news = t.posts.some((x) => x.by !== t.me && (x.updatedAt || 0) > (t.seenPosts || 0))
+      || (typeof SubNotice !== 'undefined' && SubNotice.pending().length > 0)
+      || (typeof openPollsForMe === 'function' && openPollsForMe().length > 0);
+  }
+  btn.classList.toggle('has-dot', news);
+}
+
 // ------------------------------------------------------------------ Start
 (function boot() {
   Store.load();
@@ -244,9 +265,8 @@ if (window.matchMedia) {
   setTimeout(() => { if (App.onTeamResume) App.onTeamResume(); }, 2500);
   // Minütlich die Startseite aktualisieren (aktuelle Stunde)
   setInterval(() => { if ((App.path === '/today' || App.path.startsWith('/timetable')) && !UI.stack.length && !document.hidden && !document.activeElement.matches('input,textarea,select')) App.refresh(); }, 60000);
-  syncReminders();
-  syncWidgets();
-  updateAppBadge();
+  // Erinnerungen, Widgets und App-Symbol nach dem ersten Bild – die Startseite erscheint so schneller
+  setTimeout(() => { syncReminders(); syncWidgets(); updateAppBadge(); }, 250);
   // Neuerungen nach einem Update, Update-Prüfung, Benachrichtigungs-Erlaubnis
   setTimeout(() => {
     if (!UI.stack.length && !Lock.active) showWhatsNew();

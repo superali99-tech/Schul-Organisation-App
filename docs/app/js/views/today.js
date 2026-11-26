@@ -85,11 +85,22 @@ App.def('/today', () => {
   const openTasks = S.tasks.filter((t) => !t.done && (!t.due || t.due <= addDays(d, 2))).length;
   const examsWeek = S.assessments.filter((a) => a.date && a.date >= d && a.date <= addDays(d, 7) && (cat(a.catId) || {}).exam).length;
   const dd = pd(d);
+  const tdl = lessonsOn(d).filter((l) => !l.cancelled && !l.holiday);
+  const nmNow = nowMin();
+  const doneL = tdl.filter((l) => { const p = periodTime(l.period); return p && tmin(p.e) <= nmNow; }).length;
+  const ring = tdl.length ? (() => {
+    const pct = doneL / tdl.length;
+    const c = 2 * Math.PI * 25;
+    return `<div class="th-ring" data-nav="/timetable" data-root title="Heute ${doneL} von ${tdl.length} Stunden geschafft"><svg viewBox="0 0 60 60"><circle cx="30" cy="30" r="25" class="r-bg"/><circle cx="30" cy="30" r="25" class="r-fg" stroke-dasharray="${(c * pct).toFixed(1)} ${c.toFixed(1)}"/></svg><div class="th-ring-t"><b>${doneL}/${tdl.length}</b><span>geschafft</span></div></div>`;
+  })() : '';
+  const hr = now().getHours();
   out.push(`<div class="today-hero">
-    <div class="th-date">${WD[dow(d)]}, ${dd.getDate()}. ${MONTHS[dd.getMonth()]}</div>
+    <div class="th-top"><div class="sp">
+    <div class="th-date">${icon(hr >= 18 || hr < 5 ? 'moon' : 'sun')}${WD[dow(d)]}, ${dd.getDate()}. ${MONTHS[dd.getMonth()]}</div>
     <h2>${greeting()}${teacherName() ? ', ' + esc(teacherName()) : ''}!</h2>
     <div class="th-sub">KW ${isoWeek(d)}${wt ? ` · ${wt}-Woche` : ''}${st.school ? ' · ' + esc(st.school) : ''}</div>
     ${holidayCountdown(d, hol)}
+    </div>${ring}</div>
     <div class="th-stats">
       <div data-nav="/timetable" data-root><b>${lessonsToday}</b><span>${lessonsToday === 1 ? 'Stunde' : 'Stunden'} heute</span></div>
       <div data-nav="/tasks"><b>${openTasks}</b><span>Aufgaben fällig</span></div>
@@ -107,6 +118,20 @@ App.def('/today', () => {
   });
   const subN = Team.on() ? SubNotice.pending() : [];
   if (subN.length) out.push(`<div class="banner sub-banner" data-act="sub-notice">${icon('replace')}<div><b>${subN.length === 1 ? 'Neue Vertretung für dich' : subN.length + ' neue Vertretungen für dich'}</b><br><span class="text2">${esc(SubNotice.when(subN[0]))} · ${esc(SubNotice.what(subN[0]))}</span><div class="mt"><span class="badge acc">Tippen zum Bestätigen</span></div></div></div>`);
+  if (Team.on()) {
+    // Aufsicht und Raumbuchungen heute
+    const md = myDutiesOn(d);
+    const mb = myBookingsOn(d);
+    if (md.length || mb.length) {
+      out.push(`<div class="card tone-amber"><div class="card-h"><h3>${icon('eye')}Heute außerdem</h3><button class="link" data-nav="/team/duties">Aufsichtsplan</button></div><div class="list">
+        ${md.map((x) => `<div class="li" data-nav="/team/duties"><div class="li-ic" style="flex-direction:column;line-height:1.05;font-size:.74rem">${esc(x.start || '')}<small>${esc(x.end || '')}</small></div><div class="li-main"><div class="li-t">Aufsicht · ${esc(x.slot || '')}</div><div class="li-s">${esc(x.place || '')}${x.date ? ' · Vertretung' : ''}</div></div></div>`).join('')}
+        ${mb.map((b) => `<div class="li" data-nav="/room/${b.room}"><div class="li-ic">${icon('door-open')}</div><div class="li-main"><div class="li-t">${esc(roomName(b.room))} gebucht</div><div class="li-s">${Number(b.period) + 1}. Stunde${b.note ? ' · ' + esc(b.note) : ''}</div></div></div>`).join('')}
+      </div></div>`);
+    }
+    openPollsForMe().slice(0, 2).forEach((p) => {
+      out.push(`<div class="banner ${p.official ? 'lead-banner' : 'sub-banner'}" data-act="poll-open" data-id="${p.id}">${icon('chart-column')}<div><b>${p.official ? 'Umfrage der Schulleitung' : 'Umfrage'}: ${esc(p.question)}</b><br><span class="text2">von ${esc(teamMemberName(p.by, true))}${p.deadline ? ' · bis ' + fmtDW(p.deadline) : ''}</span><div class="mt"><span class="badge acc">Jetzt abstimmen</span></div></div></div>`);
+    });
+  }
   const myAbs = Team.on() ? absencesOn(d).find((a) => a.member === S.team.me) : null;
   if (myAbs) {
     const k = ABS_KINDS[myAbs.kind] || ABS_KINDS.sonstiges;
@@ -182,12 +207,12 @@ App.def('/today', () => {
   // Stundenplan heute
   const tl = timelineHTML(d);
   if (tl) {
-    out.push(`<div class="card"><div class="card-h"><h3>${icon('clock')}Heute</h3><button class="link" data-nav="/timetable" data-root>Woche</button></div>${tl}</div>`);
+    out.push(`<div class="card tone-acc"><div class="card-h"><h3>${icon('clock')}Heute</h3><button class="link" data-nav="/timetable" data-root>Woche</button></div>${tl}</div>`);
   } else if (S.timetable.length) {
     // Nächster Unterrichtstag
     let nd = null;
     for (let i = 1; i < 21; i++) { const x = addDays(d, i); if (lessonsOn(x).some((l) => !l.holiday)) { nd = x; break; } }
-    if (nd) out.push(`<div class="card"><div class="card-h"><h3>${icon('clock')}${relDay(nd)}, ${fmtDS(nd)}</h3><button class="link" data-nav="/timetable" data-root>Woche</button></div>${timelineHTML(nd, { compact: true })}</div>`);
+    if (nd) out.push(`<div class="card tone-acc"><div class="card-h"><h3>${icon('clock')}${relDay(nd)}, ${fmtDS(nd)}</h3><button class="link" data-nav="/timetable" data-root>Woche</button></div>${timelineHTML(nd, { compact: true })}</div>`);
   }
 
   // Aufgaben
@@ -195,20 +220,20 @@ App.def('/today', () => {
   const prio = S.tasks.filter((t) => !t.done && !t.due && t.prio === 2);
   const tl2 = sortBy([...tasks, ...prio], (t) => t.due || '9999', (t) => -(t.prio || 0));
   if (tl2.length) {
-    out.push(`<div class="card"><div class="card-h"><h3>${icon('list-todo')}Aufgaben</h3><button class="link" data-nav="/tasks">Alle</button></div><div class="list">${tl2.slice(0, 6).map(taskItem).join('')}</div></div>`);
+    out.push(`<div class="card tone-blue"><div class="card-h"><h3>${icon('list-todo')}Aufgaben</h3><button class="link" data-nav="/tasks">Alle</button></div><div class="list">${tl2.slice(0, 6).map(taskItem).join('')}</div></div>`);
   }
 
   // Hausaufgaben
   const hw = sortBy(S.homework.filter((h) => !h.done && h.due && h.due >= d && h.due <= addDays(d, 2)), 'due');
   if (hw.length) {
-    out.push(`<div class="card"><div class="card-h"><h3>${icon('book-open')}Fällige Hausaufgaben</h3><button class="link" data-nav="/homework">Alle</button></div><div class="list">${hw.map(hwItem).join('')}</div></div>`);
+    out.push(`<div class="card tone-teal"><div class="card-h"><h3>${icon('book-open')}Fällige Hausaufgaben</h3><button class="link" data-nav="/homework">Alle</button></div><div class="list">${hw.map(hwItem).join('')}</div></div>`);
   }
   out.push('</div><div>');
 
   // Prüfungen
   const exams = sortBy(S.assessments.filter((a) => a.date && a.date >= d && a.date <= addDays(d, 21) && (cat(a.catId) || {}).exam), 'date');
   if (exams.length) {
-    out.push(`<div class="card"><div class="card-h"><h3>${icon('file-text')}Anstehende Prüfungen</h3></div><div class="list">${exams.map((a) => `
+    out.push(`<div class="card tone-red"><div class="card-h"><h3>${icon('file-text')}Anstehende Prüfungen</h3></div><div class="list">${exams.map((a) => `
       <div class="li" data-nav="/assessment/${a.id}"><div class="li-ic" style="background:${rgba(classColor(cls(a.classId)), .15)};color:${classColor(cls(a.classId))}">${icon('file-text')}</div>
       <div class="li-main"><div class="li-t">${esc(a.title)}</div><div class="li-s">${esc(cName(a.classId))}${a.subjectId ? ' · ' + esc(subName(a.subjectId)) : ''}</div></div>
       <div class="li-end"><span class="badge ${daysBetween(d, a.date) <= 2 ? 'red' : 'acc'}">${relDay(a.date)}</span></div></div>`).join('')}</div></div>`);
@@ -217,13 +242,13 @@ App.def('/today', () => {
   // Termine
   const evs = sortBy(S.events.filter((e) => e.type !== 'ferien' && e.date <= addDays(d, 7) && (e.end || e.date) >= d), 'date', 'time');
   if (evs.length) {
-    out.push(`<div class="card"><div class="card-h"><h3>${icon('calendar')}Termine (7 Tage)</h3><button class="link" data-nav="/calendar" data-root>Kalender</button></div><div class="list">${evs.map(eventItem).join('')}</div></div>`);
+    out.push(`<div class="card tone-violet"><div class="card-h"><h3>${icon('calendar')}Termine (7 Tage)</h3><button class="link" data-nav="/calendar" data-root>Kalender</button></div><div class="list">${evs.map(eventItem).join('')}</div></div>`);
   }
 
   // Wiedervorlagen Elterngespräche
   const fu = sortBy(S.talks.filter((t) => t.followUp && !t.followUpDone && t.followUp <= addDays(d, 3)), 'followUp');
   if (fu.length) {
-    out.push(`<div class="card"><div class="card-h"><h3>${icon('handshake')}Wiedervorlagen</h3></div><div class="list">${fu.map((t) => `
+    out.push(`<div class="card tone-pink"><div class="card-h"><h3>${icon('handshake')}Wiedervorlagen</h3></div><div class="list">${fu.map((t) => `
       <div class="li" data-act="talk-edit" data-id="${t.id}"><div class="li-ic">${icon('handshake')}</div><div class="li-main"><div class="li-t">${esc(sName(stu(t.studentId)))}: ${esc(t.topic || 'Gespräch')}</div><div class="li-s">Wiedervorlage ${relDay(t.followUp)}</div></div></div>`).join('')}</div></div>`);
   }
 
@@ -231,7 +256,7 @@ App.def('/today', () => {
   const bd = sortBy(S.students.filter((s) => s.birthday && cls(s.classId) && !cls(s.classId).archived).map((s) => ({ s, n: nextBirthday(s.birthday, d) }))
     .filter((x) => daysBetween(d, x.n) <= 7), 'n');
   if (bd.length) {
-    out.push(`<div class="card"><div class="card-h"><h3>${icon('cake')}Geburtstage</h3></div><div class="list">${bd.map(({ s, n }) => `
+    out.push(`<div class="card tone-amber"><div class="card-h"><h3>${icon('cake')}Geburtstage</h3></div><div class="list">${bd.map(({ s, n }) => `
       <div class="li" data-nav="/student/${s.id}">${UI.avatar(s)}<div class="li-main"><div class="li-t">${esc(sName(s))}</div><div class="li-s">${esc(cName(s.classId))} · wird ${age(s.birthday, n)}</div></div>
       <div class="li-end"><span class="badge ${n === d ? 'green' : ''}">${n === d ? '🎉 Heute' : relDay(n)}</span></div></div>`).join('')}</div></div>`);
   }
@@ -244,7 +269,7 @@ App.def('/today', () => {
     const mySubs = sortBy(t.subs.filter((x) => x.sub === t.me && x.date >= d && x.date <= addDays(d, 7)), 'date', (x) => Number(x.period));
     const open = t.subs.filter((x) => !x.sub && x.date >= d).length;
     if (unread.length || mySubs.length || open) {
-      out.push(`<div class="card team-card"><div class="card-h"><h3>${icon('users')}Kollegium · ${esc(t.name)}</h3><button class="link" data-nav="/team">Öffnen</button></div>
+      out.push(`<div class="card team-card tone-acc"><div class="card-h"><h3>${icon('users')}Kollegium · ${esc(t.name)}</h3><button class="link" data-nav="/team">Öffnen</button></div>
         ${unread.slice(0, 3).map((x) => `<div class="mini-post" data-nav="/team/board"><b>${esc(teamMemberName(x.by, true))}:</b> ${esc(x.title || (x.text || '').slice(0, 80))}</div>`).join('')}
         ${mySubs.map((x) => `<div class="mini-post" data-nav="/lesson/${x.date}/${x.period}">${icon('replace')} <b>Vertretung ${relDay(x.date)}, ${Number(x.period) + 1}. Std.:</b> ${esc(x.className)}${x.room ? ' · Raum ' + esc(x.room) : ''}</div>`).join('')}
         ${open ? `<div class="mini-post" data-nav="/team/subs">${icon('triangle-alert')} ${plural(open, 'offene Vertretung', 'offene Vertretungen')} im Team</div>` : ''}

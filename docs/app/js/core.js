@@ -169,6 +169,17 @@ const Native = {
 };
 
 // ------------------------------------------------------------------ Konstanten
+// Farbthemen (Verlauf von a nach b)
+const THEMES = [
+  { v: 'indigo', l: 'Indigo', a: '#4f46e5', b: '#8b5cf6' },
+  { v: 'ozean', l: 'Ozean', a: '#0369a1', b: '#06b6d4' },
+  { v: 'smaragd', l: 'Smaragd', a: '#047857', b: '#22c55e' },
+  { v: 'sonne', l: 'Sonnenuntergang', a: '#ea580c', b: '#f43f5e' },
+  { v: 'beere', l: 'Beere', a: '#be185d', b: '#a855f7' },
+  { v: 'nacht', l: 'Mitternacht', a: '#1e3a8a', b: '#7c3aed' },
+  { v: 'koralle', l: 'Koralle', a: '#e11d48', b: '#fb923c' },
+  { v: 'graphit', l: 'Graphit', a: '#334155', b: '#64748b' },
+];
 const COLORS = ['#4f46e5', '#2563eb', '#0891b2', '#0d9488', '#16a34a', '#65a30d', '#ca8a04', '#ea580c', '#dc2626', '#db2777', '#9333ea', '#64748b'];
 const NOTE_COLORS = ['', '#fde68a', '#bbf7d0', '#bfdbfe', '#fbcfe8', '#ddd6fe', '#fed7aa', '#e5e7eb'];
 
@@ -296,7 +307,7 @@ const Store = {
     if (oldVersion < 3) { d.settings.remind.on = true; d.settings.remind.lessons = true; }
     if (d.team) {
       const t = d.team;
-      ['acks', 'absences', 'posts', 'subs', 'classes', 'members'].forEach((k) => { if (!Array.isArray(t[k])) t[k] = []; });
+      ['acks', 'absences', 'posts', 'subs', 'classes', 'members', 'duties', 'rooms', 'bookings', 'polls', 'votes'].forEach((k) => { if (!Array.isArray(t[k])) t[k] = []; });
       ['delSig', 'removed', 'deleted'].forEach((k) => { if (!t[k] || typeof t[k] !== 'object') t[k] = {}; });
     }
     d.version = DATA_VERSION;

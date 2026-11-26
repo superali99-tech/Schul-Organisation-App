@@ -5,6 +5,14 @@ const UPDATE_URLS = ['https://raw.githubusercontent.com/superali99-tech/Schul-Or
 
 /** Neuerungen je Version (neueste zuerst) */
 const CHANGELOG = [
+  { v: '1.7.0', items: [
+    'Design 2.0: acht Farbthemen (Indigo, Ozean, Smaragd, Sonnenuntergang …), Hintergrund wählbar, Tagesring „geschafft" auf der Startseite',
+    'Neu: Pausenaufsicht – die Schulleitung plant, du siehst deine Aufsichten auf der Startseite und wirst 5 Minuten vorher erinnert',
+    'Neu: Räume buchen – Computerraum, Aula oder Sporthalle für eine Stunde reservieren, mit Wochenübersicht',
+    'Neu: Umfragen im Kollegium – abstimmen, Ergebnisse live, auf Wunsch anonym',
+    'Schulleitung: Aufsicht vertreten, wenn jemand fehlt, Statistik zu Vertretungen und Abwesenheiten (CSV-Export)',
+    'Roter Punkt an „Mehr", wenn im Kollegium etwas auf dich wartet; schnellere Übergänge',
+  ] },
   { v: '1.6.0', video: 'sub', items: [
     'Vertretung gezielt zuweisen: Nur die Vertretung bekommt die Meldung „Du vertrittst …" – oder auf Wunsch das ganze Kollegium',
     'Meldung mit einem Tipp versenden (WhatsApp, E-Mail …) – die Stunde landet direkt im Stundenplan der Kollegin oder des Kollegen',

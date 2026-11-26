@@ -7,7 +7,7 @@ function setItem(ic, title, sub, attrs_, end = '') {
 
 App.def('/settings', () => {
   const st = S.settings;
-  const themeL = { auto: 'Wie System', light: 'Hell', dark: 'Dunkel' }[st.theme];
+  const themeL = { auto: 'Wie System', light: 'Hell', dark: 'Dunkel' }[st.theme] + ' · ' + ((THEMES.find((t) => t.v === st.themeColor) || { l: st.themeColor === '' ? 'Eigene Farbe' : 'Indigo' }).l);
   const h = `
   <div class="section-title">Allgemein</div>
   <div class="card pad0"><div class="list">
@@ -82,11 +82,13 @@ A['set-look'] = () => {
     title: 'Darstellung',
     fields: [
       { k: 'theme', label: 'Design', type: 'seg', opts: [{ v: 'auto', l: 'System', i: 'sparkles' }, { v: 'light', l: 'Hell', i: 'sun' }, { v: 'dark', l: 'Dunkel', i: 'moon' }] },
-      { k: 'accent', label: 'Akzentfarbe', type: 'color' },
+      { k: 'themeColor', label: 'Farbthema', type: 'themes', opts: [...THEMES, { v: '', l: 'Eigene Farbe', a: st.accent || '#4f46e5', b: shiftHue(st.accent || '#4f46e5', 32, 0.04) }] },
+      { k: 'accent', label: 'Eigene Farbe (bei „Eigene Farbe")', type: 'color' },
+      { k: 'bg', label: 'Hintergrund', type: 'seg', opts: [{ v: 'gradient', l: 'Farbverlauf', i: 'sparkles' }, { v: 'plain', l: 'Schlicht', i: 'square' }] },
       { k: 'fontScale', label: 'Schriftgröße', type: 'seg', opts: [{ v: '0.9', l: 'Klein' }, { v: '1', l: 'Normal' }, { v: '1.1', l: 'Groß' }, { v: '1.2', l: 'Sehr groß' }] },
       { k: 'startTab', label: 'Startseite', type: 'select', opts: [{ v: '/today', l: 'Heute' }, { v: '/timetable', l: 'Stundenplan' }, { v: '/classes', l: 'Klassen' }, { v: '/calendar', l: 'Kalender' }] },
     ],
-    values: { ...st, fontScale: String(st.fontScale || 1) },
+    values: { ...st, themeColor: st.themeColor ?? (st.accent && st.accent !== '#4f46e5' ? '' : 'indigo'), bg: st.bg || 'gradient', fontScale: String(st.fontScale || 1) },
     onSave: (v) => { Object.assign(st, v, { fontScale: Number(v.fontScale) || 1 }); save(); applyTheme(); App.refresh(); },
   });
 };

@@ -10,7 +10,7 @@ Eine Android-App, die den Schulalltag für Lehrerinnen und Lehrer organisiert. S
 
 🌐 **Website:** https://superali99-tech.github.io/Schul-Organisation-App/ – Downloads, ausführliche Anleitung, Datenschutzerklärung, Nutzungsrichtlinien und Lizenz (Quelle im Ordner `docs/`).
 
-**Neu in 1.6:** Vertretung gezielt zuweisen – nur die Vertretung bekommt die Meldung (oder auf Wunsch alle), Meldung mit einem Tipp versenden, Anleitungs-Video · **1.5:** Schulleitermodus mit Cockpit · Abwesenheit melden · Linux-Version · Zahl am App-Symbol der Web-App · bessere Darstellung auf iPhone/iPad.
+**Neu in 1.7:** Design 2.0 mit Farbthemen · Pausenaufsicht mit Erinnerung · Räume buchen · Umfragen · Statistik für die Schulleitung · **1.6:** Vertretung gezielt zuweisen – nur die Vertretung bekommt die Meldung (oder auf Wunsch alle), Meldung mit einem Tipp versenden, Anleitungs-Video · **1.5:** Schulleitermodus mit Cockpit · Abwesenheit melden · Linux-Version · Zahl am App-Symbol der Web-App · bessere Darstellung auf iPhone/iPad.
 
 **Neu in 1.3.2:** Mac-Version · Update-Suche mit Zeitlimit (kein endloses Suchen mehr).
 
@@ -72,6 +72,10 @@ Unter **Mehr → Schulleitermodus** meldet sich die Schulleitung mit eigenen Zug
 * das **Kollegium verwalten** (Mitglieder entfernen, Schulleitung übergeben).
 
 Verbindliche Einträge werden mit einem ECDSA-Schlüssel des Schulleitungs-Geräts **digital unterschrieben**; andere Geräte prüfen die Unterschrift beim Abgleich und lehnen Änderungen, Löschungen oder Fälschungen ab. Lehrkräfte melden **Abwesenheiten** (ihre betroffenen Stunden gehen automatisch an die Vertretungsplanung) und bestätigen Mitteilungen.
+
+## Aufsicht, Räume & Umfragen
+
+Unter *Kollegium* gibt es die Reiter **Aufsicht** (Pausenaufsichtsplan der Schulleitung; jede Lehrkraft sieht ihre Aufsichten auf der Startseite und wird 5 Minuten vorher erinnert; fehlt jemand, kann die Schulleitung die Aufsicht für diesen Tag vertreten lassen), **Räume** (buchbare Räume wie Computerraum oder Aula mit Wochenübersicht; freie Stunde antippen = buchen) und **Umfragen** (abstimmen mit Live-Ergebnis, optional anonym und mit Frist). Die Schulleitung findet im Cockpit außerdem eine **Statistik** zu Vertretungen, Abwesenheitstagen, Aufsichten und gelesenen Mitteilungen (CSV-Export). Aufsichtsplan und Räume sind – sobald eine Schulleitung eingetragen ist – digital unterschrieben und nur von ihr änderbar.
 
 ## Vertretung zuweisen
 

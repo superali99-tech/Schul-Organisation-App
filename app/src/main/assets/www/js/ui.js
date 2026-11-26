@@ -98,6 +98,7 @@ const App = {
       <div class="tb-title"><h1>${esc(v.title || '')}</h1>${v.sub ? `<div class="tb-sub">${esc(v.sub)}</div>` : ''}</div>
       <div class="tb-actions">${typeof Leader !== 'undefined' && Leader.active() && !String(App.path || '').startsWith('/leader') ? `<button class="tb-btn tb-lead" data-nav="/leader" aria-label="Schulleitungs-Cockpit" title="Schulleitungs-Cockpit">${icon('crown')}</button>` : ''}${(v.actions || []).map((a) => `<button class="tb-btn" ${attrs({ 'data-act': a.act, 'data-nav': a.nav, 'data-id': a.id, 'aria-label': a.label, title: a.label })}>${icon(a.icon)}</button>`).join('')}</div>`;
     main.className = 'view ' + (v.cls || '');
+    if (typeof navBadges === 'function') { try { navBadges(); } catch (e) { /* egal */ } }
     main.innerHTML = v.html || '';
     // FAB
     const fab = $('#fab');
@@ -329,6 +330,8 @@ const UI = {
         const list = f.colors || COLORS;
         return `<div class="field">${lab}<div class="swatches">${list.map((c) => `<label class="swatch" style="--sc:${c || 'var(--card)'}"><input type="radio" name="${f.k}" value="${c}" ${String(c) === String(v || (f.allowEmpty ? '' : list[0])) ? 'checked' : ''}><span>${c ? '' : icon('ban')}</span></label>`).join('')}</div></div>`;
       }
+      case 'themes':
+        return `<div class="field">${lab}<div class="themes">${(f.opts || []).map((o) => `<label class="theme-o"><input type="radio" name="${f.k}" value="${esc(o.v)}" ${String(o.v) === String(v ?? '') ? 'checked' : ''}><span style="--ta:${o.a};--tb:${o.b}">${icon('check')}</span><small>${esc(o.l)}</small></label>`).join('')}</div>${hint}</div>`;
       case 'chips':
       case 'seg': {
         return `<div class="field">${lab}<div class="${f.type === 'seg' ? 'seg seg-form' : 'chips chips-wrap'}">${(f.opts || []).map((o) => `<label class="${f.type === 'seg' ? 'seg-o' : 'chip'}"><input type="radio" name="${f.k}" value="${esc(o.v)}" ${String(o.v) === String(v ?? '') ? 'checked' : ''}><span>${o.i ? icon(o.i) : ''}${esc(o.l)}</span></label>`).join('')}</div>${hint}</div>`;
@@ -353,7 +356,7 @@ const UI = {
       if (!f || !f.k) continue;
       if (f.type === 'multi') { out[f.k] = $$(`input[name="${f.k}"]:checked`, form).map((x) => x.value); continue; }
       if (f.type === 'switch') { out[f.k] = !!$(`input[name="${f.k}"]`, form).checked; continue; }
-      if (f.type === 'color' || f.type === 'chips' || f.type === 'seg') { const c = $(`input[name="${f.k}"]:checked`, form); out[f.k] = c ? c.value : ''; continue; }
+      if (f.type === 'color' || f.type === 'chips' || f.type === 'seg' || f.type === 'themes') { const c = $(`input[name="${f.k}"]:checked`, form); out[f.k] = c ? c.value : ''; continue; }
       if (f.type === 'file') { out[f.k] = $(`input[name="${f.k}"]`, form).files[0] || null; continue; }
       const el = $(`[name="${f.k}"]`, form);
       if (!el) continue;
@@ -488,11 +491,13 @@ function applyTheme() {
   root.dataset.theme = dark ? 'dark' : 'light';
   root.style.background = dark ? '#0b0d13' : '#f3f4fa';
   try { localStorage.setItem('sp-theme', dark ? 'dark' : 'light'); } catch (e) { /* egal */ }
-  const acc = st.accent || '#4f46e5';
+  const th = THEMES.find((t) => t.v === st.themeColor);
+  const acc = th ? th.a : st.accent || '#4f46e5';
   root.style.setProperty('--accent', acc);
   root.style.setProperty('--accent-soft', rgba(acc, dark ? 0.24 : 0.12));
   root.style.setProperty('--accent-line', rgba(acc, dark ? 0.3 : 0.32));
-  root.style.setProperty('--accent2', shiftHue(acc, 32, 0.04));
+  root.style.setProperty('--accent2', th ? th.b : shiftHue(acc, 32, 0.04));
+  document.body.classList.toggle('plain-bg', st.bg === 'plain');
   root.style.fontSize = (16 * (st.fontScale || 1)) + 'px';
   const bar = dark ? '#0b0d13' : '#f3f4fa';
   Native.call('setBarColors', bar, bar, !dark);

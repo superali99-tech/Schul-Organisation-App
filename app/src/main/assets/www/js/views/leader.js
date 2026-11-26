@@ -107,6 +107,8 @@ const Leader = {
     t.leader = rec;
     const me = Team.me();
     if (me && me.role !== 'Schulleitung') { me.role = 'Schulleitung'; me.updatedAt = Date.now(); }
+    // Bestehenden Aufsichtsplan und Räume ab jetzt als Schulleitung unterschreiben
+    for (const k of ['duties', 'rooms']) for (const x of (t[k] || [])) { x.official = true; Team.touch(x); await Leader.signItem(x); }
     Team.changed();
   },
   async handover(toId) {
@@ -159,15 +161,17 @@ const Leader = {
     }
     const pub = leader && leader.pub;
     const ok = async (s, sig) => !!pub && Sig.verify(s, sig, pub);
-    const localOf = { events: S.events.filter((e) => e.team === t.id), posts: t.posts };
-    for (const key of ['events', 'posts']) {
+    const localOf = { events: S.events.filter((e) => e.team === t.id), posts: t.posts, duties: t.duties || [], rooms: t.rooms || [], polls: t.polls || [] };
+    for (const key of ['events', 'posts', 'duties', 'rooms', 'polls']) {
       if (!Array.isArray(d[key])) continue;
       const local = new Map(localOf[key].map((x) => [x.id, x]));
+      // Aufsichtsplan und Räume legt allein die Schulleitung fest, sobald es eine gibt
+      const strict = (key === 'duties' || key === 'rooms') && !!pub;
       const out = [];
       for (const it of d[key]) {
         if (!it || !it.id) continue;
         const cur = local.get(it.id);
-        if (!it.official && !(cur && cur.official)) { out.push(it); continue; }
+        if (!strict && !it.official && !(cur && cur.official)) { out.push(it); continue; }
         if (await ok(it, it.sig)) out.push(it);
       }
       d[key] = out;
@@ -175,7 +179,8 @@ const Leader = {
     if (d.school && (d.school.official || (t.school && t.school.official)) && !(await ok(d.school, d.school.sig))) delete d.school;
     // Löschungen offizieller Einträge nur mit Unterschrift der Schulleitung
     if (d.deleted) {
-      const officialIds = new Set([...localOf.events, ...localOf.posts].filter((x) => x.official).map((x) => x.id));
+      const officialIds = new Set([...localOf.events, ...localOf.posts, ...localOf.polls].filter((x) => x.official).map((x) => x.id));
+      if (pub) [...localOf.duties, ...localOf.rooms].forEach((x) => officialIds.add(x.id));
       const del = {};
       const sigs = {};
       for (const [id, ts] of Object.entries(d.deleted)) {
@@ -330,6 +335,10 @@ function leaderCockpit() {
     ${qa('lead-sub', 'replace', 'Vertretung planen', '#9333ea')}
     ${qa('lead-absence', 'thermometer', 'Abwesenheit eintragen', '#dc2626')}
     ${qa('lead-school', 'school', 'Schulvorgaben', '#ca8a04')}
+    ${qa(team ? '/team/duties' : 'team-create', 'eye', 'Aufsichtsplan', '#0d9488')}
+    ${qa(team ? 'poll-add' : 'team-create', 'chart-column', 'Umfrage starten', '#7c3aed')}
+    ${qa(team ? '/team/rooms' : 'team-create', 'door-open', 'Räume', '#0369a1')}
+    ${qa(team ? '/leader/stats' : 'team-create', 'gauge', 'Statistik', '#e11d48')}
     ${qa('/leader/year', 'calendar-range', 'Jahresplanung', '#2563eb')}
     ${qa(team ? '/leader/members' : 'team-create', 'users', 'Kollegium verwalten', '#0891b2')}
     ${team ? qa('team-invite', 'user-plus', 'Einladen', '#16a34a') : ''}
@@ -340,6 +349,10 @@ function leaderCockpit() {
     h += absent.length ? `<div class="card pad0"><div class="list">${absent.map(absenceItem).join('')}</div></div>` : `<div class="card"><p class="muted small" style="margin:0">${icon('circle-check')} Heute sind alle da – keine Abwesenheit gemeldet.</p></div>`;
     const later = sortBy((t.absences || []).filter((a) => a.from > d && !(t.removed || {})[a.member]), 'from').slice(0, 5);
     if (later.length) h += `<div class="section-title">${icon('calendar-clock')}Demnächst abwesend</div><div class="card pad0"><div class="list">${later.map(absenceItem).join('')}</div></div>`;
+    const uncovered = dutiesOn(d).filter((x) => absent.some((a) => a.member === x.member));
+    if (uncovered.length) h += `<div class="section-title">${icon('eye')}Aufsichten ohne Lehrkraft</div><div class="card pad0"><div class="list">${uncovered.map((x) => `<div class="li"><div class="li-ic" style="background:rgba(220,38,38,.12);color:#dc2626">${icon('eye')}</div><div class="li-main"><div class="li-t">${esc(x.slot || 'Aufsicht')} · ${esc(x.start)}–${esc(x.end)}</div><div class="li-s">${esc(x.place || '')} · ${esc(teamMemberName(x.member))} ist abwesend</div></div><div class="li-end"><button class="btn btn-sm btn-primary" data-act="duty-cover" data-id="${x.id}">Vertreten</button></div></div>`).join('')}</div></div>`;
+    const openPolls = (t.polls || []).filter((p) => pollOpen(p) && p.by === t.me);
+    if (openPolls.length) h += `<div class="section-title">${icon('chart-column')}Deine laufenden Umfragen</div><div class="card pad0"><div class="list">${openPolls.map(pollItem).join('')}</div></div>`;
     if (openSubs.length) h += `<div class="section-title">${icon('replace')}Offene Vertretungen</div><div class="card pad0"><div class="list">${sortBy(openSubs, 'date', (x) => Number(x.period)).slice(0, 8).map(subItem).join('')}</div></div>`;
     h += `<div class="section-title">${icon('megaphone')}Mitteilungen der Schulleitung</div>`;
     h += official.length ? `<div class="card pad0"><div class="list">${official.slice(0, 6).map((p) => {

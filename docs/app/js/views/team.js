@@ -112,11 +112,12 @@ const Team = {
   collect() {
     const t = S.team;
     return deepCopy({ members: t.members, events: S.events.filter((e) => e.team === t.id), posts: t.posts, subs: t.subs, classes: t.classes, school: t.school, deleted: t.deleted,
-      acks: t.acks || [], absences: t.absences || [], leader: t.leader || null, delSig: t.delSig || {}, removed: t.removed || {} });
+      acks: t.acks || [], absences: t.absences || [], leader: t.leader || null, delSig: t.delSig || {}, removed: t.removed || {},
+      duties: t.duties || [], rooms: t.rooms || [], bookings: t.bookings || [], polls: t.polls || [], votes: t.votes || [] });
   },
   merge(d) {
     const t = S.team;
-    const sum = { _subs: 0, subsForMe: 0, posts: 0, members: 0, events: 0, subs: 0, classes: 0, absences: 0, acks: 0, school: false, schoolApplied: false, leader: false, n: 0 };
+    const sum = { _subs: 0, _x: 0, polls: 0, dutiesChanged: false, subsForMe: 0, posts: 0, members: 0, events: 0, subs: 0, classes: 0, absences: 0, acks: 0, school: false, schoolApplied: false, leader: false, n: 0 };
     t.acks = t.acks || []; t.absences = t.absences || []; t.delSig = t.delSig || {}; t.removed = t.removed || {};
     // Bereits geprüft (Leader.verifyIncoming): Schulleitung, unterschriebene Löschungen und Entfernungen
     if (d.leader) { if (!t.leader || t.leader.member !== d.leader.member) sum.leader = true; t.leader = d.leader; }
@@ -136,6 +137,15 @@ const Team = {
     };
     t.members = mergeList(t.members, d.members, 'members').filter((m) => m.id === t.me || !t.removed[m.id]);
     t.acks = mergeList(t.acks, d.acks, 'acks');
+    ['duties', 'rooms', 'bookings', 'polls', 'votes'].forEach((k) => { if (!Array.isArray(t[k])) t[k] = []; });
+    const myDutyKey = () => JSON.stringify(t.duties.filter((x) => x.member === t.me).map((x) => [x.id, x.day, x.date, x.start, x.end, x.place]));
+    const dutiesBefore = myDutyKey();
+    t.duties = mergeList(t.duties, d.duties, '_x');
+    sum.dutiesChanged = dutiesBefore !== myDutyKey();
+    t.rooms = mergeList(t.rooms, d.rooms, '_x');
+    t.bookings = mergeList(t.bookings, d.bookings, '_x');
+    t.polls = mergeList(t.polls, d.polls, 'polls');
+    t.votes = mergeList(t.votes, d.votes, '_x');
     t.absences = mergeList(t.absences, d.absences, 'absences');
     t.posts = mergeList(t.posts, d.posts, 'posts');
     const subIds = new Set(t.subs.map((x) => x.id));
@@ -154,12 +164,12 @@ const Team = {
         if (d.school.official) { Team.applySchool(d.school); sum.schoolApplied = true; }
       }
     }
-    sum.n = sum.posts + sum.members + sum.events + sum.subs + sum.classes + sum.absences;
+    sum.n = sum.posts + sum.members + sum.events + sum.subs + sum.classes + sum.absences + sum.polls + (sum.dutiesChanged ? 1 : 0);
     return sum;
   },
   async mergeVerified(d) { return Team.merge(await Leader.verifyIncoming(d)); },
   newTeam(name, key, id) {
-    return { id: id || uid(), name, key, me: uid(), created: new Date().toISOString(), members: [], posts: [], subs: [], classes: [], school: null, deleted: {}, lastSync: null, seenPosts: Date.now(), autoSync: true, acks: [], absences: [], leader: null, delSig: {}, removed: {} };
+    return { id: id || uid(), name, key, me: uid(), created: new Date().toISOString(), members: [], posts: [], subs: [], classes: [], school: null, deleted: {}, lastSync: null, seenPosts: Date.now(), autoSync: true, acks: [], absences: [], leader: null, delSig: {}, removed: {}, duties: [], rooms: [], bookings: [], polls: [], votes: [] };
   },
   memberFromForm(v, id) {
     return { id, title: v.title || '', name: v.name || '', short: (v.short || '').toUpperCase(), role: v.role || 'Lehrkraft', subjects: v.subjects || '', classes: v.classes || '', email: v.email || '', phone: v.phone || '', updatedAt: Date.now(), by: id };
@@ -490,6 +500,8 @@ const Team = {
     else if (sum.subs) p.push(plural(sum.subs, 'Vertretung', 'Vertretungen'));
     if (sum.classes) p.push(plural(sum.classes, 'Klassenliste', 'Klassenlisten'));
     if (sum.absences) p.push(plural(sum.absences, 'Abwesenheit', 'Abwesenheiten'));
+    if (sum.polls) p.push(plural(sum.polls, 'neue Umfrage', 'neue Umfragen'));
+    if (sum.dutiesChanged) p.push('deine Aufsichten wurden geändert');
     if (sum.leader) p.push('Schulleitung eingetragen');
     if (sum.schoolApplied) p.push('Schulvorgaben der Schulleitung übernommen');
     else if (sum.school) p.push('neue Schulvorgaben');
@@ -591,6 +603,9 @@ const TEAM_TABS = [
   { v: 'dates', l: 'Termine', i: 'calendar' },
   { v: 'subs', l: 'Vertretungen', i: 'replace' },
   { v: 'absent', l: 'Abwesend', i: 'thermometer' },
+  { v: 'polls', l: 'Umfragen', i: 'chart-column' },
+  { v: 'duties', l: 'Aufsicht', i: 'eye' },
+  { v: 'rooms', l: 'Räume', i: 'door-open' },
   { v: 'lists', l: 'Klassenlisten', i: 'clipboard-list' },
 ];
 
@@ -650,6 +665,9 @@ App.def('/team/:tab?', (p) => {
   if (tab === 'dates') { h += teamDates(); fab = { act: 'team-event-add', label: 'Termin' }; }
   if (tab === 'subs') { h += teamSubs(); fab = { act: 'sub-add', label: 'Vertretung' }; }
   if (tab === 'absent') { h += teamAbsent(); fab = { act: 'absence-add', icon: 'thermometer', label: 'Abwesenheit melden' }; }
+  if (tab === 'polls') { h += teamPolls(); fab = { act: 'poll-add', label: 'Umfrage' }; }
+  if (tab === 'duties') { h += teamDuties(); fab = canPlanSchool() ? { act: 'duty-add', label: 'Aufsicht' } : null; }
+  if (tab === 'rooms') { h += teamRooms(); fab = canPlanSchool() ? { act: 'room-add', label: 'Raum' } : null; }
   if (tab === 'lists') { h += teamLists(); fab = { act: 'list-share', icon: 'share-2', label: 'Klasse teilen' }; }
   if (p.tab === 'sync') setTimeout(() => teamSyncSheet(), 50);
   return {

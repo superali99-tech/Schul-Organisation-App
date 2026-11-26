@@ -1,43 +1,43 @@
 {
-  "versionCode": 13,
-  "versionName": "1.6.0",
+  "versionCode": 14,
+  "versionName": "1.7.0",
   "date": "2026-11-26",
   "apk": "https://raw.githubusercontent.com/superali99-tech/Schul-Organisation-App/HEAD/release/Schulplan.apk",
   "notes": [
-    "Vertretung gezielt zuweisen: Nur die Vertretung bekommt die Meldung „Du vertrittst …\" – oder auf Wunsch das ganze Kollegium",
-    "Meldung mit einem Tipp versenden – die Stunde landet direkt im Stundenplan",
-    "Kurzes Anleitungs-Video unter Kollegium → Vertretungen → „So geht's\""
+    "Design 2.0: acht Farbthemen, Tagesring auf der Startseite, schnellere Übergänge",
+    "Neu: Pausenaufsicht mit Erinnerung, Räume buchen, Umfragen im Kollegium",
+    "Schulleitung: Aufsicht vertreten, Statistik zu Vertretungen und Abwesenheiten"
   ],
   "desktop": {
-    "version": "1.6.0",
+    "version": "1.7.0",
     "date": "2026-11-26",
     "url": "https://raw.githubusercontent.com/superali99-tech/Schul-Organisation-App/HEAD/release/Schulplan-Setup.exe",
     "notes": [
-      "Vertretung gezielt zuweisen: Nur die Vertretung bekommt die Meldung „Du vertrittst …\" – oder auf Wunsch das ganze Kollegium",
-      "Meldung mit einem Tipp versenden – die Stunde landet direkt im Stundenplan",
-      "Kurzes Anleitungs-Video unter Kollegium → Vertretungen → „So geht's\""
+      "Design 2.0: acht Farbthemen, Tagesring auf der Startseite, schnellere Übergänge",
+      "Neu: Pausenaufsicht mit Erinnerung, Räume buchen, Umfragen im Kollegium",
+      "Schulleitung: Aufsicht vertreten, Statistik zu Vertretungen und Abwesenheiten"
     ]
   },
   "mac": {
-    "version": "1.6.0",
+    "version": "1.7.0",
     "date": "2026-11-26",
     "arm64": "https://raw.githubusercontent.com/superali99-tech/Schul-Organisation-App/HEAD/release/Schulplan-Mac-AppleSilicon.zip",
     "x64": "https://raw.githubusercontent.com/superali99-tech/Schul-Organisation-App/HEAD/release/Schulplan-Mac-Intel.zip",
     "notes": [
-      "Vertretung gezielt zuweisen: Nur die Vertretung bekommt die Meldung „Du vertrittst …\" – oder auf Wunsch das ganze Kollegium",
-      "Meldung mit einem Tipp versenden – die Stunde landet direkt im Stundenplan",
-      "Kurzes Anleitungs-Video unter Kollegium → Vertretungen → „So geht's\""
+      "Design 2.0: acht Farbthemen, Tagesring auf der Startseite, schnellere Übergänge",
+      "Neu: Pausenaufsicht mit Erinnerung, Räume buchen, Umfragen im Kollegium",
+      "Schulleitung: Aufsicht vertreten, Statistik zu Vertretungen und Abwesenheiten"
     ]
   },
   "linux": {
-    "version": "1.6.0",
+    "version": "1.7.0",
     "date": "2026-11-26",
     "appimage": "https://raw.githubusercontent.com/superali99-tech/Schul-Organisation-App/HEAD/release/Schulplan-Linux.AppImage",
     "deb": "https://raw.githubusercontent.com/superali99-tech/Schul-Organisation-App/HEAD/release/Schulplan-Linux.deb",
     "notes": [
-      "Vertretung gezielt zuweisen: Nur die Vertretung bekommt die Meldung „Du vertrittst …\" – oder auf Wunsch das ganze Kollegium",
-      "Meldung mit einem Tipp versenden – die Stunde landet direkt im Stundenplan",
-      "Kurzes Anleitungs-Video unter Kollegium → Vertretungen → „So geht's\""
+      "Design 2.0: acht Farbthemen, Tagesring auf der Startseite, schnellere Übergänge",
+      "Neu: Pausenaufsicht mit Erinnerung, Räume buchen, Umfragen im Kollegium",
+      "Schulleitung: Aufsicht vertreten, Statistik zu Vertretungen und Abwesenheiten"
     ]
   }
 }
