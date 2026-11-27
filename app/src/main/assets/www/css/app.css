@@ -1525,3 +1525,15 @@ body { background:
 .sheet .chip { background: var(--card2); border-color: transparent; }
 .chip.on span, .chip:has(input:checked) span, .chip input:checked + span { color: #fff; }
 .chips-wrap { gap: 8px; }
+
+/* =====================================================================
+   Version 2.3: Wischen, Aufträge
+   ===================================================================== */
+.list.swipe-clip { overflow: hidden; }
+.li.swiping { position: relative; z-index: 1; background: var(--card); touch-action: pan-y; }
+.li.swiping::before, .li.swiping::after { position: absolute; top: 0; bottom: 0; width: 150px; display: flex; align-items: center; font-weight: 750; font-size: .86rem; color: #fff; padding: 0 18px; transition: filter .15s; }
+.li.swiping::before { content: "✓  Erledigt"; right: 100%; justify-content: flex-end; background: linear-gradient(90deg, #16a34a, #22c55e); filter: saturate(.4) brightness(1.1); }
+.li.swiping::after { content: "Neuer Termin"; left: 100%; justify-content: flex-start; background: linear-gradient(90deg, #f59e0b, #f97316); filter: saturate(.4) brightness(1.1); }
+.li.swiping.sw-r::before, .li.swiping.sw-l::after { filter: none; }
+.li.swiping .chev { opacity: 0; }
+@media (prefers-reduced-motion: reduce) { .li.swiping { transition: none !important; } }

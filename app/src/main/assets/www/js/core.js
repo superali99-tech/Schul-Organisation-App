@@ -307,7 +307,7 @@ const Store = {
     if (oldVersion < 3) { d.settings.remind.on = true; d.settings.remind.lessons = true; }
     if (d.team) {
       const t = d.team;
-      ['acks', 'absences', 'posts', 'subs', 'classes', 'members', 'duties', 'rooms', 'bookings', 'polls', 'votes', 'chats', 'msgs', 'reacts', 'stories'].forEach((k) => { if (!Array.isArray(t[k])) t[k] = []; });
+      ['acks', 'absences', 'posts', 'subs', 'classes', 'members', 'duties', 'rooms', 'bookings', 'polls', 'votes', 'jobs', 'jobDone', 'chats', 'msgs', 'reacts', 'stories'].forEach((k) => { if (!Array.isArray(t[k])) t[k] = []; });
       ['delSig', 'removed', 'deleted'].forEach((k) => { if (!t[k] || typeof t[k] !== 'object') t[k] = {}; });
     }
     d.version = DATA_VERSION;

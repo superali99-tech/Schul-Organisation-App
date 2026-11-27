@@ -1,43 +1,43 @@
 {
-  "versionCode": 19,
-  "versionName": "2.2.0",
+  "versionCode": 20,
+  "versionName": "2.3.0",
   "date": "2026-11-27",
   "apk": "https://raw.githubusercontent.com/superali99-tech/Schul-Organisation-App/HEAD/release/Schulplan.apk",
   "notes": [
-    "„Nicht geschafft“ mit neuem Termin: Datum und Uhrzeit selbst wählen oder per Schnellwahl",
-    "Beim Verschieben Erinnerung einschalten und eine Notiz dazuschreiben",
-    "Behoben: „Erinnern“ bei einer Aufgabe wirkt jetzt immer"
+    "Neu für die Schulleitung: Aufträge mit Frist an das Kollegium – mit Übersicht, wer erledigt hat, und Erinnern-Knopf",
+    "Wischen in Listen: rechts = erledigt, links = neuer Termin; Hausaufgaben als Text teilen",
+    "Am Computer: Schnellsuche mit Strg+K / Cmd+K"
   ],
   "desktop": {
-    "version": "2.2.0",
+    "version": "2.3.0",
     "date": "2026-11-27",
     "url": "https://raw.githubusercontent.com/superali99-tech/Schul-Organisation-App/HEAD/release/Schulplan-Setup.exe",
     "notes": [
-      "„Nicht geschafft“ mit neuem Termin: Datum und Uhrzeit selbst wählen oder per Schnellwahl",
-      "Beim Verschieben Erinnerung einschalten und eine Notiz dazuschreiben",
-      "Behoben: „Erinnern“ bei einer Aufgabe wirkt jetzt immer"
+      "Neu für die Schulleitung: Aufträge mit Frist an das Kollegium – mit Übersicht, wer erledigt hat, und Erinnern-Knopf",
+      "Wischen in Listen: rechts = erledigt, links = neuer Termin; Hausaufgaben als Text teilen",
+      "Am Computer: Schnellsuche mit Strg+K / Cmd+K"
     ]
   },
   "mac": {
-    "version": "2.2.0",
+    "version": "2.3.0",
     "date": "2026-11-27",
     "arm64": "https://raw.githubusercontent.com/superali99-tech/Schul-Organisation-App/HEAD/release/Schulplan-Mac-AppleSilicon.zip",
     "x64": "https://raw.githubusercontent.com/superali99-tech/Schul-Organisation-App/HEAD/release/Schulplan-Mac-Intel.zip",
     "notes": [
-      "„Nicht geschafft“ mit neuem Termin: Datum und Uhrzeit selbst wählen oder per Schnellwahl",
-      "Beim Verschieben Erinnerung einschalten und eine Notiz dazuschreiben",
-      "Behoben: „Erinnern“ bei einer Aufgabe wirkt jetzt immer"
+      "Neu für die Schulleitung: Aufträge mit Frist an das Kollegium – mit Übersicht, wer erledigt hat, und Erinnern-Knopf",
+      "Wischen in Listen: rechts = erledigt, links = neuer Termin; Hausaufgaben als Text teilen",
+      "Am Computer: Schnellsuche mit Strg+K / Cmd+K"
     ]
   },
   "linux": {
-    "version": "2.2.0",
+    "version": "2.3.0",
     "date": "2026-11-27",
     "appimage": "https://raw.githubusercontent.com/superali99-tech/Schul-Organisation-App/HEAD/release/Schulplan-Linux.AppImage",
     "deb": "https://raw.githubusercontent.com/superali99-tech/Schul-Organisation-App/HEAD/release/Schulplan-Linux.deb",
     "notes": [
-      "„Nicht geschafft“ mit neuem Termin: Datum und Uhrzeit selbst wählen oder per Schnellwahl",
-      "Beim Verschieben Erinnerung einschalten und eine Notiz dazuschreiben",
-      "Behoben: „Erinnern“ bei einer Aufgabe wirkt jetzt immer"
+      "Neu für die Schulleitung: Aufträge mit Frist an das Kollegium – mit Übersicht, wer erledigt hat, und Erinnern-Knopf",
+      "Wischen in Listen: rechts = erledigt, links = neuer Termin; Hausaufgaben als Text teilen",
+      "Am Computer: Schnellsuche mit Strg+K / Cmd+K"
     ]
   }
 }

@@ -39,7 +39,7 @@ App.def('/homework', () => {
   } else {
     h += `<div class="card pad0"><div class="list">${sortBy(list, 'due').reverse().slice(0, 100).map(hwItem).join('')}</div></div>`;
   }
-  return { title: 'Hausaufgaben', tab: 'more', html: h, fab: { act: 'hw-add' } };
+  return { title: 'Hausaufgaben', tab: 'more', html: h, fab: { act: 'hw-add' }, actions: [{ icon: 'share-2', act: 'hw-share', label: 'Hausaufgaben teilen' }] };
 });
 A['hw-mode'] = (el) => { App.hwMode = el.dataset.v; App.refresh(); };
 A['hw-class'] = (el) => { App.hwClass = el.dataset.v; App.refresh(); };
@@ -52,11 +52,35 @@ A['hw-toggle'] = (el) => {
   checkFlow(el, {
     title: h.title,
     laterSub: 'Neues Datum und Uhrzeit wählen',
-    done: () => { h.done = true; save(); App.refresh(); UI.toast('Erledigt ✓', { undo: () => { h.done = false; save(); App.refresh(); } }); },
+    done: () => hwDone(h),
     postpone: () => postponeHomework(h),
     edit: () => editHomework(h),
     remove: () => deleteWithUndo('homework', h.id, h.title, { confirm: false }),
   });
+};
+
+function hwDone(h) {
+  h.done = true; save(); App.refresh();
+  UI.toast('Erledigt ✓', { undo: () => { h.done = false; save(); App.refresh(); } });
+}
+// Offene Hausaufgaben einer Klasse (oder aller) als Text teilen – z. B. für Eltern oder Klassen-Chat
+function hwShareText(classId) {
+  const list = sortBy(S.homework.filter((h) => !h.done && h.due && h.due >= today() && (!classId || h.classId === classId)), 'due', (h) => cName(h.classId));
+  if (!list.length) return '';
+  const head = classId ? `Hausaufgaben ${cName(classId)}` : 'Hausaufgaben';
+  return `${head} (Stand ${fmtDS(today())})\n\n` + list.map((h) => `• ${fmtDW(h.due)}${classId ? '' : ' · ' + cName(h.classId)}${h.subjectId ? ' · ' + subName(h.subjectId) : ''}: ${h.title}${h.desc ? ' (' + h.desc.split('\n')[0] + ')' : ''}`).join('\n');
+}
+A['hw-share'] = async (el) => {
+  let cid = el && el.dataset && el.dataset.id;
+  if (!cid) {
+    const ids = [...new Set(S.homework.filter((h) => !h.done && h.due >= today()).map((h) => h.classId))];
+    if (!ids.length) { UI.toast('Keine offenen Hausaufgaben'); return; }
+    cid = ids.length === 1 ? ids[0] : await UI.menu('Hausaufgaben teilen', [{ v: '', l: 'Alle Klassen', i: 'layers' }, ...ids.map((id) => ({ v: id, l: cName(id), i: 'users', c: classColor(cls(id)) }))]);
+    if (cid === null) return;
+  }
+  const text = hwShareText(cid);
+  if (!text) { UI.toast('Keine offenen Hausaufgaben'); return; }
+  Files.share('Hausaufgaben', text);
 };
 
 function postponeHomework(h) {
@@ -85,6 +109,7 @@ function classHomeworkTab(c) {
   const done = sortBy(S.homework.filter((h) => h.classId === c.id && h.done), 'due').reverse();
   if (!open.length && !done.length) return UI.empty('book-open', 'Noch keine Hausaufgaben für diese Klasse.', `<button class="btn btn-primary" data-act="hw-add" data-id="${c.id}">${icon('plus')}Hausaufgabe</button>`);
   let h = '';
+  if (open.some((x) => x.due && x.due >= today())) h += `<div class="btn-row" style="margin-bottom:6px"><button class="btn btn-soft btn-sm" data-act="hw-share" data-id="${c.id}">${icon('share-2')}Für Eltern/Schüler teilen</button></div>`;
   if (open.length) h += `<div class="section-title">Offen</div><div class="card pad0"><div class="list">${open.map(hwItem).join('')}</div></div>`;
   if (done.length) h += `<div class="section-title">Erledigt</div><div class="card pad0"><div class="list">${done.slice(0, 30).map(hwItem).join('')}</div></div>`;
   return h;

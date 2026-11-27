@@ -399,6 +399,67 @@ async function checkFlow(el, { title, later, laterSub, done, postpone, edit, rem
   if (btn && btn.classList) btn.classList.remove('on');
 }
 
+// Wischen in Listen: nach rechts = erledigt, nach links = nicht geschafft (neuer Termin)
+(function swipeLists() {
+  let st = null;
+  const reset = (li) => {
+    li.style.transition = 'transform .28s cubic-bezier(.2, .8, .2, 1)'; li.style.transform = '';
+    setTimeout(() => { li.style.transition = ''; li.classList.remove('swiping', 'sw-r', 'sw-l'); const l = li.closest('.list'); if (l) l.classList.remove('swipe-clip'); }, 300);
+  };
+  document.addEventListener('touchstart', (e) => {
+    st = null;
+    if (e.touches.length !== 1) return;
+    const li = e.target.closest && e.target.closest('.li');
+    if (!li) return;
+    const chk = li.querySelector('.check[data-act="task-toggle"]:not(.on), .check[data-act="hw-toggle"]:not(.on)');
+    if (!chk) return;
+    st = { li, chk, x: e.touches[0].clientX, y: e.touches[0].clientY, dx: 0, lock: null, buzz: false };
+  }, { passive: true });
+  document.addEventListener('touchmove', (e) => {
+    if (!st) return;
+    const t = e.touches[0];
+    const dx = t.clientX - st.x, dy = t.clientY - st.y;
+    if (!st.lock) {
+      if (Math.abs(dx) < 10 && Math.abs(dy) < 10) return;
+      st.lock = Math.abs(dx) > Math.abs(dy) * 1.4 ? 'x' : 'y';
+      if (st.lock === 'y') { st = null; return; }
+      st.li.classList.add('swiping');
+      const l = st.li.closest('.list'); if (l) l.classList.add('swipe-clip');
+    }
+    e.preventDefault();
+    st.dx = Math.max(-150, Math.min(150, dx));
+    st.li.style.transform = `translateX(${st.dx}px)`;
+    const r = st.dx > 80, l = st.dx < -80;
+    if ((r || l) && !st.buzz) { st.buzz = true; Native.call('vibrate', 10); } else if (!r && !l) st.buzz = false;
+    st.li.classList.toggle('sw-r', r); st.li.classList.toggle('sw-l', l);
+  }, { passive: false });
+  const end = () => {
+    if (!st) return;
+    const { li, chk, dx, lock } = st; st = null;
+    if (lock !== 'x') return;
+    reset(li);
+    const id = chk.dataset.id, task = chk.dataset.act === 'task-toggle';
+    const item = task ? byId('tasks', id) : byId('homework', id);
+    if (!item) return;
+    if (dx > 80) setTimeout(() => (task ? taskDone(item) : hwDone(item)), 120);
+    else if (dx < -80) setTimeout(() => (task ? postponeTask(item) : postponeHomework(item)), 120);
+  };
+  document.addEventListener('touchend', end, { passive: true });
+  document.addEventListener('touchcancel', () => { if (st) { const li = st.li; st = null; reset(li); } }, { passive: true });
+})();
+
+// Schnellsuche am Computer: Strg+K / Cmd+K (oder „/“ außerhalb von Eingabefeldern)
+document.addEventListener('keydown', (e) => {
+  const inField = e.target && e.target.matches && e.target.matches('input, textarea, select, [contenteditable]');
+  if (((e.ctrlKey || e.metaKey) && (e.key === 'k' || e.key === 'K')) || (e.key === '/' && !inField && !e.ctrlKey && !e.metaKey && !e.altKey)) {
+    if (typeof Lock !== 'undefined' && Lock.active) return;
+    e.preventDefault();
+    UI.closeAll();
+    App.navigate('/search');
+    setTimeout(() => { const i = document.querySelector('.view input[type="search"], .view .search input'); if (i) i.focus(); }, 80);
+  }
+});
+
 // „Nicht geschafft“: neues Datum, Uhrzeit, Erinnerung und Notiz wählen
 function postponeForm({ item, quick, withRemind, apply }) {
   UI.form({

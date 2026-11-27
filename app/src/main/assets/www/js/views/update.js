@@ -5,6 +5,13 @@ const UPDATE_URLS = ['https://raw.githubusercontent.com/superali99-tech/Schul-Or
 
 /** Neuerungen je Version (neueste zuerst) */
 const CHANGELOG = [
+  { v: '2.3.0', items: [
+    'Neu für die Schulleitung: Aufträge erteilen – mit Frist an das ganze Kollegium oder bestimmte Personen, mit Übersicht „3 von 12 erledigt“ und Erinnern-Knopf',
+    'Lehrkräfte sehen Aufträge auf der Startseite, werden benachrichtigt und erinnert (Vortag und Frist) und melden mit einem Tipp „erledigt“ – auf Wunsch mit kurzer Rückmeldung',
+    'Wischen in Aufgaben- und Hausaufgaben-Listen: nach rechts = erledigt, nach links = neuer Termin',
+    'Hausaufgaben teilen: offene Hausaufgaben einer Klasse als Text für Eltern oder Klassen-Chat',
+    'Am Computer: Schnellsuche mit Strg+K (Mac: Cmd+K) oder „/“',
+  ] },
   { v: '2.2.0', items: [
     '„Nicht geschafft" mit neuem Termin: Datum und Uhrzeit selbst wählen – oder per Schnellwahl (Heute Abend, Morgen, Montag, nächste oder übernächste Stunde, in einer Woche)',
     'Beim Verschieben einer Aufgabe Erinnerung einschalten und eine Notiz dazuschreiben (z. B. „Kopierer war kaputt")',

@@ -114,6 +114,7 @@ const Team = {
     return deepCopy({ members: t.members, events: S.events.filter((e) => e.team === t.id), posts: t.posts, subs: t.subs, classes: t.classes, school: t.school, deleted: t.deleted,
       acks: t.acks || [], absences: t.absences || [], leader: t.leader || null, delSig: t.delSig || {}, removed: t.removed || {},
       duties: t.duties || [], rooms: t.rooms || [], bookings: t.bookings || [], polls: t.polls || [], votes: t.votes || [],
+      jobs: t.jobs || [], jobDone: t.jobDone || [],
       chats: t.chats || [], msgs: t.msgs || [], reacts: t.reacts || [], stories: t.stories || [] });
   },
   merge(d) {
@@ -147,6 +148,11 @@ const Team = {
     t.bookings = mergeList(t.bookings, d.bookings, '_x');
     t.polls = mergeList(t.polls, d.polls, 'polls');
     t.votes = mergeList(t.votes, d.votes, '_x');
+    ['jobs', 'jobDone'].forEach((k) => { if (!Array.isArray(t[k])) t[k] = []; });
+    const jobsBefore = Object.fromEntries(t.jobs.map((j) => [j.id, j.remindAt || '-']));
+    t.jobs = mergeList(t.jobs, d.jobs, '_x');
+    t.jobDone = mergeList(t.jobDone, d.jobDone, '_x');
+    sum.jobs = typeof jobsNotify === 'function' ? jobsNotify(jobsBefore) : 0;
     // Chat: Nachrichten, Reaktionen, Storys (abgelaufene werden aufgeräumt)
     ['chats', 'msgs', 'reacts', 'stories'].forEach((k) => { if (!Array.isArray(t[k])) t[k] = []; });
     const msgIds = new Set(t.msgs.map((m) => m.id));
@@ -177,12 +183,12 @@ const Team = {
         if (d.school.official) { Team.applySchool(d.school); sum.schoolApplied = true; }
       }
     }
-    sum.n = sum.posts + sum.members + sum.events + sum.subs + sum.classes + sum.absences + sum.polls + (sum.dutiesChanged ? 1 : 0) + (sum.chatNew || 0);
+    sum.n = sum.posts + sum.members + sum.events + sum.subs + sum.classes + sum.absences + sum.polls + (sum.jobs || 0) + (sum.dutiesChanged ? 1 : 0) + (sum.chatNew || 0);
     return sum;
   },
   async mergeVerified(d) { return Team.merge(await Leader.verifyIncoming(d)); },
   newTeam(name, key, id) {
-    return { id: id || uid(), name, key, me: uid(), created: new Date().toISOString(), members: [], posts: [], subs: [], classes: [], school: null, deleted: {}, lastSync: null, seenPosts: Date.now(), autoSync: true, acks: [], absences: [], leader: null, delSig: {}, removed: {}, duties: [], rooms: [], bookings: [], polls: [], votes: [], chats: [], msgs: [], reacts: [], stories: [] };
+    return { id: id || uid(), name, key, me: uid(), created: new Date().toISOString(), members: [], posts: [], subs: [], classes: [], school: null, deleted: {}, lastSync: null, seenPosts: Date.now(), autoSync: true, acks: [], absences: [], leader: null, delSig: {}, removed: {}, duties: [], rooms: [], bookings: [], polls: [], votes: [], jobs: [], jobDone: [], chats: [], msgs: [], reacts: [], stories: [] };
   },
   memberFromForm(v, id) {
     return { id, title: v.title || '', name: v.name || '', short: (v.short || '').toUpperCase(), role: v.role || 'Lehrkraft', subjects: v.subjects || '', classes: v.classes || '', email: v.email || '', phone: v.phone || '', updatedAt: Date.now(), by: id };
@@ -515,6 +521,7 @@ const Team = {
     if (sum.classes) p.push(plural(sum.classes, 'Klassenliste', 'Klassenlisten'));
     if (sum.absences) p.push(plural(sum.absences, 'Abwesenheit', 'Abwesenheiten'));
     if (sum.polls) p.push(plural(sum.polls, 'neue Umfrage', 'neue Umfragen'));
+    if (sum.jobs) p.push(plural(sum.jobs, 'neuer Auftrag', 'neue Aufträge'));
     if (sum.chatNew) p.push(plural(sum.chatNew, 'neue Chat-Nachricht', 'neue Chat-Nachrichten'));
     if (sum.dutiesChanged) p.push('deine Aufsichten wurden geändert');
     if (sum.leader) p.push('Schulleitung eingetragen');
@@ -618,6 +625,7 @@ const TEAM_TABS = [
   { v: 'dates', l: 'Termine', i: 'calendar' },
   { v: 'subs', l: 'Vertretungen', i: 'replace' },
   { v: 'absent', l: 'Abwesend', i: 'thermometer' },
+  { v: 'jobs', l: 'Aufträge', i: 'clipboard-check' },
   { v: 'polls', l: 'Umfragen', i: 'chart-column' },
   { v: 'duties', l: 'Aufsicht', i: 'eye' },
   { v: 'rooms', l: 'Räume', i: 'door-open' },
@@ -681,6 +689,7 @@ App.def('/team/:tab?', (p) => {
   if (tab === 'subs') { h += teamSubs(); fab = { act: 'sub-add', label: 'Vertretung' }; }
   if (tab === 'absent') { h += teamAbsent(); fab = { act: 'absence-add', icon: 'thermometer', label: 'Abwesenheit melden' }; }
   if (tab === 'polls') { h += teamPolls(); fab = { act: 'poll-add', label: 'Umfrage' }; }
+  if (tab === 'jobs') { h += teamJobs(); fab = canPlanSchool() ? { act: 'job-add', label: 'Auftrag' } : null; }
   if (tab === 'duties') { h += teamDuties(); fab = canPlanSchool() ? { act: 'duty-add', label: 'Aufsicht' } : null; }
   if (tab === 'rooms') { h += teamRooms(); fab = canPlanSchool() ? { act: 'room-add', label: 'Raum' } : null; }
   if (tab === 'lists') { h += teamLists(); fab = { act: 'list-share', icon: 'share-2', label: 'Klasse teilen' }; }

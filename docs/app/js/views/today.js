@@ -130,6 +130,10 @@ App.def('/today', () => {
         ${mb.map((b) => `<div class="li" data-nav="/room/${b.room}"><div class="li-ic">${icon('door-open')}</div><div class="li-main"><div class="li-t">${esc(roomName(b.room))} gebucht</div><div class="li-s">${Number(b.period) + 1}. Stunde${b.note ? ' · ' + esc(b.note) : ''}</div></div></div>`).join('')}
       </div></div>`);
     }
+    openJobsForMe().slice(0, 3).forEach((j) => {
+      const late = j.due && j.due < d;
+      out.push(`<div class="banner ${j.official ? 'lead-banner' : 'sub-banner'}" data-act="job-open" data-id="${j.id}">${icon('clipboard-check')}<div><b>${j.official ? 'Auftrag der Schulleitung' : 'Auftrag'}: ${esc(j.title)}</b><br><span class="text2">${esc(jobDueLabel(j))} · von ${esc(teamMemberName(j.by, true))}</span><div class="mt"><span class="badge ${late ? 'red' : 'acc'}">${late ? 'Überfällig – ' : ''}Tippen zum Erledigen</span></div></div></div>`);
+    });
     openPollsForMe().slice(0, 2).forEach((p) => {
       out.push(`<div class="banner ${p.official ? 'lead-banner' : 'sub-banner'}" data-act="poll-open" data-id="${p.id}">${icon('chart-column')}<div><b>${p.official ? 'Umfrage der Schulleitung' : 'Umfrage'}: ${esc(p.question)}</b><br><span class="text2">von ${esc(teamMemberName(p.by, true))}${p.deadline ? ' · bis ' + fmtDW(p.deadline) : ''}</span><div class="mt"><span class="badge acc">Jetzt abstimmen</span></div></div></div>`);
     });

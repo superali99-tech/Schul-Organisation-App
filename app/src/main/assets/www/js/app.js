@@ -83,6 +83,12 @@ function buildReminders() {
     if (t.done || !t.due || !(r.tasks || t.remind)) return;
     add('tk' + t.id, dateTimeMs(t.due, t.time || r.taskTime || '07:30'), t.prio === 2 ? 'Dringende Aufgabe fällig' : 'Aufgabe fällig', t.title + (t.cat ? ' · ' + t.cat : ''), '/tasks');
   });
+  // Aufträge der Schulleitung: am Vortag 17 Uhr und zur Frist
+  if (typeof openJobsForMe === 'function') openJobsForMe().forEach((j) => {
+    if (!j.due) return;
+    add('jb' + j.id, dateTimeMs(addDays(j.due, -1), '17:00'), 'Morgen fällig: Auftrag', j.title, '/team/jobs');
+    add('jbd' + j.id, dateTimeMs(j.due, j.time || '07:30'), 'Auftrag heute fällig', j.title + (j.time ? ' · bis ' + j.time + ' Uhr' : ''), '/team/jobs');
+  });
   // Hausaufgaben (Kontrolle)
   if (r.homework) S.homework.forEach((h) => {
     if (h.done || !h.due) return;
@@ -235,6 +241,7 @@ function navBadges() {
     news = t.posts.some((x) => x.by !== t.me && (x.updatedAt || 0) > (t.seenPosts || 0))
       || (typeof SubNotice !== 'undefined' && SubNotice.pending().length > 0)
       || (typeof openPollsForMe === 'function' && openPollsForMe().length > 0)
+      || (typeof openJobsForMe === 'function' && openJobsForMe().length > 0)
       || (typeof chatUnreadTotal === 'function' && chatUnreadTotal() > 0);
   }
   btn.classList.toggle('has-dot', news);

@@ -77,6 +77,12 @@ Verbindliche Einträge werden mit einem ECDSA-Schlüssel des Schulleitungs-Gerä
 
 Unter *Kollegium* gibt es die Reiter **Aufsicht** (Pausenaufsichtsplan der Schulleitung; jede Lehrkraft sieht ihre Aufsichten auf der Startseite und wird 5 Minuten vorher erinnert; fehlt jemand, kann die Schulleitung die Aufsicht für diesen Tag vertreten lassen), **Räume** (buchbare Räume wie Computerraum oder Aula mit Wochenübersicht; freie Stunde antippen = buchen) und **Umfragen** (abstimmen mit Live-Ergebnis, optional anonym und mit Frist). Die Schulleitung findet im Cockpit außerdem eine **Statistik** zu Vertretungen, Abwesenheitstagen, Aufsichten und gelesenen Mitteilungen (CSV-Export). Aufsichtsplan und Räume sind – sobald eine Schulleitung eingetragen ist – digital unterschrieben und nur von ihr änderbar.
 
+## Aufträge der Schulleitung
+
+Unter *Kollegium → Aufträge* oder im Cockpit (*Auftrag erteilen*) vergibt die Schulleitung Aufgaben mit Frist an alle oder an bestimmte Lehrkräfte. Diese sehen den Auftrag auf der Startseite, werden am Vortag und zur Frist erinnert und melden „erledigt“ (optional mit Notiz). Die Schulleitung sieht den Stand („3 von 12 erledigt“) und kann erinnern. Aufträge sind digital unterschrieben.
+
+Außerdem neu in 2.3: **Wischen** in Aufgaben- und Hausaufgabenlisten (rechts = erledigt, links = neuer Termin), **Hausaufgaben teilen** als Text und am Computer die **Schnellsuche mit Strg+K / Cmd+K**.
+
 ## Chat im Kollegium
 
 Unter *Mehr → Chat* schreiben sich Lehrkräfte und Schulleitung gegenseitig: Einzelchats, **Gruppen** (Name, Symbol, Mitglieder) und der Chat **Ganzes Kollegium**. Es gibt **Emojis**, **Reaktionen**, **Fotos** (automatisch verkleinert), **Sprachnachrichten** (bis 2 Minuten), „Für alle löschen“ und **Storys** (Text oder Foto, 24 Stunden sichtbar). **Anrufen** öffnet die Telefon-App, **Videoanruf** verschickt einen Link zu einem Jitsi-Raum (Server unter *Einstellungen → Videoanrufe im Chat* änderbar).
