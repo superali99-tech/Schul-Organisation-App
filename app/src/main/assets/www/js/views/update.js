@@ -5,6 +5,13 @@ const UPDATE_URLS = ['https://raw.githubusercontent.com/superali99-tech/Schul-Or
 
 /** Neuerungen je Version (neueste zuerst) */
 const CHANGELOG = [
+  { v: '2.0.0', items: [
+    'Neu: Fest-Animationen – trägst du Ferien ein, begrüßt dich kurz eine Sonne (Sommer), Blumen und Schmetterlinge (Frühling), fallende Blätter (Herbst), Kürbisse und Fledermäuse (Halloween) oder ein Weihnachtsbaum mit Schnee',
+    'Passt sich dem Titel an („Osterferien", „Halloween-Party") oder der Jahreszeit; antippen beendet die Animation',
+    'Abschaltbar unter Einstellungen → Fest-Animationen – mit Vorschau aller Animationen, im Lehrer- und im Schulleitermodus',
+    'Ohne Beispieldaten: Du richtest die App von Anfang an selbst ein – mit der Einrichtungs-Hilfe auf der Startseite',
+    'Design 3.0 jetzt auch für Mac und Linux',
+  ] },
   { v: '1.9.0', items: [
     'Design 3.0: die ganze App im neuen Glas-Look – schwebende Navigation mit gleitender Markierung, leuchtender Hintergrund in der Farbe deines Themas',
     'Große Seitentitel, die beim Scrollen kleiner werden',

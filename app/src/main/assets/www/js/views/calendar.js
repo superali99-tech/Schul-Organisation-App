@@ -170,6 +170,7 @@ function editEvent(e, preset = {}) {
         }
       }
       save(); App.refresh(); UI.toast(shared ? 'Gespeichert & mit dem Kollegium geteilt' : 'Gespeichert');
+      if (isNew || (e && e.type !== obj.type)) Festive.forEvent(obj);
     },
     onDelete: isNew ? null : () => deleteWithUndo('events', e.id, e.title, { confirm: !!e.team, after: async () => { if (e.team && Team.on()) { if (e.official && leader) await Leader.signDelete(e.id); else Team.markDeleted(e.id); Team.changed(); } } }),
   });

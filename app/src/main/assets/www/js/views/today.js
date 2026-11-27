@@ -147,13 +147,12 @@ App.def('/today', () => {
   if (empty) {
     out.push(`<div class="card">
       <div class="card-h"><h3>${icon('sparkles')}Willkommen bei Schulplan</h3></div>
-      <p class="text2">Richte die App in wenigen Schritten ein – oder schau dir zuerst die Beispieldaten an.</p>
+      <p class="text2">Richte die App in wenigen Schritten ein – alles gehört dir, nichts ist vorgegeben.</p>
       <div class="list">
         <div class="li" data-nav="/classes">${'<div class="li-ic">1</div>'}<div class="li-main"><div class="li-t">Klassen & Fächer anlegen</div><div class="li-s">Klassen, Kurse und deine Fächer</div></div>${icon('chevron-right', 'chev')}</div>
         <div class="li" data-nav="/timetable"><div class="li-ic">2</div><div class="li-main"><div class="li-t">Stundenplan eintragen</div><div class="li-s">Zeiten und Stunden deiner Woche</div></div>${icon('chevron-right', 'chev')}</div>
         <div class="li" data-nav="/classes"><div class="li-ic">3</div><div class="li-main"><div class="li-t">Schüler:innen hinzufügen</div><div class="li-s">Einzeln, als Liste oder per CSV-Import</div></div>${icon('chevron-right', 'chev')}</div>
       </div>
-      <div class="btn-row mt"><button class="btn btn-soft" data-act="demo-load">${icon('sparkles')}Beispieldaten laden</button></div>
     </div>`);
   }
 

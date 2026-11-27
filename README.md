@@ -29,7 +29,7 @@ Eine Android-App, die den Schulalltag für Lehrerinnen und Lehrer organisiert. S
 1. `release/Schulplan.apk` aufs Gerät laden (z. B. über GitHub im Browser → „Download“).
 2. Die Datei antippen. Android fragt beim ersten Mal, ob der Browser bzw. Dateimanager **„Apps aus unbekannten Quellen installieren“** darf → erlauben.
 3. Auf **Installieren** tippen und die App „Schulplan“ öffnen.
-4. Beim ersten Start legst du deinen Namen und dein Notensystem fest – oder lädst zum Ausprobieren die **Beispieldaten**.
+4. Beim ersten Start legst du deinen Namen und dein Notensystem fest. Danach führt dich die Karte „Willkommen bei Schulplan“ auf der Startseite durch die Einrichtung – Beispieldaten gibt es nicht, du richtest alles selbst ein.
 
 > **Updates kommen automatisch:** Ab Version 1.3 prüft die App selbst auf neue Versionen, zeigt „Neue Version verfügbar“ mit den Neuerungen und installiert sie mit einem Tipp. Die Daten bleiben dabei erhalten. Nur Version 1.3 selbst muss einmalig per Hand installiert werden.
 
@@ -88,6 +88,10 @@ Jede Nachricht wird zusätzlich nur für die Mitglieder des Chats verschlüsselt
 Das ✨-Symbol auf der Startseite öffnet den **Assistenten**. Offline versteht er Befehle wie „Erinnere mich morgen um 7 an die Kopien“, „Erstelle Aufgabe … bis Freitag“, „Verschiebe Termin … auf den 15.12.“, „Lösche Termin …“, „Was steht morgen an?“ oder „Öffne Kalender“.
 
 Optional gibt es den **KI-Modus** mit Claude (Anthropic): Im Assistenten auf das Zahnrad tippen, „KI-Modus“ wählen und einen **eigenen API-Schlüssel** von console.anthropic.com eintragen (Nutzung kostet pro Anfrage). Dann versteht der Assistent freie Fragen und kann Termine, Aufgaben, Hausaufgaben und Notizen anlegen, ändern und löschen – vor dem Löschen fragt die App nach. Der Schlüssel bleibt nur auf dem Gerät. Im KI-Modus werden Fragen und die nötigen Einträge an Anthropic gesendet; Schülerdaten nur, wenn „Schülerdaten freigeben“ eingeschaltet ist.
+
+## Fest-Animationen
+
+Trägst du Ferien oder einen Festtag ein, erscheint kurz eine Animation: eine Sonne bei den Sommerferien, Blumen und Schmetterlinge im Frühling, fallende Blätter im Herbst, Kürbisse und Fledermäuse an Halloween und ein Weihnachtsbaum mit Schnee bei den Weihnachts- und Winterferien. Unter *Einstellungen → Fest-Animationen* gibt es eine Vorschau und einen Schalter zum Ausschalten (im Lehrer- und im Schulleitermodus).
 
 ## Vertretung zuweisen
 

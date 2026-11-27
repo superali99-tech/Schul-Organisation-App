@@ -20,6 +20,7 @@ App.def('/settings', () => {
     ${setItem('presentation', 'Videoanrufe im Chat', (S.settings.callBase || 'https://meet.jit.si/').replace(/^https?:\/\//, ''), 'data-act="set-callbase"')}
     ${setItem('crown', 'Schulleitermodus', Leader.active() ? 'Angemeldet als ' + Leader.name() + ' · Zugangsdaten ändern' : 'Lehrermodus · Anmeldung für die Schulleitung', 'data-nav="/settings/leader"', Leader.active() ? '<span class="badge lead">Aktiv</span>' : '')}
     ${setItem('palette', 'Darstellung', `${themeL} · Schrift ${Math.round((st.fontScale || 1) * 100)} %`, 'data-act="set-look"')}
+    ${setItem('sun', 'Fest-Animationen', st.festive !== false ? 'An · Sonne, Blätter, Schnee … beim Eintragen von Ferien' : 'Aus', 'data-act="set-festive"')}
     ${window.SCHULPLAN_DESKTOP ? setItem('layout-grid', 'Desktop-Widget', 'Nächste Stunde, heutige Stunden und Aufgaben immer auf dem Desktop', '', `<input type="checkbox" class="switch" data-change="desk-widget" ${Native.call('widgetEnabled') ? 'checked' : ''}>`) : ''}
     ${!Native.has && 'setAppBadge' in navigator ? setItem('bell', 'Zahl am App-Symbol', 'Fällige Aufgaben und Hausaufgaben am Symbol der installierten Web-App', '', `<input type="checkbox" class="switch" data-change="app-badge" ${st.appBadge !== false ? 'checked' : ''}>`) : ''}
   </div></div>
@@ -44,7 +45,6 @@ App.def('/settings', () => {
   <div class="card pad0"><div class="list">
     ${setItem('database', 'Datensicherung', st.lastBackup ? 'Letzte Sicherung: ' + fmtD(st.lastBackup.slice(0, 10)) : 'Noch keine Sicherung', 'data-nav="/settings/backup"')}
     ${setItem('graduation-cap', 'Schuljahreswechsel', 'Neues Schuljahr vorbereiten', 'data-act="set-newyear"')}
-    ${setItem('sparkles', 'Beispieldaten laden', 'Zum Ausprobieren (ersetzt alle Daten)', 'data-act="demo-load"')}
     ${setItem('trash-2', 'Alle Daten löschen', 'App zurücksetzen', 'data-act="set-reset" style="color:var(--danger)"')}
   </div></div>
   <div class="section-title">Info</div>

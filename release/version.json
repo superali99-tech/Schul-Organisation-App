@@ -1,21 +1,21 @@
 {
-  "versionCode": 16,
-  "versionName": "1.9.0",
+  "versionCode": 17,
+  "versionName": "2.0.0",
   "date": "2026-11-27",
   "apk": "https://raw.githubusercontent.com/superali99-tech/Schul-Organisation-App/HEAD/release/Schulplan.apk",
   "notes": [
-    "Design 3.0: die ganze App im neuen Glas-Look mit schwebender Navigation und gleitender Markierung",
-    "Große Seitentitel, neue Startseite mit farbigen Kacheln, weiche Seitenübergänge",
-    "Einstellungen mit farbigen Symbolen, runde Knöpfe, überarbeiteter Dunkelmodus"
+    "Neu: Fest-Animationen – Sonne, Frühlingsblumen, Herbstblätter, Halloween und Weihnachtsbaum mit Schnee, wenn du Ferien einträgst (abschaltbar)",
+    "Ohne Beispieldaten: du richtest die App von Anfang an selbst ein",
+    "Design 3.0 im Glas-Look mit schwebender Navigation, großen Titeln und neuer Startseite"
   ],
   "desktop": {
-    "version": "1.9.0",
+    "version": "2.0.0",
     "date": "2026-11-27",
     "url": "https://raw.githubusercontent.com/superali99-tech/Schul-Organisation-App/HEAD/release/Schulplan-Setup.exe",
     "notes": [
-      "Design 3.0: die ganze App im neuen Glas-Look mit schwebender Navigation und gleitender Markierung",
-      "Große Seitentitel, neue Startseite mit farbigen Kacheln, weiche Seitenübergänge",
-      "Einstellungen mit farbigen Symbolen, runde Knöpfe, überarbeiteter Dunkelmodus"
+      "Neu: Fest-Animationen – Sonne, Frühlingsblumen, Herbstblätter, Halloween und Weihnachtsbaum mit Schnee, wenn du Ferien einträgst (abschaltbar)",
+      "Ohne Beispieldaten: du richtest die App von Anfang an selbst ein",
+      "Design 3.0 im Glas-Look mit schwebender Navigation, großen Titeln und neuer Startseite"
     ]
   },
   "mac": {

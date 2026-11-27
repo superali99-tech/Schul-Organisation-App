@@ -173,7 +173,7 @@ function showOnboarding() {
         <label class="field"><span>Schule</span><input name="school" placeholder="z. B. Astrid Lindgren Schule" value="${esc(st.school)}"></label>
         <div class="field"><span>Notensystem</span><div class="seg seg-form"><label class="seg-o"><input type="radio" name="gs" value="noten" checked><span>Noten 1–6</span></label><label class="seg-o"><input type="radio" name="gs" value="punkte"><span>Punkte 0–15</span></label></div></div>
       </form>`,
-    foot: `<button class="btn btn-ghost" data-ob="demo">${icon('sparkles')}Beispieldaten</button><span class="sp"></span><button class="btn btn-primary" data-ob="start">Los geht's</button>`,
+    foot: `<button class="btn btn-primary btn-block" data-ob="start">Los geht's</button>`,
     onMount: (el, m) => {
       const read = () => {
         const f = el.querySelector('form');
@@ -181,7 +181,6 @@ function showOnboarding() {
         st.gradeSystem = f.querySelector('input[name=gs]:checked').value;
       };
       el.querySelector('[data-ob="start"]').addEventListener('click', () => { read(); st.onboarded = true; save(); m.close(); App.refresh(); });
-      el.querySelector('[data-ob="demo"]').addEventListener('click', () => { m.close(); Store.replace(buildDemoData()); applyTheme(); App.navigate('/today', { root: true }); UI.toast('Beispieldaten geladen – schau dich um!'); });
     },
     onClose: () => { if (!st.onboarded) { st.onboarded = true; save(); } },
   });
