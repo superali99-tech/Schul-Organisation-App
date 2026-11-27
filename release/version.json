@@ -19,25 +19,25 @@
     ]
   },
   "mac": {
-    "version": "1.8.0",
-    "date": "2026-11-26",
+    "version": "2.0.0",
+    "date": "2026-11-27",
     "arm64": "https://raw.githubusercontent.com/superali99-tech/Schul-Organisation-App/HEAD/release/Schulplan-Mac-AppleSilicon.zip",
     "x64": "https://raw.githubusercontent.com/superali99-tech/Schul-Organisation-App/HEAD/release/Schulplan-Mac-Intel.zip",
     "notes": [
-      "Neu: Chat im Kollegium – Einzel- und Gruppenchats, Ende-zu-Ende verschlüsselt, mit Emojis, Fotos, Sprachnachrichten und Storys",
-      "Neu: Assistent – erstellt, ändert und löscht Einträge und erinnert dich; optional mit KI-Modus (Claude)",
-      "Anrufen und Videoanruf aus dem Chat, Benachrichtigung bei neuen Nachrichten"
+      "Neu: Fest-Animationen – Sonne, Frühlingsblumen, Herbstblätter, Halloween und Weihnachtsbaum mit Schnee, wenn du Ferien einträgst (abschaltbar)",
+      "Ohne Beispieldaten: du richtest die App von Anfang an selbst ein",
+      "Design 3.0 im Glas-Look mit schwebender Navigation, großen Titeln und neuer Startseite"
     ]
   },
   "linux": {
-    "version": "1.8.0",
-    "date": "2026-11-26",
+    "version": "2.0.0",
+    "date": "2026-11-27",
     "appimage": "https://raw.githubusercontent.com/superali99-tech/Schul-Organisation-App/HEAD/release/Schulplan-Linux.AppImage",
     "deb": "https://raw.githubusercontent.com/superali99-tech/Schul-Organisation-App/HEAD/release/Schulplan-Linux.deb",
     "notes": [
-      "Neu: Chat im Kollegium – Einzel- und Gruppenchats, Ende-zu-Ende verschlüsselt, mit Emojis, Fotos, Sprachnachrichten und Storys",
-      "Neu: Assistent – erstellt, ändert und löscht Einträge und erinnert dich; optional mit KI-Modus (Claude)",
-      "Anrufen und Videoanruf aus dem Chat, Benachrichtigung bei neuen Nachrichten"
+      "Neu: Fest-Animationen – Sonne, Frühlingsblumen, Herbstblätter, Halloween und Weihnachtsbaum mit Schnee, wenn du Ferien einträgst (abschaltbar)",
+      "Ohne Beispieldaten: du richtest die App von Anfang an selbst ein",
+      "Design 3.0 im Glas-Look mit schwebender Navigation, großen Titeln und neuer Startseite"
     ]
   }
 }
