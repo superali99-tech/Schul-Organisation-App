@@ -5,6 +5,12 @@ const UPDATE_URLS = ['https://raw.githubusercontent.com/superali99-tech/Schul-Or
 
 /** Neuerungen je Version (neueste zuerst) */
 const CHANGELOG = [
+  { v: '2.2.0', items: [
+    '„Nicht geschafft" mit neuem Termin: Datum und Uhrzeit selbst wählen – oder per Schnellwahl (Heute Abend, Morgen, Montag, nächste oder übernächste Stunde, in einer Woche)',
+    'Beim Verschieben einer Aufgabe Erinnerung einschalten und eine Notiz dazuschreiben (z. B. „Kopierer war kaputt")',
+    'Hausaufgaben können jetzt auch eine Uhrzeit haben',
+    'Behoben: Der Schalter „Erinnern" bei einer Aufgabe wirkt jetzt auch, wenn die allgemeinen Aufgaben-Erinnerungen aus sind',
+  ] },
   { v: '2.1.0', items: [
     'Abhaken mit Auswahl: Tippst du bei einer Aufgabe oder Hausaufgabe auf den Kreis, erscheint der Haken – danach wählst du Erledigt, Nicht geschafft, Bearbeiten, Löschen oder Haken wieder entfernen',
     '„Nicht geschafft" verschiebt Aufgaben auf den nächsten Tag und Hausaufgaben auf die nächste Stunde der Klasse',

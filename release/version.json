@@ -1,43 +1,43 @@
 {
-  "versionCode": 18,
-  "versionName": "2.1.0",
+  "versionCode": 19,
+  "versionName": "2.2.0",
   "date": "2026-11-27",
   "apk": "https://raw.githubusercontent.com/superali99-tech/Schul-Organisation-App/HEAD/release/Schulplan.apk",
   "notes": [
-    "Abhaken mit Auswahl: Erledigt, Nicht geschafft, Bearbeiten, Löschen oder Haken wieder entfernen",
-    "„Nicht geschafft“ verschiebt Aufgaben auf morgen und Hausaufgaben auf die nächste Stunde",
-    "Dazu aus 2.0: Fest-Animationen, Design 3.0, Start ohne Beispieldaten"
+    "„Nicht geschafft“ mit neuem Termin: Datum und Uhrzeit selbst wählen oder per Schnellwahl",
+    "Beim Verschieben Erinnerung einschalten und eine Notiz dazuschreiben",
+    "Behoben: „Erinnern“ bei einer Aufgabe wirkt jetzt immer"
   ],
   "desktop": {
-    "version": "2.1.0",
+    "version": "2.2.0",
     "date": "2026-11-27",
     "url": "https://raw.githubusercontent.com/superali99-tech/Schul-Organisation-App/HEAD/release/Schulplan-Setup.exe",
     "notes": [
-      "Abhaken mit Auswahl: Erledigt, Nicht geschafft, Bearbeiten, Löschen oder Haken wieder entfernen",
-      "„Nicht geschafft“ verschiebt Aufgaben auf morgen und Hausaufgaben auf die nächste Stunde",
-      "Dazu aus 2.0: Fest-Animationen, Design 3.0, Start ohne Beispieldaten"
+      "„Nicht geschafft“ mit neuem Termin: Datum und Uhrzeit selbst wählen oder per Schnellwahl",
+      "Beim Verschieben Erinnerung einschalten und eine Notiz dazuschreiben",
+      "Behoben: „Erinnern“ bei einer Aufgabe wirkt jetzt immer"
     ]
   },
   "mac": {
-    "version": "2.1.0",
+    "version": "2.2.0",
     "date": "2026-11-27",
     "arm64": "https://raw.githubusercontent.com/superali99-tech/Schul-Organisation-App/HEAD/release/Schulplan-Mac-AppleSilicon.zip",
     "x64": "https://raw.githubusercontent.com/superali99-tech/Schul-Organisation-App/HEAD/release/Schulplan-Mac-Intel.zip",
     "notes": [
-      "Abhaken mit Auswahl: Erledigt, Nicht geschafft, Bearbeiten, Löschen oder Haken wieder entfernen",
-      "„Nicht geschafft“ verschiebt Aufgaben auf morgen und Hausaufgaben auf die nächste Stunde",
-      "Dazu aus 2.0: Fest-Animationen, Design 3.0, Start ohne Beispieldaten"
+      "„Nicht geschafft“ mit neuem Termin: Datum und Uhrzeit selbst wählen oder per Schnellwahl",
+      "Beim Verschieben Erinnerung einschalten und eine Notiz dazuschreiben",
+      "Behoben: „Erinnern“ bei einer Aufgabe wirkt jetzt immer"
     ]
   },
   "linux": {
-    "version": "2.1.0",
+    "version": "2.2.0",
     "date": "2026-11-27",
     "appimage": "https://raw.githubusercontent.com/superali99-tech/Schul-Organisation-App/HEAD/release/Schulplan-Linux.AppImage",
     "deb": "https://raw.githubusercontent.com/superali99-tech/Schul-Organisation-App/HEAD/release/Schulplan-Linux.deb",
     "notes": [
-      "Abhaken mit Auswahl: Erledigt, Nicht geschafft, Bearbeiten, Löschen oder Haken wieder entfernen",
-      "„Nicht geschafft“ verschiebt Aufgaben auf morgen und Hausaufgaben auf die nächste Stunde",
-      "Dazu aus 2.0: Fest-Animationen, Design 3.0, Start ohne Beispieldaten"
+      "„Nicht geschafft“ mit neuem Termin: Datum und Uhrzeit selbst wählen oder per Schnellwahl",
+      "Beim Verschieben Erinnerung einschalten und eine Notiz dazuschreiben",
+      "Behoben: „Erinnern“ bei einer Aufgabe wirkt jetzt immer"
     ]
   }
 }

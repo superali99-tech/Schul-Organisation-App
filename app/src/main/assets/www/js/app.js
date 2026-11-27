@@ -79,8 +79,8 @@ function buildReminders() {
     }
   }
   // Aufgaben
-  if (r.tasks) S.tasks.forEach((t) => {
-    if (t.done || !t.due) return;
+  S.tasks.forEach((t) => {
+    if (t.done || !t.due || !(r.tasks || t.remind)) return;
     add('tk' + t.id, dateTimeMs(t.due, t.time || r.taskTime || '07:30'), t.prio === 2 ? 'Dringende Aufgabe fällig' : 'Aufgabe fällig', t.title + (t.cat ? ' · ' + t.cat : ''), '/tasks');
   });
   // Hausaufgaben (Kontrolle)

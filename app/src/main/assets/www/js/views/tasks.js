@@ -63,16 +63,36 @@ A['task-toggle'] = (el) => {
   const t = byId('tasks', el.dataset.id);
   if (!t) return;
   if (t.done) { t.done = false; t.doneAt = null; save(); App.refresh(); return; }
-  const later = t.due && t.due > today() ? addDays(t.due, 1) : addDays(today(), 1);
   checkFlow(el, {
     title: t.title,
-    laterSub: `Auf ${relDay(later)} (${fmtDS(later)}) verschieben`,
+    laterSub: 'Neues Datum und Uhrzeit wählen',
     done: () => taskDone(t),
-    postpone: () => { const old = t.due; t.due = later; save(); App.refresh(); UI.toast(`Verschoben auf ${relDay(later)}`, { undo: () => { t.due = old; save(); App.refresh(); } }); },
+    postpone: () => postponeTask(t),
     edit: () => editTask(t),
     remove: () => deleteWithUndo('tasks', t.id, t.title, { confirm: false }),
   });
 };
+function postponeTask(t) {
+  const d0 = today();
+  const base = t.due && t.due > d0 ? t.due : d0;
+  let mon = addDays(d0, 1); while (dow(mon) !== 0) mon = addDays(mon, 1);
+  const quick = [
+    { l: `Morgen · ${fmtDW(addDays(d0, 1))}`, d: addDays(d0, 1) },
+    { l: `Übermorgen · ${fmtDW(addDays(d0, 2))}`, d: addDays(d0, 2) },
+    { l: `Montag · ${fmtDS(mon)}`, d: mon },
+    { l: `In einer Woche · ${fmtDS(addDays(base, 7))}`, d: addDays(base, 7) },
+  ];
+  if (now().getHours() < 17) quick.splice(0, 0, { l: 'Heute Abend · 18:00', d: d0, t: '18:00' });
+  postponeForm({
+    item: t, quick, withRemind: true,
+    apply: (v) => {
+      const old = { due: t.due, time: t.time, remind: t.remind, notes: t.notes };
+      t.due = v.due; t.time = v.time || ''; t.remind = !!v.remind; t.notes = notDoneNote(t.notes, v.note);
+      save(); App.refresh();
+      UI.toast(`Verschoben auf ${relDay(t.due)}${t.time ? ', ' + t.time + ' Uhr' : ''}`, { undo: () => { Object.assign(t, old); save(); App.refresh(); } });
+    },
+  });
+}
 function taskDone(t) {
   t.done = !t.done;
   t.doneAt = t.done ? new Date().toISOString() : null;

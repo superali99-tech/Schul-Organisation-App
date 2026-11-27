@@ -10,7 +10,7 @@ function hwItem(h) {
     <button class="check round ${h.done ? 'on' : ''}" data-act="hw-toggle" data-id="${h.id}" aria-label="Erledigt">${icon('check')}</button>
     <div class="li-main" data-act="hw-edit" data-id="${h.id}"><div class="li-t wrap">${esc(h.title)}</div>
       <div class="li-s"><i class="dot" style="background:${col}"></i> ${esc(c ? c.name : '–')}${h.subjectId ? ' · ' + esc(subName(h.subjectId)) : ''}${missing ? ` · ${missing}× vergessen` : ''}</div></div>
-    <div class="li-end">${h.due ? `<span class="badge ${overdue ? 'red' : h.due === today() ? 'orange' : ''}">${relDay(h.due)}</span>` : ''}</div>
+    <div class="li-end">${h.due ? `<span class="badge ${overdue ? 'red' : h.due === today() ? 'orange' : ''}">${relDay(h.due)}${h.time ? ' ' + esc(h.time) : ''}</span>` : ''}</div>
   </div>`;
 }
 
@@ -49,17 +49,36 @@ A['hw-toggle'] = (el) => {
   const h = byId('homework', el.dataset.id);
   if (!h) return;
   if (h.done) { h.done = false; save(); App.refresh(); return; }
-  const from = h.due && h.due > today() ? h.due : today();
-  const later = h.classId ? nextLessonDate(h.classId, from, h.subjectId) : addDays(from, 1);
   checkFlow(el, {
     title: h.title,
-    laterSub: `Auf die nächste Stunde verschieben (${fmtDW(later)})`,
+    laterSub: 'Neues Datum und Uhrzeit wählen',
     done: () => { h.done = true; save(); App.refresh(); UI.toast('Erledigt ✓', { undo: () => { h.done = false; save(); App.refresh(); } }); },
-    postpone: () => { const old = h.due; h.due = later; save(); App.refresh(); UI.toast('Verschoben auf ' + fmtDW(later), { undo: () => { h.due = old; save(); App.refresh(); } }); },
+    postpone: () => postponeHomework(h),
     edit: () => editHomework(h),
     remove: () => deleteWithUndo('homework', h.id, h.title, { confirm: false }),
   });
 };
+
+function postponeHomework(h) {
+  const d0 = today();
+  const from = h.due && h.due > d0 ? h.due : d0;
+  const quick = [];
+  if (h.classId) {
+    const n1 = nextLessonDate(h.classId, from, h.subjectId);
+    const n2 = nextLessonDate(h.classId, n1, h.subjectId);
+    quick.push({ l: `Nächste Stunde · ${fmtDW(n1)}`, d: n1 }, { l: `Übernächste Stunde · ${fmtDW(n2)}`, d: n2 });
+  }
+  quick.push({ l: `Morgen · ${fmtDW(addDays(d0, 1))}`, d: addDays(d0, 1) }, { l: `In einer Woche · ${fmtDS(addDays(from, 7))}`, d: addDays(from, 7) });
+  postponeForm({
+    item: h, quick, withRemind: false,
+    apply: (v) => {
+      const old = { due: h.due, time: h.time, desc: h.desc };
+      h.due = v.due; h.time = v.time || ''; h.desc = notDoneNote(h.desc, v.note);
+      save(); App.refresh();
+      UI.toast(`Verschoben auf ${fmtDW(h.due)}${h.time ? ', ' + h.time + ' Uhr' : ''}`, { undo: () => { Object.assign(h, old); save(); App.refresh(); } });
+    },
+  });
+}
 
 function classHomeworkTab(c) {
   const open = sortBy(S.homework.filter((h) => h.classId === c.id && !h.done), 'due');
@@ -82,6 +101,7 @@ function editHomework(h, preset = {}) {
       { k: 'subjectId', label: 'Fach', type: 'select', opts: subjectOptions(true), half: true },
       { k: 'given', label: 'Aufgegeben am', type: 'date', half: true },
       { k: 'due', label: 'Fällig am', type: 'date', half: true },
+      { k: 'time', label: 'Uhrzeit (optional)', type: 'time', half: true },
       { k: 'desc', label: 'Details', type: 'textarea', rows: 2 },
       !isNew ? { k: 'done', label: 'Erledigt / abgeschlossen', type: 'switch' } : null,
     ],

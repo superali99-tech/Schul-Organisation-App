@@ -142,7 +142,7 @@ Alle Team-Daten sind Ende-zu-Ende verschlüsselt (AES-256-GCM). Den Schlüssel h
 | **Klassenbuch & Planung** | Stundenplanung (Ziele, Phasen, Material), Unterrichtsreihen mit Fortschritt, Klassenbuch drucken/exportieren |
 | **Sitzplan** | Raster frei einstellbar, Gänge, Tafel oben/unten, zufällig verteilen, Plätze tauschen, Abwesende ausgegraut, Drucken |
 | **Kalender** | Monat und Liste, Termine (Konferenz, Elternabend, Ausflug, Aufsicht, Fristen …), Ferien & freie Tage, alles in einer Ansicht; Export als **.ics** für Google/Outlook |
-| **Aufgaben** | To-dos mit Priorität, Kategorie, Fälligkeit, Wiederholung und Erinnerung; Abhaken mit Auswahl: Erledigt, Nicht geschafft (verschieben), Bearbeiten, Löschen |
+| **Aufgaben** | To-dos mit Priorität, Kategorie, Fälligkeit, Wiederholung und Erinnerung; Abhaken mit Auswahl: Erledigt, Nicht geschafft (neuer Termin mit Datum, Uhrzeit, Erinnerung und Notiz), Bearbeiten, Löschen |
 | **Notizen** | Farbige Notizen, Anheften, Checklisten, Suche, Zuordnung zu Klassen |
 | **Elterngespräche** | Protokolle mit Teilnehmenden, Vereinbarungen und Wiedervorlage, druckbar mit Unterschriftenfeld |
 | **Chat** | Einzel- und Gruppenchats im Kollegium, Emojis, Reaktionen, Fotos, Sprachnachrichten, Storys, Anruf und Videoanruf per Link, Ende-zu-Ende verschlüsselt |

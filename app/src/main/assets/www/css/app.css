@@ -1521,3 +1521,7 @@ body { background:
 @keyframes checkPop { 0% { transform: scale(.7); } 60% { transform: scale(1.18); } 100% { transform: scale(1); } }
 @keyframes checkDraw { from { opacity: 0; transform: scale(.3) rotate(-30deg); } to { opacity: 1; transform: none; } }
 .modal-menu .sheet-h h2 { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-right: 8px; }
+/* Auswahl-Chips in Formularen gut lesbar */
+.sheet .chip { background: var(--card2); border-color: transparent; }
+.chip.on span, .chip:has(input:checked) span, .chip input:checked + span { color: #fff; }
+.chips-wrap { gap: 8px; }

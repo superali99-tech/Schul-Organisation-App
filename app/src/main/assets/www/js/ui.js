@@ -392,11 +392,47 @@ async function checkFlow(el, { title, later, laterSub, done, postpone, edit, rem
   ]);
   if (btn && btn.classList) btn.classList.remove('popping');
   if (v === 'done') return done();
-  if (v === 'later') return postpone();
+  if (v === 'later') { if (btn && btn.classList) btn.classList.remove('on'); return postpone(); }
   if (v === 'edit') { if (btn && btn.classList) btn.classList.remove('on'); return edit(); }
   if (v === 'delete') { if (btn && btn.classList) btn.classList.remove('on'); return remove(); }
   // Haken entfernen oder Menü einfach geschlossen
   if (btn && btn.classList) btn.classList.remove('on');
+}
+
+// „Nicht geschafft“: neues Datum, Uhrzeit, Erinnerung und Notiz wählen
+function postponeForm({ item, quick, withRemind, apply }) {
+  UI.form({
+    title: 'Nicht geschafft – neuer Termin',
+    submit: 'Verschieben',
+    fields: [
+      { type: 'html', html: `<p class="text2" style="margin:0 0 2px">„${esc(item.title)}“ – bis wann schaffst du es?</p>` },
+      { k: 'quick', label: 'Schnell wählen', type: 'chips', opts: quick.map((q, i) => ({ v: String(i), l: q.l })) },
+      { k: 'due', label: 'Neues Datum', type: 'date', req: true, half: true },
+      { k: 'time', label: 'Uhrzeit (optional)', type: 'time', half: true },
+      withRemind ? { k: 'remind', label: 'Erinnern', type: 'switch', hint: 'Benachrichtigung zum neuen Termin' } : null,
+      { k: 'note', label: 'Notiz (optional)', ph: 'z. B. Kopierer war kaputt' },
+    ],
+    values: { quick: '0', due: quick[0].d, time: quick[0].t !== undefined ? quick[0].t : (item.time || ''), remind: !!item.remind },
+    autofocus: false,
+    onMount: (el) => {
+      const due = el.querySelector('[name=due]');
+      const time = el.querySelector('[name=time]');
+      const radios = [...el.querySelectorAll('input[name=quick]')];
+      radios.forEach((r) => r.addEventListener('change', () => { const q = quick[Number(r.value)]; due.value = q.d; if (q.t !== undefined) time.value = q.t; }));
+      due.addEventListener('input', () => radios.forEach((r) => { r.checked = quick[Number(r.value)].d === due.value; }));
+    },
+    onSave: (v) => {
+      if (!v.due) { UI.toast('Bitte ein Datum wählen', { type: 'err' }); return false; }
+      if (v.due < today()) { UI.toast('Das Datum liegt in der Vergangenheit', { type: 'err' }); return false; }
+      if (v.remind && !S.settings.remind.on) { S.settings.remind.on = true; requestNotifPermission(); }
+      apply(v);
+    },
+  });
+}
+// Notiz „Nicht geschafft“ an einen Text anhängen
+function notDoneNote(text, note) {
+  if (!note || !String(note).trim()) return text || '';
+  return (text ? text + '\n' : '') + `Nicht geschafft (${fmtDS(today())}): ${String(note).trim()}`;
 }
 
 async function deleteWithUndo(coll, id, label, { confirm = true, after } = {}) {
