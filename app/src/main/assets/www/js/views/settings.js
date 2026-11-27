@@ -1,8 +1,11 @@
 /* Einstellungen, Datensicherung, Erinnerungen, Sicherheit */
 'use strict';
 
+const SET_COLORS = ['#6366f1', '#0ea5e9', '#8b5cf6', '#10b981', '#f59e0b', '#ec4899', '#ef4444', '#14b8a6', '#f97316', '#3b82f6'];
+const SET_FIXED = { crown: '#f59e0b', palette: '#ec4899', bell: '#ef4444', sparkles: '#8b5cf6', user: '#6366f1', video: '#10b981', 'calendar-range': '#0ea5e9', clock: '#f97316', database: '#3b82f6', lock: '#64748b', shield: '#64748b' };
+function setColor(ic) { if (SET_FIXED[ic]) return SET_FIXED[ic]; let h = 0; for (const ch of String(ic)) h = (h * 31 + ch.charCodeAt(0)) >>> 0; return SET_COLORS[h % SET_COLORS.length]; }
 function setItem(ic, title, sub, attrs_, end = '') {
-  return `<div class="li" ${attrs_}><div class="li-ic">${icon(ic)}</div><div class="li-main"><div class="li-t">${esc(title)}</div>${sub ? `<div class="li-s">${esc(sub)}</div>` : ''}</div>${end || icon('chevron-right', 'chev')}</div>`;
+  return `<div class="li" ${attrs_}><div class="li-ic set-ic" style="--lc:${setColor(ic)}">${icon(ic)}</div><div class="li-main"><div class="li-t">${esc(title)}</div>${sub ? `<div class="li-s">${esc(sub)}</div>` : ''}</div>${end || icon('chevron-right', 'chev')}</div>`;
 }
 
 App.def('/settings', () => {

@@ -57,6 +57,7 @@ const App = {
   get path() { return this.stack[this.stack.length - 1] || '/today'; },
   navigate(path, opts = {}) {
     if (!path) return;
+    this._dir = opts.root ? 'tab' : 'fwd';
     if (opts.root) this.stack = [path];
     else if (opts.replace && this.stack.length) this.stack[this.stack.length - 1] = path;
     else if (this.path !== path) this.stack.push(path);
@@ -97,7 +98,10 @@ const App = {
       ${showBack ? `<button class="tb-btn" data-act="app-back" aria-label="Zurück">${icon('arrow-left')}</button>` : `<div class="tb-logo">${icon(v.icon || 'graduation-cap')}</div>`}
       <div class="tb-title"><h1>${esc(v.title || '')}</h1>${v.sub ? `<div class="tb-sub">${esc(v.sub)}</div>` : ''}</div>
       <div class="tb-actions">${typeof Leader !== 'undefined' && Leader.active() && !String(App.path || '').startsWith('/leader') ? `<button class="tb-btn tb-lead" data-nav="/leader" aria-label="Schulleitungs-Cockpit" title="Schulleitungs-Cockpit">${icon('crown')}</button>` : ''}${(v.actions || []).map((a) => `<button class="tb-btn" ${attrs({ 'data-act': a.act, 'data-nav': a.nav, 'data-id': a.id, 'aria-label': a.label, title: a.label })}>${icon(a.icon)}</button>`).join('')}</div>`;
+    $('#topbar').classList.toggle('root', !showBack);
     main.className = 'view ' + (v.cls || '');
+    main.dataset.dir = restore ? 'back' : (this._dir || 'tab');
+    this._dir = '';
     if (typeof navBadges === 'function') { try { navBadges(); } catch (e) { /* egal */ } }
     main.innerHTML = v.html || '';
     // FAB
@@ -112,6 +116,7 @@ const App = {
     // Navigation
     const tab = v.tab || (path.split('/')[1] || 'today');
     $$('#bottomnav [data-tab]').forEach((b) => b.classList.toggle('on', b.dataset.tab === tab));
+    navPill();
     if (scrollTop) { void main.offsetWidth; main.classList.add('enter'); }
     $('#topbar').classList.toggle('scrolled', main.scrollTop > 4);
     if (scrollTop && !restore) main.scrollTop = 0;
@@ -484,6 +489,24 @@ function systemDark() {
   if (Native.has) { const v = Native.call('isSystemDark'); if (v != null) return !!v; }
   return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
 }
+// Gleitende Markierung in der Navigation (Design 3.0)
+function navPill() {
+  const nav = $('#bottomnav');
+  if (!nav) return;
+  let pill = nav.querySelector('.nav-pill');
+  if (!pill) { pill = document.createElement('span'); pill.className = 'nav-pill'; pill.setAttribute('aria-hidden', 'true'); nav.prepend(pill); }
+  const on = nav.querySelector('button.on');
+  if (!on || !nav.offsetWidth) { pill.style.opacity = '0'; return; }
+  const first = pill.dataset.ready !== '1';
+  if (first) pill.style.transition = 'none';
+  pill.style.transform = `translate3d(${on.offsetLeft}px, ${on.offsetTop}px, 0)`;
+  pill.style.width = on.offsetWidth + 'px';
+  pill.style.height = on.offsetHeight + 'px';
+  pill.style.opacity = '1';
+  if (first) { void pill.offsetWidth; pill.style.transition = ''; pill.dataset.ready = '1'; }
+}
+window.addEventListener('resize', () => { const p = $('#bottomnav .nav-pill'); if (p) p.dataset.ready = ''; navPill(); }, { passive: true });
+
 function applyTheme() {
   const st = S.settings;
   const dark = st.theme === 'dark' || (st.theme === 'auto' && systemDark());

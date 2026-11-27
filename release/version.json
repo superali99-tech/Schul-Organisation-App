@@ -1,21 +1,21 @@
 {
-  "versionCode": 15,
-  "versionName": "1.8.0",
-  "date": "2026-11-26",
+  "versionCode": 16,
+  "versionName": "1.9.0",
+  "date": "2026-11-27",
   "apk": "https://raw.githubusercontent.com/superali99-tech/Schul-Organisation-App/HEAD/release/Schulplan.apk",
   "notes": [
-    "Neu: Chat im Kollegium – Einzel- und Gruppenchats, Ende-zu-Ende verschlüsselt, mit Emojis, Fotos, Sprachnachrichten und Storys",
-    "Neu: Assistent – erstellt, ändert und löscht Einträge und erinnert dich; optional mit KI-Modus (Claude)",
-    "Anrufen und Videoanruf aus dem Chat, Benachrichtigung bei neuen Nachrichten"
+    "Design 3.0: die ganze App im neuen Glas-Look mit schwebender Navigation und gleitender Markierung",
+    "Große Seitentitel, neue Startseite mit farbigen Kacheln, weiche Seitenübergänge",
+    "Einstellungen mit farbigen Symbolen, runde Knöpfe, überarbeiteter Dunkelmodus"
   ],
   "desktop": {
-    "version": "1.8.0",
-    "date": "2026-11-26",
+    "version": "1.9.0",
+    "date": "2026-11-27",
     "url": "https://raw.githubusercontent.com/superali99-tech/Schul-Organisation-App/HEAD/release/Schulplan-Setup.exe",
     "notes": [
-      "Neu: Chat im Kollegium – Einzel- und Gruppenchats, Ende-zu-Ende verschlüsselt, mit Emojis, Fotos, Sprachnachrichten und Storys",
-      "Neu: Assistent – erstellt, ändert und löscht Einträge und erinnert dich; optional mit KI-Modus (Claude)",
-      "Anrufen und Videoanruf aus dem Chat, Benachrichtigung bei neuen Nachrichten"
+      "Design 3.0: die ganze App im neuen Glas-Look mit schwebender Navigation und gleitender Markierung",
+      "Große Seitentitel, neue Startseite mit farbigen Kacheln, weiche Seitenübergänge",
+      "Einstellungen mit farbigen Symbolen, runde Knöpfe, überarbeiteter Dunkelmodus"
     ]
   },
   "mac": {

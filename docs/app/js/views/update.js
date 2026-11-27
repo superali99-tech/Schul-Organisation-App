@@ -5,6 +5,14 @@ const UPDATE_URLS = ['https://raw.githubusercontent.com/superali99-tech/Schul-Or
 
 /** Neuerungen je Version (neueste zuerst) */
 const CHANGELOG = [
+  { v: '1.9.0', items: [
+    'Design 3.0: die ganze App im neuen Glas-Look – schwebende Navigation mit gleitender Markierung, leuchtender Hintergrund in der Farbe deines Themas',
+    'Große Seitentitel, die beim Scrollen kleiner werden',
+    'Startseite neu: Kennzahlen als farbige Kacheln, „Als Nächstes" mit Farbleiste und lebendigem Fortschrittsbalken',
+    'Weichere Bewegungen: Seiten gleiten vorwärts und zurück, Knöpfe federn beim Antippen',
+    'Einstellungen mit farbigen Symbolen, runde Knöpfe und Eingabefelder, neuer Dunkelmodus',
+    'Am Computer: Seitenleiste mit Markierung, schlanke Scrollleisten',
+  ] },
   { v: '1.8.0', items: [
     'Neu: Chat im Kollegium – Einzel- und Gruppenchats, Ende-zu-Ende verschlüsselt, mit Emojis, Reaktionen, Fotos und Sprachnachrichten',
     'Storys: Fotos und Grüße für das ganze Kollegium, die nach 24 Stunden verschwinden',

@@ -148,7 +148,7 @@ Alle Team-Daten sind Ende-zu-Ende verschlüsselt (AES-256-GCM). Den Schlüssel h
 | **Erinnerungen** | Benachrichtigungen für Prüfungen, Termine, Aufgaben, Wiedervorlagen und optional vor jeder Stunde |
 | **Sicherheit** | PIN-Sperre, Bildschirmfotos verhindern, Internet nur für Updates und – wenn du sie nutzt – KI-Modus und Videoanrufe |
 | **Daten** | Sicherung exportieren/wiederherstellen (.json), tägliche automatische Sicherungen auf dem Gerät, CSV-Exporte, Schuljahreswechsel, Drucken bzw. PDF über Android |
-| **Darstellung** | Modernes Design mit Farbverläufen und schwebender Navigation, Hell/Dunkel/System, Akzentfarbe, Schriftgröße, für Handy und Tablet |
+| **Darstellung** | Design 3.0 im Glas-Look: schwebende Navigation mit gleitender Markierung, große Seitentitel, Hintergrund in der Themenfarbe, weiche Übergänge, acht Farbthemen, Hell/Dunkel/System, Akzentfarbe, Schriftgröße, für Handy und Tablet |
 
 ## Datenschutz
 

@@ -100,12 +100,12 @@ App.def('/today', () => {
     <h2>${greeting()}${teacherName() ? ', ' + esc(teacherName()) : ''}!</h2>
     <div class="th-sub">KW ${isoWeek(d)}${wt ? ` · ${wt}-Woche` : ''}${st.school ? ' · ' + esc(st.school) : ''}</div>
     ${holidayCountdown(d, hol)}
-    </div>${ring}</div>
-    <div class="th-stats">
-      <div data-nav="/timetable" data-root><b>${lessonsToday}</b><span>${lessonsToday === 1 ? 'Stunde' : 'Stunden'} heute</span></div>
-      <div data-nav="/tasks"><b>${openTasks}</b><span>Aufgaben fällig</span></div>
-      <div data-nav="/overview/exams"><b>${examsWeek}</b><span>Prüfungen</span></div>
-    </div></div>`);
+    </div>${ring}</div></div>
+    <div class="bento-stats">
+      <div data-nav="/timetable" data-root style="--bc:#6366f1"><span class="bs-ic">${icon('clock')}</span><b>${lessonsToday}</b><span>${lessonsToday === 1 ? 'Stunde' : 'Stunden'} heute</span></div>
+      <div data-nav="/tasks" style="--bc:#0ea5e9"><span class="bs-ic">${icon('list-todo')}</span><b>${openTasks}</b><span>Aufgaben fällig</span></div>
+      <div data-nav="/overview/exams" style="--bc:#f97316"><span class="bs-ic">${icon('clipboard-check')}</span><b>${examsWeek}</b><span>Prüfungen</span></div>
+    </div>`);
 
   if (Leader.active()) {
     const abs = absencesOn(d).length;
