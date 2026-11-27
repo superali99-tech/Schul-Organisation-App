@@ -47,9 +47,18 @@ A['hw-add'] = (el) => editHomework(null, { classId: (el && el.dataset && el.data
 A['hw-edit'] = (el) => editHomework(byId('homework', el.dataset.id));
 A['hw-toggle'] = (el) => {
   const h = byId('homework', el.dataset.id);
-  h.done = !h.done;
-  save(); App.refresh();
-  if (h.done) UI.toast('Erledigt', { undo: () => { h.done = false; save(); App.refresh(); } });
+  if (!h) return;
+  if (h.done) { h.done = false; save(); App.refresh(); return; }
+  const from = h.due && h.due > today() ? h.due : today();
+  const later = h.classId ? nextLessonDate(h.classId, from, h.subjectId) : addDays(from, 1);
+  checkFlow(el, {
+    title: h.title,
+    laterSub: `Auf die nächste Stunde verschieben (${fmtDW(later)})`,
+    done: () => { h.done = true; save(); App.refresh(); UI.toast('Erledigt ✓', { undo: () => { h.done = false; save(); App.refresh(); } }); },
+    postpone: () => { const old = h.due; h.due = later; save(); App.refresh(); UI.toast('Verschoben auf ' + fmtDW(later), { undo: () => { h.due = old; save(); App.refresh(); } }); },
+    edit: () => editHomework(h),
+    remove: () => deleteWithUndo('homework', h.id, h.title, { confirm: false }),
+  });
 };
 
 function classHomeworkTab(c) {

@@ -1,43 +1,43 @@
 {
-  "versionCode": 17,
-  "versionName": "2.0.0",
+  "versionCode": 18,
+  "versionName": "2.1.0",
   "date": "2026-11-27",
   "apk": "https://raw.githubusercontent.com/superali99-tech/Schul-Organisation-App/HEAD/release/Schulplan.apk",
   "notes": [
-    "Neu: Fest-Animationen – Sonne, Frühlingsblumen, Herbstblätter, Halloween und Weihnachtsbaum mit Schnee, wenn du Ferien einträgst (abschaltbar)",
-    "Ohne Beispieldaten: du richtest die App von Anfang an selbst ein",
-    "Design 3.0 im Glas-Look mit schwebender Navigation, großen Titeln und neuer Startseite"
+    "Abhaken mit Auswahl: Erledigt, Nicht geschafft, Bearbeiten, Löschen oder Haken wieder entfernen",
+    "„Nicht geschafft“ verschiebt Aufgaben auf morgen und Hausaufgaben auf die nächste Stunde",
+    "Dazu aus 2.0: Fest-Animationen, Design 3.0, Start ohne Beispieldaten"
   ],
   "desktop": {
-    "version": "2.0.0",
+    "version": "2.1.0",
     "date": "2026-11-27",
     "url": "https://raw.githubusercontent.com/superali99-tech/Schul-Organisation-App/HEAD/release/Schulplan-Setup.exe",
     "notes": [
-      "Neu: Fest-Animationen – Sonne, Frühlingsblumen, Herbstblätter, Halloween und Weihnachtsbaum mit Schnee, wenn du Ferien einträgst (abschaltbar)",
-      "Ohne Beispieldaten: du richtest die App von Anfang an selbst ein",
-      "Design 3.0 im Glas-Look mit schwebender Navigation, großen Titeln und neuer Startseite"
+      "Abhaken mit Auswahl: Erledigt, Nicht geschafft, Bearbeiten, Löschen oder Haken wieder entfernen",
+      "„Nicht geschafft“ verschiebt Aufgaben auf morgen und Hausaufgaben auf die nächste Stunde",
+      "Dazu aus 2.0: Fest-Animationen, Design 3.0, Start ohne Beispieldaten"
     ]
   },
   "mac": {
-    "version": "2.0.0",
+    "version": "2.1.0",
     "date": "2026-11-27",
     "arm64": "https://raw.githubusercontent.com/superali99-tech/Schul-Organisation-App/HEAD/release/Schulplan-Mac-AppleSilicon.zip",
     "x64": "https://raw.githubusercontent.com/superali99-tech/Schul-Organisation-App/HEAD/release/Schulplan-Mac-Intel.zip",
     "notes": [
-      "Neu: Fest-Animationen – Sonne, Frühlingsblumen, Herbstblätter, Halloween und Weihnachtsbaum mit Schnee, wenn du Ferien einträgst (abschaltbar)",
-      "Ohne Beispieldaten: du richtest die App von Anfang an selbst ein",
-      "Design 3.0 im Glas-Look mit schwebender Navigation, großen Titeln und neuer Startseite"
+      "Abhaken mit Auswahl: Erledigt, Nicht geschafft, Bearbeiten, Löschen oder Haken wieder entfernen",
+      "„Nicht geschafft“ verschiebt Aufgaben auf morgen und Hausaufgaben auf die nächste Stunde",
+      "Dazu aus 2.0: Fest-Animationen, Design 3.0, Start ohne Beispieldaten"
     ]
   },
   "linux": {
-    "version": "2.0.0",
+    "version": "2.1.0",
     "date": "2026-11-27",
     "appimage": "https://raw.githubusercontent.com/superali99-tech/Schul-Organisation-App/HEAD/release/Schulplan-Linux.AppImage",
     "deb": "https://raw.githubusercontent.com/superali99-tech/Schul-Organisation-App/HEAD/release/Schulplan-Linux.deb",
     "notes": [
-      "Neu: Fest-Animationen – Sonne, Frühlingsblumen, Herbstblätter, Halloween und Weihnachtsbaum mit Schnee, wenn du Ferien einträgst (abschaltbar)",
-      "Ohne Beispieldaten: du richtest die App von Anfang an selbst ein",
-      "Design 3.0 im Glas-Look mit schwebender Navigation, großen Titeln und neuer Startseite"
+      "Abhaken mit Auswahl: Erledigt, Nicht geschafft, Bearbeiten, Löschen oder Haken wieder entfernen",
+      "„Nicht geschafft“ verschiebt Aufgaben auf morgen und Hausaufgaben auf die nächste Stunde",
+      "Dazu aus 2.0: Fest-Animationen, Design 3.0, Start ohne Beispieldaten"
     ]
   }
 }

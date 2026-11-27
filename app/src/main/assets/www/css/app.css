@@ -1513,3 +1513,11 @@ body { background:
 .fx-sky.autumn { background: radial-gradient(120% 80% at 50% 0%, rgba(254, 220, 175, .93), rgba(250, 185, 120, .88) 60%, rgba(200, 125, 70, .9)); }
 .fx-sky.halloween { background: radial-gradient(70% 55% at 82% 14%, rgba(254, 243, 199, .25), transparent 60%), linear-gradient(180deg, rgba(30, 10, 60, .94), rgba(59, 7, 100, .9) 60%, rgba(124, 45, 18, .88)); }
 .fx-sky.winter { background: linear-gradient(180deg, rgba(15, 23, 42, .93), rgba(30, 58, 138, .88) 65%, rgba(147, 197, 253, .85)); }
+
+/* Abhaken: Haken federt herein, bevor die Auswahl erscheint */
+.check { transition: background .2s, border-color .2s, transform .3s var(--spring); }
+.check.popping { animation: checkPop .45s var(--spring) both; box-shadow: 0 0 0 6px color-mix(in srgb, var(--ok) 22%, transparent); }
+.check.popping .i { animation: checkDraw .35s ease-out both; }
+@keyframes checkPop { 0% { transform: scale(.7); } 60% { transform: scale(1.18); } 100% { transform: scale(1); } }
+@keyframes checkDraw { from { opacity: 0; transform: scale(.3) rotate(-30deg); } to { opacity: 1; transform: none; } }
+.modal-menu .sheet-h h2 { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-right: 8px; }

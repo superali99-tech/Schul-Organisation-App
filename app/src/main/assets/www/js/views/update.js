@@ -5,6 +5,10 @@ const UPDATE_URLS = ['https://raw.githubusercontent.com/superali99-tech/Schul-Or
 
 /** Neuerungen je Version (neueste zuerst) */
 const CHANGELOG = [
+  { v: '2.1.0', items: [
+    'Abhaken mit Auswahl: Tippst du bei einer Aufgabe oder Hausaufgabe auf den Kreis, erscheint der Haken – danach wählst du Erledigt, Nicht geschafft, Bearbeiten, Löschen oder Haken wieder entfernen',
+    '„Nicht geschafft" verschiebt Aufgaben auf den nächsten Tag und Hausaufgaben auf die nächste Stunde der Klasse',
+  ] },
   { v: '2.0.0', items: [
     'Neu: Fest-Animationen – trägst du Ferien ein, begrüßt dich kurz eine Sonne (Sommer), Blumen und Schmetterlinge (Frühling), fallende Blätter (Herbst), Kürbisse und Fledermäuse (Halloween) oder ein Weihnachtsbaum mit Schnee',
     'Passt sich dem Titel an („Osterferien", „Halloween-Party") oder der Jahreszeit; antippen beendet die Animation',

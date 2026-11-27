@@ -375,6 +375,30 @@ const UI = {
 };
 
 // ------------------------------------------------------------------ Löschen mit Rückgängig
+// Abhaken mit Rückfrage (Aufgaben & Hausaufgaben): erst erscheint der Haken,
+// dann: Erledigt · Nicht geschafft (verschieben) · Bearbeiten · Löschen · Haken entfernen
+async function checkFlow(el, { title, later, laterSub, done, postpone, edit, remove }) {
+  const btn = el && el.closest ? el.closest('.check') || el : el;
+  if (btn && btn.classList) { btn.classList.add('on', 'popping'); }
+  Native.call('vibrate', 12);
+  await new Promise((r) => setTimeout(r, 260));
+  const v = await UI.menu(title, [
+    { v: 'done', l: 'Erledigt', s: 'Abhaken – verschwindet aus der Liste', i: 'circle-check', c: '#16a34a' },
+    { v: 'later', l: 'Nicht geschafft', s: laterSub, i: 'calendar-clock', c: '#f59e0b' },
+    { v: 'edit', l: 'Bearbeiten', i: 'pencil' },
+    { v: 'delete', l: 'Löschen', i: 'trash-2', danger: true },
+    { sep: true },
+    { v: 'undo', l: 'Haken wieder entfernen', i: 'rotate-ccw' },
+  ]);
+  if (btn && btn.classList) btn.classList.remove('popping');
+  if (v === 'done') return done();
+  if (v === 'later') return postpone();
+  if (v === 'edit') { if (btn && btn.classList) btn.classList.remove('on'); return edit(); }
+  if (v === 'delete') { if (btn && btn.classList) btn.classList.remove('on'); return remove(); }
+  // Haken entfernen oder Menü einfach geschlossen
+  if (btn && btn.classList) btn.classList.remove('on');
+}
+
 async function deleteWithUndo(coll, id, label, { confirm = true, after } = {}) {
   if (confirm && !(await UI.confirm(`„${esc(label)}" wirklich löschen?`, { ok: 'Löschen', danger: true }))) return false;
   const idx = S[coll].findIndex((x) => x.id === id);

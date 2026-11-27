@@ -61,6 +61,19 @@ A['task-add'] = () => editTask();
 A['task-edit'] = (el) => editTask(byId('tasks', el.dataset.id));
 A['task-toggle'] = (el) => {
   const t = byId('tasks', el.dataset.id);
+  if (!t) return;
+  if (t.done) { t.done = false; t.doneAt = null; save(); App.refresh(); return; }
+  const later = t.due && t.due > today() ? addDays(t.due, 1) : addDays(today(), 1);
+  checkFlow(el, {
+    title: t.title,
+    laterSub: `Auf ${relDay(later)} (${fmtDS(later)}) verschieben`,
+    done: () => taskDone(t),
+    postpone: () => { const old = t.due; t.due = later; save(); App.refresh(); UI.toast(`Verschoben auf ${relDay(later)}`, { undo: () => { t.due = old; save(); App.refresh(); } }); },
+    edit: () => editTask(t),
+    remove: () => deleteWithUndo('tasks', t.id, t.title, { confirm: false }),
+  });
+};
+function taskDone(t) {
   t.done = !t.done;
   t.doneAt = t.done ? new Date().toISOString() : null;
   // Wiederkehrende Aufgabe
@@ -71,7 +84,7 @@ A['task-toggle'] = (el) => {
   save(); App.refresh();
   Native.call('vibrate', 15);
   if (t.done) UI.toast('Erledigt ✓', { undo: () => { t.done = false; save(); App.refresh(); } });
-};
+}
 A['task-clear-done'] = async () => {
   if (!(await UI.confirm('Alle erledigten Aufgaben löschen?', { danger: true, ok: 'Löschen' }))) return;
   const old = S.tasks;
