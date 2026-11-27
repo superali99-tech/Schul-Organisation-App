@@ -8,35 +8,32 @@
     "Weiches Gleiten beim Wechseln, federndes Symbol, Glas-Look mit Lichtkante"
   ],
   "desktop": {
-    "version": "2.3.0",
+    "version": "2.4.0",
     "date": "2026-11-27",
     "url": "https://raw.githubusercontent.com/superali99-tech/Schul-Organisation-App/HEAD/release/Schulplan-Setup.exe",
     "notes": [
-      "Neu für die Schulleitung: Aufträge mit Frist an das Kollegium – mit Übersicht, wer erledigt hat, und Erinnern-Knopf",
-      "Wischen in Listen: rechts = erledigt, links = neuer Termin; Hausaufgaben als Text teilen",
-      "Am Computer: Schnellsuche mit Strg+K / Cmd+K"
+      "Neue Navigationsleiste: der aktive Bereich als farbige Kapsel mit Symbol und Namen",
+      "Weiches Gleiten beim Wechseln, federndes Symbol, Glas-Look mit Lichtkante"
     ]
   },
   "mac": {
-    "version": "2.3.0",
+    "version": "2.4.0",
     "date": "2026-11-27",
     "arm64": "https://raw.githubusercontent.com/superali99-tech/Schul-Organisation-App/HEAD/release/Schulplan-Mac-AppleSilicon.zip",
     "x64": "https://raw.githubusercontent.com/superali99-tech/Schul-Organisation-App/HEAD/release/Schulplan-Mac-Intel.zip",
     "notes": [
-      "Neu für die Schulleitung: Aufträge mit Frist an das Kollegium – mit Übersicht, wer erledigt hat, und Erinnern-Knopf",
-      "Wischen in Listen: rechts = erledigt, links = neuer Termin; Hausaufgaben als Text teilen",
-      "Am Computer: Schnellsuche mit Strg+K / Cmd+K"
+      "Neue Navigationsleiste: der aktive Bereich als farbige Kapsel mit Symbol und Namen",
+      "Weiches Gleiten beim Wechseln, federndes Symbol, Glas-Look mit Lichtkante"
     ]
   },
   "linux": {
-    "version": "2.3.0",
+    "version": "2.4.0",
     "date": "2026-11-27",
     "appimage": "https://raw.githubusercontent.com/superali99-tech/Schul-Organisation-App/HEAD/release/Schulplan-Linux.AppImage",
     "deb": "https://raw.githubusercontent.com/superali99-tech/Schul-Organisation-App/HEAD/release/Schulplan-Linux.deb",
     "notes": [
-      "Neu für die Schulleitung: Aufträge mit Frist an das Kollegium – mit Übersicht, wer erledigt hat, und Erinnern-Knopf",
-      "Wischen in Listen: rechts = erledigt, links = neuer Termin; Hausaufgaben als Text teilen",
-      "Am Computer: Schnellsuche mit Strg+K / Cmd+K"
+      "Neue Navigationsleiste: der aktive Bereich als farbige Kapsel mit Symbol und Namen",
+      "Weiches Gleiten beim Wechseln, federndes Symbol, Glas-Look mit Lichtkante"
     ]
   }
 }
