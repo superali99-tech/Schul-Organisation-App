@@ -1,12 +1,11 @@
 {
-  "versionCode": 20,
-  "versionName": "2.3.0",
+  "versionCode": 21,
+  "versionName": "2.4.0",
   "date": "2026-11-27",
   "apk": "https://raw.githubusercontent.com/superali99-tech/Schul-Organisation-App/HEAD/release/Schulplan.apk",
   "notes": [
-    "Neu für die Schulleitung: Aufträge mit Frist an das Kollegium – mit Übersicht, wer erledigt hat, und Erinnern-Knopf",
-    "Wischen in Listen: rechts = erledigt, links = neuer Termin; Hausaufgaben als Text teilen",
-    "Am Computer: Schnellsuche mit Strg+K / Cmd+K"
+    "Neue Navigationsleiste: der aktive Bereich als farbige Kapsel mit Symbol und Namen",
+    "Weiches Gleiten beim Wechseln, federndes Symbol, Glas-Look mit Lichtkante"
   ],
   "desktop": {
     "version": "2.3.0",

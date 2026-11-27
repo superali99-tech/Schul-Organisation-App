@@ -619,12 +619,22 @@ function navPill() {
   const on = nav.querySelector('button.on');
   if (!on || !nav.offsetWidth) { pill.style.opacity = '0'; return; }
   const first = pill.dataset.ready !== '1';
+  const place = () => {
+    const b = nav.querySelector('button.on');
+    if (!b) return;
+    pill.style.transform = `translate3d(${b.offsetLeft}px, ${b.offsetTop}px, 0)`;
+    pill.style.width = b.offsetWidth + 'px';
+    pill.style.height = b.offsetHeight + 'px';
+  };
   if (first) pill.style.transition = 'none';
-  pill.style.transform = `translate3d(${on.offsetLeft}px, ${on.offsetTop}px, 0)`;
-  pill.style.width = on.offsetWidth + 'px';
-  pill.style.height = on.offsetHeight + 'px';
+  place();
   pill.style.opacity = '1';
   if (first) { void pill.offsetWidth; pill.style.transition = ''; pill.dataset.ready = '1'; }
+  // Der aktive Reiter wächst (Symbol + Name) – die Markierung folgt ihm, bis er fertig ist
+  cancelAnimationFrame(navPill.raf);
+  const t0 = performance.now();
+  const follow = () => { place(); if (performance.now() - t0 < 560) navPill.raf = requestAnimationFrame(follow); };
+  navPill.raf = requestAnimationFrame(follow);
 }
 window.addEventListener('resize', () => { const p = $('#bottomnav .nav-pill'); if (p) p.dataset.ready = ''; navPill(); }, { passive: true });
 

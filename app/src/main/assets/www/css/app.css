@@ -1537,3 +1537,38 @@ body { background:
 .li.swiping.sw-r::before, .li.swiping.sw-l::after { filter: none; }
 .li.swiping .chev { opacity: 0; }
 @media (prefers-reduced-motion: reduce) { .li.swiping { transition: none !important; } }
+
+/* =====================================================================
+   Version 2.4: Navigationsleiste neu – aktive Kapsel mit Symbol + Name
+   ===================================================================== */
+.nav-l { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+#bottomnav .nav-pill::before { background: var(--grad); border: 0; box-shadow: inset 0 1px 0 rgba(255, 255, 255, .4), inset 0 -1px 0 rgba(0, 0, 0, .08), 0 10px 22px -8px var(--accent-line); }
+[data-theme="dark"] #bottomnav .nav-pill::before { background: var(--grad); border: 0; box-shadow: inset 0 1px 0 rgba(255, 255, 255, .25), 0 10px 24px -8px color-mix(in srgb, var(--accent) 70%, transparent); }
+#bottomnav button.on, [data-theme="dark"] #bottomnav button.on { color: #fff; }
+#bottomnav button.on .nav-ic { animation: navPop .5s var(--spring); }
+@keyframes navPop { 0% { transform: scale(.7) rotate(-12deg); } 60% { transform: scale(1.15) rotate(4deg); } 100% { transform: scale(1); } }
+#bottomnav .nav-pill { transition: transform .38s cubic-bezier(.2, .8, .2, 1), width .38s cubic-bezier(.2, .8, .2, 1), height .38s cubic-bezier(.2, .8, .2, 1), opacity .2s; }
+
+@media (max-width: 899px) {
+  #bottomnav { height: 64px; padding: 6px; gap: 2px; border-radius: 999px;
+    left: max(14px, env(safe-area-inset-left, 0px)); right: max(14px, env(safe-area-inset-right, 0px));
+    background: color-mix(in srgb, var(--card) 58%, transparent); border: 1px solid rgba(255, 255, 255, .6);
+    backdrop-filter: saturate(2) blur(28px); -webkit-backdrop-filter: saturate(2) blur(28px);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .85), inset 0 -1px 0 rgba(255, 255, 255, .2), 0 2px 6px rgba(15, 18, 34, .07), 0 26px 50px -18px rgba(15, 18, 34, .42); }
+  [data-theme="dark"] #bottomnav { background: color-mix(in srgb, var(--card) 55%, transparent); border-color: rgba(255, 255, 255, .09);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .08), 0 26px 50px -16px rgba(0, 0, 0, .8); }
+  #bottomnav button { flex: 1 1 0; min-width: 0; flex-direction: row; gap: 7px; padding: 0 6px; font-size: .8rem; font-weight: 720; letter-spacing: -.01em;
+    color: var(--text2); transition: color .25s; }
+  #bottomnav button.on { flex: 0 0 auto; padding: 0 16px 0 13px; }
+  #bottomnav button .nav-ic, #bottomnav button.on .nav-ic { width: 26px; height: 26px; flex: none; }
+  #bottomnav .nav-l { max-width: 0; opacity: 0; transition: max-width .45s var(--spring), opacity .2s; }
+  #bottomnav button.on .nav-l { max-width: 140px; opacity: 1; transition: max-width .5s cubic-bezier(.2, .8, .2, 1), opacity .3s .12s; }
+  #bottomnav button:active .nav-ic { transform: scale(.82); }
+  #bottomnav button.has-dot .nav-ic::after { top: -2px; right: -4px; }
+}
+@media (prefers-reduced-motion: reduce) { #bottomnav button, #bottomnav .nav-l, #bottomnav .nav-pill { transition: none !important; } #bottomnav button.on .nav-ic { animation: none; } }
+@media (min-width: 900px) {
+  #bottomnav button { padding: 0 2px; }
+  #bottomnav .nav-l { font-size: .6rem; letter-spacing: -.02em; overflow: visible; text-overflow: clip; }
+  #bottomnav button.on .nav-l { font-weight: 700; }
+}

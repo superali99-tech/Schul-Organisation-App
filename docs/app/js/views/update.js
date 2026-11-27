@@ -5,6 +5,11 @@ const UPDATE_URLS = ['https://raw.githubusercontent.com/superali99-tech/Schul-Or
 
 /** Neuerungen je Version (neueste zuerst) */
 const CHANGELOG = [
+  { v: '2.4.0', items: [
+    'Neue Navigationsleiste: Der aktive Bereich wird zur farbigen Kapsel mit Symbol und Namen, die anderen zeigen nur ihr Symbol – mehr Platz, klarer Überblick',
+    'Die Kapsel gleitet beim Wechseln weich mit, das Symbol federt kurz',
+    'Leiste im Glas-Look mit stärkerer Unschärfe und Lichtkante, im hellen und dunklen Design',
+  ] },
   { v: '2.3.0', items: [
     'Neu für die Schulleitung: Aufträge erteilen – mit Frist an das ganze Kollegium oder bestimmte Personen, mit Übersicht „3 von 12 erledigt“ und Erinnern-Knopf',
     'Lehrkräfte sehen Aufträge auf der Startseite, werden benachrichtigt und erinnert (Vortag und Frist) und melden mit einem Tipp „erledigt“ – auf Wunsch mit kurzer Rückmeldung',
