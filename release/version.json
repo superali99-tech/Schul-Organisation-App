@@ -1,11 +1,12 @@
 {
-  "versionCode": 21,
-  "versionName": "2.4.0",
-  "date": "2026-11-27",
+  "versionCode": 22,
+  "versionName": "2.5.0",
+  "date": "2026-11-28",
   "apk": "https://raw.githubusercontent.com/superali99-tech/Schul-Organisation-App/HEAD/release/Schulplan.apk",
   "notes": [
-    "Neue Navigationsleiste: der aktive Bereich als farbige Kapsel mit Symbol und Namen",
-    "Weiches Gleiten beim Wechseln, federndes Symbol, Glas-Look mit Lichtkante"
+    "Design 4.0: bewegter Polarlicht-Hintergrund und Begrüßung mit umlaufendem Lichtring",
+    "„Als Nächstes“ als dunkle Karte mit großem Countdown",
+    "Schnellaktionen als Raster, Karten mit Farbverlauf an der Kante"
   ],
   "desktop": {
     "version": "2.4.0",

@@ -175,7 +175,8 @@ App.def('/today', () => {
   const { cur, next, list } = nowNext();
   if (cur) {
     const p = (nowMin() - cur.s) / (cur.e - cur.s);
-    out.push(`<div class="now-card">
+    out.push(`<div class="now-card is-now">
+      <div class="nc-count"><b>${cur.e - nowMin()}</b><span>Min.<br>übrig</span></div>
       <div class="lbl">Jetzt · ${cur.l.period + 1}. Stunde</div>
       <div class="big">${esc(lessonLabel(cur.l))}</div>
       <div class="meta">${lessonRoom(cur.l) ? 'Raum ' + esc(lessonRoom(cur.l)) + ' · ' : ''}bis ${mint(cur.e)} (noch ${cur.e - nowMin()} Min.)</div>
@@ -186,7 +187,8 @@ App.def('/today', () => {
     </div>`);
   } else if (next) {
     const mins = next.s - nowMin();
-    out.push(`<div class="now-card">
+    out.push(`<div class="now-card is-next">
+      <div class="nc-count">${mins >= 60 ? `<b>${Math.floor(mins / 60)}:${String(mins % 60).padStart(2, '0')}</b><span>Std.<br>bis dahin</span>` : `<b>${mins}</b><span>Min.<br>bis dahin</span>`}</div>
       <div class="lbl">Als Nächstes · ${next.l.period + 1}. Stunde</div>
       <div class="big">${esc(lessonLabel(next.l))}</div>
       <div class="meta">${mint(next.s)} Uhr${lessonRoom(next.l) ? ' · Raum ' + esc(lessonRoom(next.l)) : ''} · in ${mins >= 60 ? Math.floor(mins / 60) + ' Std. ' + (mins % 60) + ' Min.' : mins + ' Min.'}</div>

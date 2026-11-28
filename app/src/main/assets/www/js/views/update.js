@@ -5,6 +5,13 @@ const UPDATE_URLS = ['https://raw.githubusercontent.com/superali99-tech/Schul-Or
 
 /** Neuerungen je Version (neueste zuerst) */
 const CHANGELOG = [
+  { v: '2.5.0', items: [
+    'Design 4.0: bewegter Polarlicht-Hintergrund in den Farben deines Themas',
+    'Begrüßung mit umlaufendem Lichtring',
+    '„Jetzt“ und „Als Nächstes“ als dunkle Karte mit großem Countdown (Minuten bis zur Stunde bzw. bis Stundenende)',
+    'Schnellaktionen als Raster – alle auf einen Blick, ohne Wischen',
+    'Karten mit feinem Farbverlauf an der Kante, Überschriften mit Farbakzent, schimmernde Knöpfe',
+  ] },
   { v: '2.4.0', items: [
     'Neue Navigationsleiste: Der aktive Bereich wird zur farbigen Kapsel mit Symbol und Namen, die anderen zeigen nur ihr Symbol – mehr Platz, klarer Überblick',
     'Die Kapsel gleitet beim Wechseln weich mit, das Symbol federt kurz',
