@@ -9,32 +9,35 @@
     "Schnellaktionen als Raster, Karten mit Farbverlauf an der Kante"
   ],
   "desktop": {
-    "version": "2.4.0",
-    "date": "2026-11-27",
+    "version": "2.6.0",
+    "date": "2026-11-28",
     "url": "https://raw.githubusercontent.com/superali99-tech/Schul-Organisation-App/HEAD/release/Schulplan-Setup.exe",
     "notes": [
-      "Neue Navigationsleiste: der aktive Bereich als farbige Kapsel mit Symbol und Namen",
-      "Weiches Gleiten beim Wechseln, federndes Symbol, Glas-Look mit Lichtkante"
+      "Design 4.0: bewegter Polarlicht-Hintergrund, Begrüßung mit Lichtring, „Als Nächstes“ mit großem Countdown",
+      "Kopfleiste als schwebende Glaskapsel beim Scrollen, Navigation mit Glanz",
+      "Schnellaktionen als Raster, Karten mit Farbverlauf an der Kante"
     ]
   },
   "mac": {
-    "version": "2.4.0",
-    "date": "2026-11-27",
+    "version": "2.6.0",
+    "date": "2026-11-28",
     "arm64": "https://raw.githubusercontent.com/superali99-tech/Schul-Organisation-App/HEAD/release/Schulplan-Mac-AppleSilicon.zip",
     "x64": "https://raw.githubusercontent.com/superali99-tech/Schul-Organisation-App/HEAD/release/Schulplan-Mac-Intel.zip",
     "notes": [
-      "Neue Navigationsleiste: der aktive Bereich als farbige Kapsel mit Symbol und Namen",
-      "Weiches Gleiten beim Wechseln, federndes Symbol, Glas-Look mit Lichtkante"
+      "Design 4.0: bewegter Polarlicht-Hintergrund, Begrüßung mit Lichtring, „Als Nächstes“ mit großem Countdown",
+      "Kopfleiste als schwebende Glaskapsel beim Scrollen, Navigation mit Glanz",
+      "Schnellaktionen als Raster, Karten mit Farbverlauf an der Kante"
     ]
   },
   "linux": {
-    "version": "2.4.0",
-    "date": "2026-11-27",
+    "version": "2.6.0",
+    "date": "2026-11-28",
     "appimage": "https://raw.githubusercontent.com/superali99-tech/Schul-Organisation-App/HEAD/release/Schulplan-Linux.AppImage",
     "deb": "https://raw.githubusercontent.com/superali99-tech/Schul-Organisation-App/HEAD/release/Schulplan-Linux.deb",
     "notes": [
-      "Neue Navigationsleiste: der aktive Bereich als farbige Kapsel mit Symbol und Namen",
-      "Weiches Gleiten beim Wechseln, federndes Symbol, Glas-Look mit Lichtkante"
+      "Design 4.0: bewegter Polarlicht-Hintergrund, Begrüßung mit Lichtring, „Als Nächstes“ mit großem Countdown",
+      "Kopfleiste als schwebende Glaskapsel beim Scrollen, Navigation mit Glanz",
+      "Schnellaktionen als Raster, Karten mit Farbverlauf an der Kante"
     ]
   }
 }
