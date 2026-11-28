@@ -5,6 +5,10 @@ const UPDATE_URLS = ['https://raw.githubusercontent.com/superali99-tech/Schul-Or
 
 /** Neuerungen je Version (neueste zuerst) */
 const CHANGELOG = [
+  { v: '2.6.0', items: [
+    'Kopfleiste oben: wird beim Scrollen zur schwebenden Glaskapsel – passend zur Leiste unten',
+    'Navigationsleiste unten: Glanz auf der aktiven Taste und sanfter Leuchtschein',
+  ] },
   { v: '2.5.0', items: [
     'Design 4.0: bewegter Polarlicht-Hintergrund in den Farben deines Themas',
     'Begrüßung mit umlaufendem Lichtring',

@@ -1658,3 +1658,30 @@ body.plain-bg::before { display: none; }
 .btn-primary:hover::after, .btn-primary:active::after { transform: translateX(120%); }
 
 @media (prefers-reduced-motion: reduce) { body::before, .today-hero::before { animation: none; } }
+
+/* =====================================================================
+   Version 2.6: Kopfleiste als schwebende Glaskapsel, Navigation mit Glanz
+   ===================================================================== */
+#topbar { isolation: isolate; }
+#topbar, #topbar.scrolled, [data-theme="dark"] #topbar { background: transparent; border-bottom-color: transparent; box-shadow: none; backdrop-filter: none; -webkit-backdrop-filter: none; }
+#topbar::before { content: ""; position: absolute; z-index: -1; left: 10px; right: 10px; top: calc(env(safe-area-inset-top, 0px) + 6px); bottom: 4px; border-radius: 24px; pointer-events: none;
+  background: color-mix(in srgb, var(--card) 62%, transparent); border: 1px solid rgba(255, 255, 255, .6);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .85), 0 14px 32px -18px rgba(15, 18, 34, .4);
+  backdrop-filter: saturate(1.9) blur(24px); -webkit-backdrop-filter: saturate(1.9) blur(24px);
+  opacity: 0; transform: translateY(-8px) scale(.97); transition: opacity .28s ease, transform .4s var(--spring); }
+[data-theme="dark"] #topbar::before { background: color-mix(in srgb, var(--card) 58%, transparent); border-color: rgba(255, 255, 255, .09); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .07), 0 14px 32px -16px rgba(0, 0, 0, .7); }
+#topbar.scrolled::before { opacity: 1; transform: none; }
+#topbar.scrolled .tb-btn { box-shadow: none; background: color-mix(in srgb, var(--text) 6%, transparent); border-color: transparent; }
+#topbar.scrolled .tb-logo { transform: scale(.88); }
+.tb-logo { transition: transform .35s var(--spring); }
+@media (min-width: 900px) { #topbar::before { left: calc(var(--gut) - 14px); right: calc(var(--gut) - 14px); } }
+
+/* Navigation: Glanz auf der aktiven Taste, Leuchtschein darunter */
+#bottomnav .nav-pill::after { content: ""; position: absolute; inset: 1px 1px 50% 1px; border-radius: 999px 999px 40% 40% / 999px 999px 18px 18px; pointer-events: none;
+  background: linear-gradient(180deg, rgba(255, 255, 255, .38), rgba(255, 255, 255, 0)); }
+@media (min-width: 900px) { #bottomnav .nav-pill::after { border-radius: 20px 20px 40% 40% / 20px 20px 14px 14px; } }
+#bottomnav::after { content: ""; position: absolute; left: 18%; right: 18%; bottom: -10px; height: 22px; z-index: -1; border-radius: 50%; pointer-events: none;
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--accent) 45%, transparent), transparent); filter: blur(6px); opacity: .7; }
+@media (min-width: 900px) { #bottomnav::after { display: none; } }
+#bottomnav { isolation: isolate; }
+#bottomnav button:not(.on) .nav-ic svg { stroke-width: 2.1; }

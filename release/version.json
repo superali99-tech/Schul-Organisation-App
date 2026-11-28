@@ -1,11 +1,11 @@
 {
-  "versionCode": 22,
-  "versionName": "2.5.0",
+  "versionCode": 23,
+  "versionName": "2.6.0",
   "date": "2026-11-28",
   "apk": "https://raw.githubusercontent.com/superali99-tech/Schul-Organisation-App/HEAD/release/Schulplan.apk",
   "notes": [
-    "Design 4.0: bewegter Polarlicht-Hintergrund und Begrüßung mit umlaufendem Lichtring",
-    "„Als Nächstes“ als dunkle Karte mit großem Countdown",
+    "Design 4.0: bewegter Polarlicht-Hintergrund, Begrüßung mit Lichtring, „Als Nächstes“ mit großem Countdown",
+    "Kopfleiste als schwebende Glaskapsel beim Scrollen, Navigation mit Glanz",
     "Schnellaktionen als Raster, Karten mit Farbverlauf an der Kante"
   ],
   "desktop": {
